@@ -13,7 +13,7 @@ i.parse_store("""hp
 ^#!+e cnte
 """)
 
-# SCRIPTS (because of the 's') expanded by ABBREVIATION (because of the 'a')
+i.set_trigger_immediately(True)
 i.parse_store("""as
 abr1
     keyboard.send_keys("cnt1")
@@ -21,11 +21,7 @@ return
 
 abr2
     keyboard.send_keys("cnt2")
-return
-
-abr3
-    keyboard.send_keys("cnt3")
-    keyboard.send_keys(" cnt3 continued")
+keyboard.send_keys(" cnt3 continued")
 return
 """)
 
