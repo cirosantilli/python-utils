@@ -1,0 +1,10 @@
+#!usr/bin/env bash
+
+cd /usr/share/pyshared
+sudo cp -r autokey autokey.backup
+sudo chown ciro autokey
+cd autokey
+find . -iname '*' -exec sudo chown ciro {} \;
+git init
+git add .
+git commit -m 'initial commit'

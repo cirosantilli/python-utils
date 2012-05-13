@@ -30,7 +30,7 @@ i.parse_store("""hp
 ## SCRIPTS (because of the 's') expanded by ABBREVIATION (because of the 'a')
 i.parse_store("""as
 abr1
-    # YOU MUST ALWAYS INDENT YOUR SCRIPTS WITH FOUR SPACES EXACTLY, OR YOU WILL GET AN ERROR!!!
+    # INDENT EACH LINE BY EXACTLY 4 SPACES!!
     keyboard.send_keys("cnt1")
 return
 

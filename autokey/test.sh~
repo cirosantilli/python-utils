@@ -1,0 +1,6 @@
+cd /usr/share/pyshared
+sudo cp -r autokey autokey.backup
+sudo chown ciro autokey
+cd autokey
+find . -iname '*' * -exec sudo chown ciro {} \; 
+
