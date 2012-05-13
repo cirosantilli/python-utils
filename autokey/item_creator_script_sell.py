@@ -9,10 +9,8 @@ i.parse_store("""hp
 ^+a cnta
 ^+b cntb
 ^+c cntc
-^!#+d cntd
-; this is a comment line. whitespace only lines are also ignored
-
-^e cnte
+^+d cntd
+^#!+e cnte
 """)
 
 # SCRIPTS (because of the 's') expanded by ABBREVIATION (because of the 'a')
@@ -27,19 +25,11 @@ return
 
 abr3
     keyboard.send_keys("cnt3")
-    keyboard.send_keys("\ncnt3 continued")
-return
-
-; this is a comment line. whitespace only lines are also ignored
-
-abr4
-    # this is a regular Python comment
-    keyboard.send_keys("cnt4")
+    keyboard.send_keys(" cnt3 continued")
 return
 """)
 
 # FACTORING OUT
-
 i.set_hotkey_modifiers('!+^#') # make hotkeys with alt shift  control super modifiers
 
 i.parse_store("""hp
@@ -48,15 +38,23 @@ g cntg
 h cnth
 """)
 
-# from now on, '/' will be put before abbreviation trigger sequences, and ';' after them
+i.set_hotkey_modifiers('') # reset default hotkey modifiers
+
+i.set_trigger_immediately(True)
+#i.set_ommit_trigger_char(True) # could also be used
 i.set_abbreviation_prefix('/')
-i.set_abbreviation_prefix(self, ';')
+i.set_abbreviation_sufix(';')
+# from now on, '/' will be put before abbreviation trigger sequences, and ';' after them
 
 i.parse_store("""ap
 abr5 cnt5
 abr6 cnt6
 abr7 cnt7
 """)
+
+i.set_trigger_immediately(False)
+i.set_abbreviation_prefix('')   # remove the prefix
+i.set_abbreviation_sufix('')    # remove the suffix
 
 # create all the items that were previously stored.
 i.create_stored_items()

@@ -1,3 +1,13 @@
+"""
+TODO:
+        
+    - cannot parse a script a "\n", even if it is inside quotes (this sees it as a line break)
+    
+    - understand better the Abstract Abbreviation model and allow to manipulate its properties (only some of them are not yet implemented )
+
+    - implement special chars <f1>, <space>, etc.
+"""
+
 PATH_TO_YOUR_AUTOKEY_LIB = "/usr/share/pyshared/autokey"
 
 import sys
@@ -20,7 +30,7 @@ def is_all_whitespace_or_empty(s):
         return False
 
 class ItemCreator:
-    '''
+    """
     
     *** Multiple Phrase/Script creation script ***
     
@@ -41,213 +51,21 @@ class ItemCreator:
     #--------------------------------------------------------------------------#
     USAGE
     
-        1) Create a new script called "item_creator_script" anywhere using the GUI.
+        1) Create a new script called "generate abbreviations" anywhere using the GUI.
         
-        2) copy/paste the content of TEST SCRIPT further down which contains many use examples.
+        2) copy/paste the contents of the accompagning file item_creator_tutorial.py there 
         
         3) Give "generate abbreviation" a hotkey/abbreviation.
         
-        4) Create a folder named "gen_itm" using the GUI at top level.
+        4) Create a folder named "gen" using the GUI at top level.
         
-        5) Run the "generate abbreviation" using the hotkey.
+        5) Run the "generate abbreviation" using the hotkey you assigned it.
         
-        6) Completely shut down Autokeys and reestart it (right click on taskbar icon > quit, not just closing the window).
+        6) Completely shut down Autokeys (Control Q) and reestart it (right click on taskbar icon > quit, not just closing the window).
         
-        7) Your generated scripts should all be in the "generated abreviations" folder and working.
+        7) Your generated scripts should all be in the "generated abbreviations" folder and working.
     
-    #--------------------------------------------------------------------------#
-    BASICS (Examples 1-4)
-    
-        - An Item is either a Phrase of a Script.
-        
-        - First you store, then you create
-        
-        - Item adder is a STATE MACHINE
-    
-    #--------------------------------------------------------------------------#
-    HOTKEY MODIFIERS (Examples 1-4)
-    
-        Hotkey modifiers are the same as those used by Autohotkeys:
-        
-        ^   Control
-        +   Shift
-        !   Alt
-        #   Super
-    
-    #--------------------------------------------------------------------------#
-    PARAMETER ORDER
-    
-        You decide which parameters you are giving "store", and in what order with a letter. 
-    
-        The letters are:
-    
-        Letter       meaning        default behaviour if not specified
-              
-        h            Hotkey
-        a            Abbreviation
-        p            Is Phrase           
-        c            Contents            
-        f            Folder (from engine.get_folder())
-        d            Description (will be used to create the title of the hotkey)
-    
-    The following parameter order is recommended:
-        
-            h a p c f d
-    
-    #--------------------------------------------------------------------------#
-    INNER STATE (Examples 5-...)
-    
-    An ItemCreator is a state machine. Currently, the following functions set used to set states:
-    
-    i.set_hotkey_modifiers('!+') # from now on, if no hotkey modifier char is specified for a hotkey, use Shift + Alt
-    i.set_is_phrase(1)           # from now on make phrases, not scripts, by default
-    i.set_folder(f)              # from now on save to the given folder by default        
-    
-    Those will be used on subsequent calls to store(), unless parameters given in the store method are override them.
-    
-    #--------------------------------------------------------------------------#
-    EXAMPLES
-    
-        All examples are created in the folder genabr.
-        
-        1) a phrase (and not a script, because of the 1)
-        hotkey: Alt + Shift + a
-        abbreviation:   "abr1" (explained in HOTKEY MODIFIERS)
-        expands to: "cnt1"
-        title:  "tit1"
-        folder: "genabr"
-        
-        2)  a phrase
-        hotkey Alt + Shift + b
-        abbreviation: "abr2.1" and "abr2.2"
-        expands to: "cnt2"
-        title:    "tit2"
-        folder: "genabr"
-        
-        3) a script (because of the 0)
-        hotkey: Alt + Shift + c
-        abbreviation: "abr3"
-        executes:   "keyboard.send_keys("cnt3")" (which happens to sent "cnt3" to the keyboard)
-        title:  "tit3"
-        folder: "genabr"
-        
-        4) a phrase (and not a script, because of the 1)
-        hotkey: Alt + Shift + d
-        abbreviation:   "abr4.1" and  "abr4.2" (explained in HOTKEY MODIFIERS)
-        executes:   "keyboard.send_keys("cnt4")" (which happens to sent "cnt4" to the keyboard)
-        title:  "tit4"
-        folder: "genabr"
-        
-        5) phrase ( because of the earlier call to set_is_phrase(1) )
-        hotkey: NONE (default when not specified)
-        abbreviation:   'abr5'
-        expands to:   "cnt5"
-        title:  ""  (default when not specified)
-        folder: "genabr"    ( because of the earlier call to set_folder(f) )
-    
-        6) phrase ( because of the earlier call to set_is_phrase(1) )
-        hotkey: NONE
-        abbreviation:   'abr6'
-        expands to:   "cnt6"
-        title:  ""
-        folder: "genabr"    ( because of the earlier call to set_folder(f) )
-        
-        7) script
-        hotkey: Alt + Shift + e    ( Alt and Shift because of the earlier call to set_hotkey_modifiers('!+') )
-        abbreviation:   NONE
-        executes:   "keyboard.send_keys("cnt7")"
-        title:  "tit7"
-        folder: "genabr"
-        
-        8) script
-        hotkey: Alt + Shift + f    ( Alt and Shift because of the earlier call to set_hotkey_modifiers('!+') )
-        abbreviation:   NONE
-        executes:   "keyboard.send_keys("cnt7")"
-        title:  "tit7"
-        folder: "genabr"
     """
-    
-    #=======================================================================================================================
-    # TEST SCRIPT
-    # Use this user script to test the class.
-    #=======================================================================================================================
-    
-# CREATE THE FOLDER gen_itm with the GUI!!! Script Cannot do that yet!!! TODO
-folder_title = 'gen_itm'
-f = engine.get_folder(folder_title)
-
-from item_creator import ItemCreator
-i = ItemCreator(engine)
-
-#EXAMPLES 1-4
-i.store('hapcfd',[
-    ['!+a','abr1',1,'cnt1',f,'tit1'],
-    ['!+b','abr2',1,'cnt2',f,'tit2'],
-    ['^#c', 'abr3',0,"""keyboard.send_keys('cnt3')""",f,'tit3'],
-    ['^#d','abr4',0,"""keyboard.send_keys('cnt4')""",f,'tit4'],
-])
-
-# set cur_default for next 
-
-i.set_folder(f) # from now on save to the given folder by default
-
-#EXAMPLES 5-6
-
-i.set_is_phrase(1) # from now on make phrases, not scripts, by default
-
-i.store('ac',[
-    ['abr5','cnt5'],
-    ['abr6','cnt6'],
-])
-
-#EXAMPLES 7-8
-
-i.set_is_phrase(0)
-i.set_hotkey_modifiers('!+') # from now on, if no hotkey modifier char is specified for a hotkey, use Shift + Alt (!+)
-
-i.store('hc',[
-    ['e',"""keyboard.send_keys('cnt7')"""],
-    ['f',"""keyboard.send_keys('cnt8')"""],
-])
-
-#EXAMPLES 7-8
-
-i.set_is_phrase(0)
-i.set_hotkey_modifiers('!+') # from now on, if no hotkey modifier char is specified for a hotkey, use Shift + Alt (!+)
-
-#EXAMPLES parse_store
-
-# this makes phrases (because of the 'p') which are expanded by hotkeys (because of the 'h')
-parse_store("""hp
-!a cnt1
-^b cnt2
-
-# this is a comment line, and the above line is blank and thus ignored.
-    # and this is another comment line, even if it starts with whitespaces!
-#c cnt3
-""")
-
-# this makes scripts (because of the 's') which are expanded by abbreviation (because of the 'a')
-parse_store("""as
-abr1
-    keyboard.send_keys("cnt1")
-return
-abr2
-    keyboard.send_keys("cnt2")
-return
-
-# this is a comment line, and the above line is blank and thus igonred.
-    # and this is another comment line, even if it starts with whitespaces!
-abr3
-    keyboard.send_keys("cnt3")
-return
-""")
-
-# create all the items that were previously stored.
-i.create_stored_items()
-
-# RESTART AUTOKEYS COMPLETELY! Just closing the window will not work. You need to to right click, quit. TODO avoid this.
-    '''
 
     # userland hotkey modifier chars to inner representation keys.
     HOTKEY_MODIFIER_CHAR_TO_KEY = {'^':iomediator.Key.CONTROL,
@@ -353,8 +171,25 @@ i.create_stored_items()
     def store(self, field_chars, items_fields):
         """
         Stores all the items (scripts or phrases), given in terms of the non default fields present, 
-        and a list of field values (see C{ItemCreator} for an an explanation of those terms) in order to create 
+        and a list of field values (see below) in order to create 
         them all at once with create_stored_and_clear.
+    
+        You decide which parameters you are giving "store", and in what order with a letter. 
+    
+        The letters are:
+    
+        Letter       meaning        default behaviour if not specified
+              
+        h            Hotkey
+        a            Abbreviation
+        p            Is Phrase           
+        c            Contents            
+        f            Folder (from engine.get_folder())
+        d            Description (will be used to create the title of the hotkey which you see on the GUI)
+    
+    The following parameter order is recommended:
+        
+            h a p c f d
         """
         
         self._check_field_chars(field_chars)      
@@ -658,7 +493,7 @@ i.create_stored_items()
         else:
             folder = self.cur_default['FOLDER']
         
-        # fields that can only be set by playing with the defaults TODO: understand better the model
+        # fields that can only be set by playing with the defaults
         remove_typed_abbreviation = self.cur_default['REMOVE_TYPED_ABBREVIATION']
         ommit_trigger_char = self.cur_default['OMMIT_TRIGGER_CHAR']
         match_case = self.cur_default['MATCH_CASE']
@@ -705,7 +540,7 @@ i.create_stored_items()
         """
         
         if modifiers_key_string[-1] == '>':
-            raise Exception('Special characters such as <f1> or <enter> are not yet implemented.') #TODO: implement
+            raise Exception('Special characters such as <f1> or <enter> are not yet implemented.')
         else:
             key = modifiers_key_string[-1]
         modifier_chars = modifiers_key_string[0:-1]

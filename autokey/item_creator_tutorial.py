@@ -1,4 +1,4 @@
-# CREATE THE FOLDER gen_itm with the GUI!!! Script Cannot do that yet!!! TODO
+# CREATE THE FOLDER gen_itm with the GUI!!! Script Cannot do that yet!!! TODO    
 
 #TEST
 import sys
@@ -9,7 +9,8 @@ import item_creator
 
 from item_creator import ItemCreator
 i = ItemCreator(engine)
-i.set_folder(engine.get_folder('gen')) # from now on save to the given folder by default
+f = engine.get_folder('gen')
+i.set_folder(f) # from now on save to the given folder by default
 
 #-----------------------------------------------------------
 # PARSE STORE
@@ -38,7 +39,7 @@ return
 
 abr3
     keyboard.send_keys("cnt3")
-    keyboard.send_keys("\ncnt3 continued")
+    keyboard.send_keys(" cnt3 continued")
 return
 
 ; this is a comment line. whitespace only lines are also ignored
@@ -53,7 +54,6 @@ return
 # FACTORING OUT
 #-----------------------------------------------------------
 
-
 i.set_hotkey_modifiers('!+^#') # make hotkeys with alt shift  control super modifiers
 
 i.parse_store("""hp
@@ -62,9 +62,13 @@ g cntg
 h cnth
 """)
 
-# from now on, '/' will be put before abbreviation trigger sequences, and ';' after them
+i.set_hotkey_modifiers('') # reset default hotkey modifiers
+
+i.set_trigger_immediately(True)
+#i.set_ommit_trigger_char(True) # could also be used
 i.set_abbreviation_prefix('/')
-i.set_abbreviation_prefix(self, ';')
+i.set_abbreviation_sufix(';')
+# from now on, '/' will be put before abbreviation trigger sequences, and ';' after them
 
 i.parse_store("""ap
 abr5 cnt5
@@ -72,22 +76,30 @@ abr6 cnt6
 abr7 cnt7
 """)
 
+i.set_trigger_immediately(False)
+i.set_abbreviation_prefix('')   # remove the prefix
+i.set_abbreviation_sufix('')    # remove the suffix
+
 #-----------------------------------------------------------
 # PUNCTUAL STUFF
+# 
+# You can also create more customized hotkeys using more internal
+# functions. This is more verbose, but also more precise.
 #-----------------------------------------------------------
 
 i.store('hapcfd',[
-    ['!+a','abr1',1,'cnt1',f,'tit1'],
-    ['!+b','abr2',1,'cnt2',f,'tit2'],
-    ['^#c', 'abr3',0,"""keyboard.send_keys('cnt3')""",f,'tit3'],
-    ['^#d','abr4',0,"""keyboard.send_keys('cnt4')""",f,'tit4'],
+    ['!+a','Abr5',1,'Cnt5',f,'tit5'],
+    ['!+b','Abr6',1,'Cnt6',f,'tit6'],
+    ['!+c', 'Abr7',0,"""keyboard.send_keys('Cnt7')""",f,'tit7'],
+    ['!+d','Abr8',0,"""keyboard.send_keys('Cnt8')""",f,'tit8'],
 ])
 
-i.set_is_phrase(1) # from now on make phrases, not scripts, by default
+i.set_is_phrase(1) # from now on make phrases, not scripts, by default.
+# this does does not affect parse_store 
 
 i.store('ac',[
-    ['abr5','cnt5'],
-    ['abr6','cnt6'],
+    ['Abr9','Cnt9'],
+    ['Abr10','Cnt10'],
 ])
 
 #EXAMPLES set_hotkey_modifiers
