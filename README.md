@@ -1,2 +1,2 @@
-autokey-scripts
+my simple Python scripts
 ===============
