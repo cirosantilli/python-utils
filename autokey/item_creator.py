@@ -10,8 +10,6 @@ TODO:
     - repeated trigger checking
     
     - factor out variable sensitive keys
-    
-    - 
 """
 
 PATH_TO_YOUR_AUTOKEY_LIB = "/usr/share/pyshared/autokey"
@@ -318,31 +316,33 @@ class ItemCreator:
         all of its contents. Endif. Create folder with relative path title.
         """
         
-        self.engine.monitor.suspend()
-        
-        folder = self.engine.get_folder(title)
+        new_folderfolder = self.engine.get_folder(title)
+        parent = folder.parent
         if folder:
-            folder.remove_folder()
-        
-        folder = model.Folder(title)
-        folder.persist()
-
-        self.engine.monitor.unsuspend()
-        
+            parent.remove_folder(folder)
+        new_folder = model.Folder(title)
+        parent.add_folder(new_folder)
         return folder
 
-    def create_stored_items(self):
+    def create_stored(self):
         """
         Creates all the shortcuts that have been previously stored with 
         HotkeysManager.store() in the model.Folder folder, and clears the items to 
         prepare for another call with a different folder.
         """
         
-        for item in self.items:
-            if not self.engine.configManager.check_abbreviation_unique(item.abbreviation, None):
-                raise Exception("The specified abbreviation \'"+item.abbreviation+"\' is already in use")
-            self.engine.add_item(item)
+        self.check_unique()
+        
+        for item in self.items:    
+            #self.engine.create_item(item.parent,item)
+            item.parent.add_item(item)
         self.engine.configManager.config_altered()
+
+    def _check_unique(self):
+        
+        for item in self.items:
+        if not self.engine.configManager.check_abbreviation_unique(item.abbreviation, None):
+                raise Exception("The specified abbreviation \'"+item.abbreviation+"\' is already in use")
 
     def _check_phrase_line_indent(self,line):
         """

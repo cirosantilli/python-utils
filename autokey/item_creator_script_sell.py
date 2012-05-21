@@ -53,6 +53,6 @@ i.set_abbreviation_prefix('')   # remove the prefix
 i.set_abbreviation_sufix('')    # remove the suffix
 
 # create all the items that were previously stored.
-i.create_stored_items()
+i.create_stored()
 
 # RESTART AUTOKEYS COMPLETELY IMMEDIATELY with CONTROL + Q!!!

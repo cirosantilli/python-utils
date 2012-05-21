@@ -9,7 +9,7 @@ import item_creator
 
 from item_creator import ItemCreator
 i = ItemCreator(engine)
-f = engine.get_folder('gen')
+f = engine.remake_folder('gen')
 i.set_folder(f) # from now on save to the given folder by default
 
 #-----------------------------------------------------------
@@ -114,5 +114,5 @@ i.store('hc',[
 ])
 
 # create all the items that were previously stored.
-i.create_stored_items()
+i.create_stored()
 # RESTART AUTOKEYS COMPLETELY IMMEDIATELY with CONTROL + Q!!!
