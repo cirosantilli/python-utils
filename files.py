@@ -1,5 +1,6 @@
 import os.path
 import stat
+import shutil
 
 """ join_paths
 given a parent_path and children_paths returns 
@@ -81,7 +82,7 @@ Example call:
 def rename(ext):
     return 'xml'
 
-exists, the_files = files.find(r'C: ampp\htdocs\elearning\articles',exts=['html'],files=1,dirs=0,fulltree=0) DO NOT PUT A slash XXXXXX or it does not work the import!!!
+exists, the_files = files.find(r'C: ampp\htdocs\elearning\articles',exts=['html'],files=1,dirs=0,recurse=0) DO NOT PUT A slash XXXXXX or it does not work the import!!!
 files.change_ext(the_files,rename)
 
 """
@@ -102,9 +103,10 @@ def change_ext(paths, rename_func):
                 print 'Not a file'
 
 def find(root,**kwargs):
-    """ Similar functionality to Linux bash find.
+    """
+    Implements similar functionality to Linux bash find.
     
-    Finds pahts under given directory that satisfy certain criteria.
+    Finds paths under given directory that satisfy certain criteria.
 
     @root a string representing the root of the search.
     
@@ -124,15 +126,24 @@ def find(root,**kwargs):
     @return: pair (boolean b,string list l). b is true iff the root path exists
     and is a directory.
     
+    @dirs: boolean. Selects directories iff True.
+    
+    @files: boolean. Selects files iff True.
+    
+    @recurse: boolean. If true, descends tree.
+    
     l contains the a list of selected paths if any.
 
     Sample call:
+    
     exists, file_paths = files.find(r'./',
-        type='fd',
+        dirs=True,
+        files=True,
         exts=['mp3','ogg'],
-        fulltree=False,
+        recurse=False,
         inodes=[411580,411581])
-"""
+    
+    """
     
     # decide weather to take or not files and dirs.
     type =  kwargs.get('type','df')
@@ -146,7 +157,9 @@ def find(root,**kwargs):
         else:
             raise Exception('The character \''+ c +'\' is not a valid type. Only \'d\' (directory) and \'f\' (file) are accepted')
 
-    fulltree = kwargs.get('fulltree',False)
+    select_dirs = kwargs.get('dirs',select_dirs)
+    select_files = kwargs.get('files',select_files)
+    recurse = kwargs.get('recurse',False)
     exts = kwargs.get('exts',[])
     inodes = kwargs.get('inodes',[])
     
@@ -163,7 +176,7 @@ def find(root,**kwargs):
         
         else: #a directory
             result = []
-            if(fulltree): #full tree
+            if(recurse): #full tree
                 for walkroot, dirs, files in os.walk(root):
                     if(select_dirs):
                         result.extend([os.path.join(walkroot,dir) for dir in dirs])
@@ -190,18 +203,18 @@ def parent_dir(path):
     """ Returns full path of parent directory. """
     return os.path.dirname(path)
     
-def name_ext(path):
+def basename(path):
     """ Returns basename. """
     return os.path.splitext(path)[1]
     
-def name_noext(path):
+def basename_no_ext(path):
     """ Returns basename wihout extension (no dot '.' either) """
     (shortname, ext) = os.path.splitext(os.path.basename(path))
     return shortname;
     
-def path_noext(path):
+def path_no_ext(path):
     """ Returns path without file extension (no dot '.' either) """
-    return os.path.join(parent_dir(path), name_noext(path))
+    return os.path.join(parent_dir(path), basename_no_ext(path))
     
 def extension(path):
     """ Returns file extension of a given path. """
@@ -212,37 +225,154 @@ def inode(path):
     """ Returns inode of a given path. """
     return os.stat(path)[stat.ST_INO]
     
-def write(path,input):
-    """ Saves input string to a given path. If the path already exists, it is rewritten. """
-    f = open(path,'w')
-    f.write(input)
-    f.close()
+def write(path,input,**kwargs):
+    """
+    Saves input string to a given path.
+    If the path already exists, it is overwritten.
+
+	@print_error: boolean. If True, prints errors to stderr in case of exception. Exception itself is only printed if raise_exception is False. If it is True, it is left to the caller to print it if the wants.
+
+	@raise_exception: boolean. If True, this function may raise an 
+    """
     
-def read(path):
+    print_error = kwargs.get('print_error', False)
+    raise_exception = kwargs.get('raise_exception', True)
+    
+    had_exception = False
+    try:
+        f = open(path,'w')
+        f.write(input)
+        f.close()
+    except Exception, exc:
+        had_exception = True
+        if print_error:
+            sys.stderr.write( "Could not write the output to path \n%s" % (output_path) )
+            if not raise_exception:
+                sys.stderr.write(str(err))
+        if raise_exception:
+            raise exc
+    
+    if had_exception:
+        return False
+    else:
+        return True
+
+def read(path,**kwargs):
     """
     Reads path and returns content of file.
     
     Useful for one hit read of files that wont clutter the RAM memory.
-    If its too big use a buffer instead.
-    """
-    f = open(path,'r')
-    output = f.read()
-    f.close()
-    return output
+    If its too big use a buffered reader instead.
     
-#- quick write a find of basenames to a file. default separator: \n. -#
-def write_basenames(paths,output_dir,**kwargs):
+    **kwargs:
+    
+    @print_error: boolean. If true, will print de
+    
+    """
+    
+    print_error = kwargs.get('print_error', False)
+    raise_exception = kwargs.get('raise_exception', True)
+    
+    had_exception = False
+    try:
+        f = open(path,'r')
+        output = f.read()
+        f.close()
+    except Exception, exc:
+        had_exception = True
+        if print_error:
+            sys.stderr.write("Could not write the output to path \n%s" % (output_path) )
+            if not raise_exception:
+                sys.stderr.write(str(err))
+        if raise_exception:
+            raise exc 
 
-    if('separator' in kwargs):
-        sep = kwargs['separator'];
+    if had_exception:
+        return None
     else:
-        sep = "\n";
+        return output
+    
+def remove(path):
+    """
+    If the path is a file, removes it
+    If it is a directory, removes it recursivelly
+    """
+    if os.path.isfile(path):
+        os.remove(path)
+    else:
+        shutil.rmtree(path)
+        
+    
+def assert_file_exists_report(path):
+    """
+    Returns true iff path exists and is a file.
+    
+    If not, prints the appropriate error message to stderr (thus the report).
+    """
+    
+    if not os.path.exists(path):
+        sys.stderr.write("The path '" + input_path + "' does not exist.")
+        return False
+    if not os.path.isfile(path):
+        sys.stderr.write("The path '" + input_path + "' is not a file.")
+        return False
+    return True
+
+def write_basenames(paths,output_dir,**kwargs):
+    """
+    Quick write a find of basenames to a file. default separator: \n.
+    """
+    
+    sep = kwargs.get('separator','\n')
     
     result = ""
     for path in paths:
         result += paths + sep
     write(output_dir,result)
     
+def opt_ext(path_no_ext, ext, **kwargs):
+    """
+    If the path exists, returns it.
+    If not, and if path + dotext exists, returns it.
+    Else, returns None.
+    
+    kwargs:
+    
+    @print_error: boolean.
+    If True, prints not found message to stderr in none is found.
+    Default: False
+    
+    @opt_ext_on: boolean.
+    If False, skips check .
+    Default: False
+    
+    Sample call:
+        
+        prompt_user: opt_ext_on?
+        input_path = files.opt_ext(input_path_opt_ext,'md', opt_ext_on=opt_ext_on, stderr=True)
+        if not input_path:
+            sys.stderr.write(input_path+"\nwas not converted.")
+            has_error = True
+            
+    """
+    
+    print_error = kwargs.get('print_error',False)
+    opt_ext_on = kwargs.get('opt_ext_on',True)
+    
+    # no extension
+    if os.path.exists(path_no_ext):
+        return path_no_ext
+    
+    # with extension
+    path_ext = path_no_ext + '.' + ext
+    if opt_ext_on and os.path.exists(path_ext):
+        return path_ext
+    
+    # none found
+    if print_error:
+        sys.stderr.write("Neither path was found:\n"+path_no_ext+"\n"+path_ext)
+    return None
+
 def make_hardlinks(source_paths, destination_dir ):
     """ Makes hardlinks of all the source_paths in destination_dir with same name as the original source_path."""
     for source_path in source_paths:
