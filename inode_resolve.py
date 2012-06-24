@@ -66,7 +66,6 @@ class DB:
         files.write(dbpath,db.serialize())
     
     def update_inode_path(self,inode,path):
-        
     
     def clear(self):
         self.items = []

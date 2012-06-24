@@ -168,19 +168,19 @@ class Parser:
 	if(tag=='div' and 'class' in attrs):
 	    clas = attrs['class']	#- cannot name a variable class! restricted in python of cours... -#
 	    if(clas == 'theorem'):
-		self._result += '\n\n\'\'\'Theorem\'\'\' '    
+            self._result += '\n\n\'\'\'Theorem\'\'\' '    
 	    elif(clas == 'theo-hypothesis'):
-		self._result += '\n\n\'\'\'Hypothesis\'\'\' '
+            self._result += '\n\n\'\'\'Hypothesis\'\'\' '
 	    elif(clas == 'theo-conclusions'):
-		self._result += '\n\n\'\'\'Conclusion\'\'\' '
+            self._result += '\n\n\'\'\'Conclusion\'\'\' '
 	    elif(clas == 'definition'):
-		self._result += '\n\n\'\'\'Definition\'\'\' '
+            self._result += '\n\n\'\'\'Definition\'\'\' '
 	    elif(clas == 'example'):
-		self._result += '\n\n\'\'\'Example\'\'\' '
+            self._result += '\n\n\'\'\'Example\'\'\' '
 	    elif(clas == 'counter-example'):
-		self._result += '\n\n\'\'\'Counter example\'\'\' '
+            self._result += '\n\n\'\'\'Counter example\'\'\' '
 	    elif(clas == 'remark'):
-		self._result += '\n\n\'\'\'Remark\'\'\' '	
+            self._result += '\n\n\'\'\'Remark\'\'\' '	
 	    elif(clas == 'image-gallery'):
 		self._result += '{|\n'
 	if(tag=='h2' ):
@@ -195,20 +195,20 @@ class Parser:
 	    self._result += '\n\n'
 	elif(tag == 'li'):
 	    if(self._openelems[-2][0]=='ul'):	#- suppose that li is always directly inside either ul or ol -#
-		self._result += '* '
+            self._result += '* '
 	    else:
-		self._result += '# '
+            self._result += '# '
 	elif(tag == 'img'):
 	    if('height' in attrs):
-		height=attrs['height']
+            height=attrs['height']
 	    else:
-		height='150'  #- default height value -#
+            height='150'  #- default height value -#
 	    inside_gallery = self.open_tag_with_atr('div','class','image-gallery')
 	    if( inside_gallery ):
-		self._result += '| '
-	    self._result += '[[File:' + first_letter_upper_case(attrs['src']) + '|thumb|x' + height + 'px'    #- wiki forces my first letter to be upper case... -#
+            self._result += '| '
+            self._result += '[[File:' + first_letter_upper_case(attrs['src']) + '|thumb|x' + height + 'px'    #- wiki forces my first letter to be upper case... -#
 	    if( not inside_gallery):
-		self._result += '|none'
+            self._result += '|none'
     
     def data(self, data):
 	if(not whitespace_re.match(data)):
