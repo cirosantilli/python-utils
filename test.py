@@ -1,9 +1,13 @@
 #!/usr/bin/env python
 
-def func():
-    print a
+import sys
+
+import files
 
 if __name__ == '__main__':
-    print 'TEST'
-    
-    asdf=1
+
+    for a,b,c in os.walk('.'):
+        print a
+        print b
+        print c
+        print
