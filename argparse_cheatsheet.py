@@ -10,38 +10,69 @@ if __name__ == '__main__':
     
     import argparse
     
-    parser = argparse.ArgumentParser(description='Wrapper for markdown',
+    parser = argparse.ArgumentParser(description="""Wrapper for markdown""",
         epilog="Report any bugs to ciro.santilli@gmail.com", 
-        prog='Program')
+        prog="Program")
 
     parser.add_argument('a',
-        help='positional (obligatory) argument')
-    args = parser.parse_args('va')
-    a = args.a
+        help="positional (obligatory) argument because no hyphen before a.",
+        default="")
 
-    parser.add_argument('a',
-            nargs='*',
-            help='n or zero positional args')
+    parser.add_argument('-a',
+        help="optional argument because there is hyphen before a. Takes a single value.",
+        default="")
 
-    parser.add_argument('-a', '--along', 
-        dest='da', 
+    parser.add_argument('-a', '--along'
+        dest='a'
+        help="provides long name. Must destination is 'along', not 'a'.",
+        default="")
+
+    parser.add_argument('-a', 
         action="store_true", 
         default=False, 
         help='a is False if not present')
-    
+
+    parser.add_argument('-a', 
+        action="store_false", 
+        default=True, 
+        help="a is True if not present")
+
+
+
+
+    parser.add_argument('-a',
+        type=int,
+        default=1
+        help="stores an integer value")
+
+
+
+    parser.add_argument('-a'
+        nargs='*',
+        help="optional. takes 0 or more args. stores a list.",
+        default=[])
+
+    parser.add_argument('-a'
+        nargs=3,
+        help="optional. takes 3 args exatcly. stores a list, even if nargs=1!",
+        default=[])
+
+    args = parser.parse_args(sys.argv[1:])
+    a = args.a
+
+
+
+
+
+
+
+
     parser.add_argument('-b', '--blong', 
         action="store", 
         dest="b", 
         help='put string value given into b')
     
-    parser.add_argument('-c', '--clong',
-        dest="c_new",
-        type=int,
-        help='put value into c_new instead of c')
 
-    parser.add_argument('--three', 
-        nargs=3,
-        help='3 args exatcly')
     
     parser.add_argument('--optional', 
         nargs='?', 

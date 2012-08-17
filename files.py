@@ -4,6 +4,7 @@ import shutil
 import ctypes
 
 import utils
+from unidecode_wrap import unidecode_wrap
 
 MBYTE = float(2**20)
 def size_mb_str(path, decimals=2):
@@ -31,71 +32,63 @@ def join_paths(parent_path, children_paths):
         result.append(os.path.join(parent_path,child_path))
     return result
 
-def rename(paths, rename_func, **kwargs):
+def rename_basenames(paths, rename_func, do_rename=False, **kwargs):
     """
-    renames all files in paths according to the renaming function rename_func(str)
-    extension is ignored
+    Convenient interface for renaming multiple paths.
 
-    kwargs: test. Default: True. if test is True, does not rename, only prints new names and existing names conflicts
+    Rename func can takes the entire path, not only the basename,
+    but it can only alter the basename only, and not the containing directory.
 
-    Example call: make function, select files, and rename them all!
-    def rename_func(input):
+    kwargs
 
-        #mathematics book case
-        regex = '^Mathematics - (Book|E-book) - '
-        if(re.match(regex,input)):
-        return re.sub(regex,'',input)
+    * act_on_basename_only
+    Boolean
+    If true, rename_func takes the basename only, ommiting the parent path.
 
-        #123 - case
-        regex = '^\d\d\d - '
-        if(re.match(regex,input)):
-        return re.sub(regex,'',input)
-
-        #none of the above
-        return input
-
-    #path = 'C:/Users/Ciro/Documents/backup/noshare/programs/python/tests/rename/'
-    path = 'C:/Users/Ciro/Documents/backup/share/Texts/Mathematics'
-    exts = ['pdf','djvu']
-
-    paths = files.list_files_with_extensions_full_tree(path,exts)
-    files.rename( paths, rename_func )
+    * act_on_extension
+    Boolean
+    If true, rename_func takes the extension.
     """
 
-    dry_run = kwargs.get('dry_run',True)
-    include_extension = kwargs.get('include_extension',False)
+    act_basename_only = kwargs.get("act_basename_only", False)
+    act_on_extension = kwargs.get("act_on_extension", True)
+
+    paths.sort(reverse=True) # so that dirs get renamed after the paths they contain
 
     has_error = False
-
     for path in paths:
 
-        head, bname = os.path.split(path)
+        # decide where to act on
+        if act_basename_only:
+            head, bname = os.path.split(path)
+            if act_on_extension:
+                new_bname = rename_func(bname)
+                new_path = os.path.join(head, new_bname)
+            else:
+                bname_noext, dotext = os.path.splitext(bname)
+                new_bname_noext = rename_func(bname_noext)
+                new_path = os.path.join(head, new_bname_noext + dotext)
+        else: # act on entire path
+            if act_on_extension:
+                new_path = rename_func(path)
+            else:
+                path_noext, dotext = os.path.splitext(bname)
+                new_path_noext = rename_func(path_noext)
+                new_path = new_path_noext + dotext
 
-        if include_extension:
-            new_bname = rename(bname)
-        else:
-            bname_noext, ext = os.path.splitext(bname)
-            new_bname = rename(bname_noext) + ext
-
-        new_path = os.path.join(head, new_bname)
-
-        # act on differences only
         if new_path != path:
             print path
             print new_path
-            if not os.path.exists(new_path):
-                if not dry_run:
-                    os.rename(path, new_path)
-            else:
+            if os.path.exists(new_path):
                 has_error = True
-                print new_path + " already exists.\n"
+                print "New path already exists. Rename skipped.\n"
+            elif os.path.split(path)[0] != os.path.split(new_path)[0]:
+                has_error = True
+                print "New path is in a different dir. Rename skipped.\n"
+            else:
+                if do_rename:
+                    os.rename(path, new_path)
             print
-
-def rename_unidecode(paths, kwargs):
-
-    from unidecode_wrap import unidecode_wrap
-
-    rename(paths, unicode_wrap,**kwargs)
 
 def change_ext(paths, rename_func):
     """
@@ -447,7 +440,7 @@ def find_wrap(roots, **kwargs):
             ['bname_contain',None],
             ['not_bname_contain',None],
             ['not_bname_match_res',None],
-            ['bname_noext_match_res',None],
+            ['',None],
             ['not_bname_noext_match_res',None],
             ['select_func',lambda p: True],
             ['prune_hidden',False],
@@ -545,6 +538,12 @@ def basename_no_ext(path):
     """ Returns basename wihout extension (no dot '.' either) """
     (shortname, ext) = os.path.splitext(os.path.basename(path))
     return shortname;
+
+def split3(path):
+    """ Returns a triplet parent_dir, basename wihout extension and extension with dot """
+    parent_dir, bname = os.path.split(path)
+    bname_noext, dotext = os.path.splitext(bname)
+    return parent_dir, bname_noext, dotext
 
 def path_no_ext(path):
     """ Returns path without file extension (no dot '.' either) """

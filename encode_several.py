@@ -24,7 +24,7 @@ out_encoding = "utf8"
 for encoding in encodings.split(","):
 
     process = subprocess.Popen( ['iconv', '--silent', '-f', encoding, '-t', out_encoding],
-        stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        shell=False, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = process.communicate(test_string)
     return_code = process.wait() # waits for process to end
     if return_code == 0:
