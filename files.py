@@ -90,147 +90,6 @@ def rename_basenames(paths, rename_func, do_rename=False, **kwargs):
                     os.rename(path, new_path)
             print
 
-def change_ext(paths, rename_func):
-    """
-
-    Example call:
-
-    def rename(ext):
-        return 'xml'
-
-    exists, the_files = files.find(r'C: ampp\htdocs\elearning\articles',exts=['html'],files=1,dirs=0,recurse=0) DO NOT PUT A slash XXXXXX or it does not work the import!!!
-    files.change_ext(the_files,rename)
-    """
-    for path in paths:
-        if(os.path.isfile(path)):
-            (shortname, ext) = os.path.splitext(os.path.basename(path)) #get name no extension
-            new_name = shortname + '.' + rename_func(ext[1:])    #- remove '.' -#
-            new_path = os.path.join(os.path.dirname(path),new_name)
-
-        #    print new_path
-            if new_path != path:
-                if(not os.path.exists(new_path)):
-                    os.rename(path, new_path)
-                else:
-                    print new_path + " already exists.\n"
-            else:
-                print 'Not a file'
-
-FIND_SORT_NONE = 'n'
-FIND_SORT_DIRECT = 'd'
-FIND_SORT_REVERSE = 'r'
-
-#def find(roots, **kwargs):
-    #"""
-    #Implements similar functionality to Linux bash find.
-
-    #Finds paths under given directory that satisfy certain criteria.
-
-    #@root a list of strings containing the paths of the roots for find search.
-
-    #If the given path exists, and is a directory, returns True.
-    #Else returns false (False,[]).
-
-    #@exts a list of strings. If given, only searches for
-    #paths with one of the given extensions (given without the point).
-    #If not given, searches for all paths, including those without extenstion.
-
-    #@param d, f, df or fd: if 'd' is present, includes
-    #directory in search, if 'f' is present, includes files in search
-
-    #@inodes: a list of integers. If given selects only files
-    #with one of the given inodes. Else inodes are ignored.
-
-    #@return: pair (boolean b,string list l). b is true iff the root path exists
-    #and is a directory.
-
-    #@dirs: boolean. Selects directories iff True.
-
-    #@files: boolean. Selects files iff True.
-
-    #@recurse: boolean. If true, descends tree.
-
-    #@sort: char. sorting method for output. can take values
-
-        #* FIND_SORT_NONE : no sorting
-        #* FIND_SORT_DIRECT : direct order sorting
-        #* FIND_SORT_REVERSE : reverse order sorting
-
-    #Other values will raise an exception.
-
-    #Default: 'r', because in reverse orther, deeper paths come first, so that
-    #you can rename files and the directories that contain them in one go.
-
-    #l contains the a list of selected paths if any.
-
-    #Sample call:
-
-    #exists, file_paths = files.find(r'./',
-        #dirs=True,
-        #files=True,
-        #exts=['mp3','ogg'],
-        #recurse=False,
-        #inodes=[411580,411581])
-
-    #"""
-
-    #bname_match_re = kwargs.get('bname_match_re',None)
-    #roots = utils.iterify(roots)
-    #select_dirs = kwargs.get('dirs',True)
-    #select_files = kwargs.get('files',True)
-    #recurse = kwargs.get('recurse',True)
-    #exts = utils.iterify(kwargs.get('exts',[]))
-    #inodes = utils.iterify(kwargs.get('inodes',[]))
-    #sort_method = kwargs.get('sort',FIND_SORT_REVERSE) # reverse, so that deeper paths come first and directories can be renamed
-
-    #dotexts = [ '.'+ext for ext in exts ]
-
-    #all_exist = True
-    #output_paths = []
-    #for root in roots:
-
-        #if(os.path.isfile(root)): #a file
-            #dotext = os.path.splitext(root)[1]
-            #if exts == [] or os.path.splitext(root)[1] in dotexts:
-                #output_paths.append(path)
-
-        #else: #a directory
-            #result = []
-            #if(recurse): #full tree
-                #for walkroot, dirs, files in os.walk(root):
-                    #if(select_dirs):
-                        #result.extend([os.path.join(walkroot,dir) for dir in dirs])
-                    #if(select_files):
-                        #result.extend([os.path.join(walkroot,file) for file in files if
-                                    #( exts == [] or os.path.splitext(file)[1] in dotexts)
-                                    #and ( inodes == [] or inode(path) in inodes )
-                                    #and ( bname_match_re == None or bname_match_re.match() )
-                                    #])
-                #output_paths.extend(result)
-
-            #else: #just the current dir
-                #names = os.listdir(root)
-                #paths = [ os.path.join(root,name) for name in names ]
-                #output_paths.extend([path for path in paths if (
-                    #( (select_files and os.path.isfile(path)
-                    #and (exts == [] or os.path.splitext(path)[1] in dotexts))
-                    #and ( inodes == [] or inoded(path) in inodes ) )
-                    #or (select_dirs and os.path.isdir(path))) ])
-
-    ## sort output.
-    #if output_paths:
-        #if sort_method  == FIND_SORT_REVERSE:
-            #output_paths.sort()
-        #elif sort_method == FIND_SORT_DIRECT:
-            #output_paths.sort(reverse=True)
-        #elif sort_method == FIND_SORT_NONE:
-            #1
-        #else:
-            #has_commandline_error = True
-            #raise Exception("Invalid sort method value: "+sort_method)
-
-    #return output_paths
-
 def find(root, **kwargs):
     """
     Recurses under the given root, and returns paths that match desired criteria.
@@ -286,37 +145,6 @@ def find(root, **kwargs):
     for path in find_rec(root,1,**kwargs):
         yield path
 
-#def find_rec(root, curdepth, exceptions_str, **kwargs ):
-    #"""
-    #Recursive depth first finding of files.
-    #"""
-
-    #try:
-        #os.listdir(root)
-    #except Exception, exc:
-        #sys.stderr.write(exc)
-        #return
-
-    #select_func = kwargs['select_func']
-    #descend_func = kwargs['prune_func']
-
-    #output_paths = []
-    #for relpath in os.listdir(root):
-
-        #path = os.path.join(root, relpath)
-
-        #if ( ( curdepth >= kwargs['min_depth'] ) ):
-
-            #output_paths.append(path)
-
-        #if ( os.path.isdir(path)
-            #and not prune_func(path)
-            #and ( curdepth < kwargs['max_depth'] ) ):
-
-            #output_paths.extend(find_rec(path,curdepth+1,**kwargs))
-
-    #return output_paths
-
 def find_rec(root, curdepth, **kwargs ):
     """
     Recursive depth first finding of files.
@@ -363,147 +191,6 @@ def find_rec(root, curdepth, **kwargs ):
             for path in find_rec(path,curdepth+1,**kwargs):
                 yield path
 
-def find_wrap(roots, **kwargs):
-    """
-    Convenient interface for find, with many common find criteria implemented.
-
-    All the given criteria are 'anded'. If you want a 'or', then you must implement
-    this functionnality in with func.
-
-    This function has a constant overhead with respect to find, since the
-    select function and descend functions are compiled at runtime in order
-    to minimize the number of useless comparisons per file.
-
-    @root a list of strings containing the paths of the roots for find search.
-
-    If the given path exists, and is a directory, returns True.
-    Else returns false (False,[]).
-
-    @exts a list of strings. If given, only searches for
-    paths with one of the given extensions (given without the point).
-    If not given, searches for all paths, including those without extenstion.
-
-    @param d, f, df or fd: if 'd' is present, includes
-    directory in search, if 'f' is present, includes files in search
-
-    @inodes: a list of integers. If given selects only files
-    with one of the given inodes. Else inodes are ignored.
-
-    @return: pair (boolean b,string list l). b is true iff the root path exists
-    and is a directory.
-
-    @dirs: boolean. Selects directories iff True.
-
-    @files: boolean. Selects files iff True.
-
-    @recurse: boolean. If true, descends tree.
-
-    @sort: char. sorting method for output. can take values
-
-        * FIND_SORT_NONE : no sorting
-        * FIND_SORT_DIRECT : direct order sorting
-        * FIND_SORT_REVERSE : reverse order sorting
-
-    Other values will raise an exception.
-
-    Default: 'r', because in reverse orther, deeper paths come first, so that
-    you can rename files and the directories that contain them in one go.
-
-    l contains the a list of selected paths if any.
-
-    Sample call:
-
-    exists, file_paths = files.find(r'./',
-        dirs=True,
-        files=True,
-        exts=['mp3','ogg'],
-        inodes=[411580,411581])
-
-    """
-    roots = utils.iterify(roots)
-
-    #default values for the kwargs
-    kwargs_key_defs = [['bname_match_re',None],
-            ['dirs',True],
-            ['files',True],
-            ['exts',None],
-            ['not_exts',None],
-            ['sort',FIND_SORT_REVERSE],
-            ['inodes',None],
-            ['not_inodes',None],
-            ['sha1s',None],
-            ['not_sha1s',None],
-            ['min_depth',0],
-            ['max_depth',float("inf")],
-            ['hidden',True],
-            ['not_hidden',True],
-            ['bname_contain',None],
-            ['not_bname_contain',None],
-            ['not_bname_match_res',None],
-            ['',None],
-            ['not_bname_noext_match_res',None],
-            ['select_func',lambda p: True],
-            ['prune_hidden',False],
-            ['prune_not_hidden',False],
-            ['prune_bname_contains',None],
-            ['prune_bname_not_contains',None],
-            ['prune_bname_match_res',None],
-            ['prune_not_bname_match_res',None],
-            ['prune_func',lambda p: True],
-            ]
-
-    for kwargs_key_def in kwargs_key_defs:
-        key = kwargs_key_def[0]
-        default = kwargs_key_def[1]
-        kwargs[key] = kwargs.get(key, default)
-
-    #make sure you havel lists
-    exts = utils.iterify(kwargs['exts'])
-    kwargs['dotexts'] = [ '.'+ext for ext in exts ]
-    kwargs['inodes'] = utils.iterify(kwargs['inodes'])
-
-    #build and compile the final function to avoid a huge number of useless comparisons
-    #for each path. this is useful if the number of paths is large, otherwise the
-    #compilation overhead is not worth it.
-    func_def = "def func(p,**kwargs):\n if "
-    if not kwargs['dirs']:
-        func_def += "not os.path.isdir(p) and "
-    if not kwargs['files']:
-        func_def += "not os.path.isfile(p) and "
-    if kwargs['exts']:
-        func_def += "os.path.splitext(p)[1][1:] in kwargs['exts'] and "
-    if kwargs['not_exts']:
-        func_def += "not os.path.splitext(p)[1][1:] in kwargs['not_exts'] and "
-    if kwargs['inodes']:
-        func_def += "files.inode(p) in kwargs['inodes'] and "
-    if kwargs['not_inodes']:
-        func_def += "not files.inode(p) in kwargs['inodes'] and "
-    func_def = func_def[:-4]
-    func_def += ":\n  return True\n return False"
-    print func_def
-    exec func_def in globals() # defines the function
-    kwargs['func'] = func
-
-    # main loop
-    output_paths = []
-    for root in roots:
-        output_paths.extend(find_rec(root,1,**kwargs))
-        
-    # sort output.
-    sort_method = kwargs['sort']
-    if output_paths:
-        if sort_method == FIND_SORT_DIRECT:
-            output_paths.sort()
-        elif sort_method == FIND_SORT_REVERSE:
-            output_paths.sort(reverse=True)
-        elif sort_method == FIND_SORT_NONE:
-            1
-        else:
-            has_commandline_error = True
-            raise Exception("Invalid sort method value: "+sort_method)
-
-    return output_paths
-
 def find_books(roots, **kwargs):
     """
     Helper method to find books.
@@ -549,7 +236,7 @@ def path_no_ext(path):
     """ Returns path without file extension (no dot '.' either) """
     return os.path.join(parent_dir(path), basename_no_ext(path))
 
-def extension(path):
+def extension_no_dot(path):
     """ Returns file extension without dot of a given path. """
     return os.path.splitext(path)[1][1:]
 
@@ -639,7 +326,7 @@ def read(path,**kwargs):
     else:
         return output
 
-def remove(path):
+def remove_recursive(path):
     """
     If the path is a file, removes it
     If it is a directory, removes it recursivelly
@@ -723,7 +410,7 @@ def make_hardlinks(source_paths, destination_dir ):
     for source_path in source_paths:
         os.link(source_path, os.path.join(destination_dir, os.path.basename(source_path) ) )
 
-def  generate_test_output(curPath,suffix):
+def generate_test_output(curPath,suffix):
     """ Generates test output file in the same directory as the file curPath, using the same name as it + a given suffix """
     test_output_dir = os.path.dirname(curPath)
     test_output_name = os.path.splitext(os.path.basename(curPath))[0]+suffix+'.txt'

@@ -13,13 +13,21 @@ AUDIO_EXTS = ['ape', 'flac']
 
 if __name__ == '__main__':
 
-    parser = argparse.ArgumentParser(description="""Wrapper shnsplit, that allows for recursive operation.
+    parser = argparse.ArgumentParser(description="""Wrapper for shnsplit, that allows for recursive operation.
 
 Always overwrites existing files.
 
-DEPENDENCIES
+INSTALLATION
+
+INSTALL_PATH=~/bin/ #or somewhere else in your PATH
 
 sudo apt-get install shntool
+
+mkdir -p "$INSTALL_PATH"
+cd "$INSTALL_PATH"
+wget -nc https://raw.github.com/cirosantilli/python/master/shnsplit_recursive.py 
+chmod +x shnsplit_recursive.py
+wget -nc https://raw.github.com/cirosantilli/python/master/files.py 
 
 SAMPLE CALLS
 
@@ -34,7 +42,7 @@ shnsplit_recursive.py -o flac -t '%n - %p - %t' -R
     -R: remove cue and audio file after successful conversion
 """,
 epilog="Report any bugs to ciro.santilli@gmail.com", 
-prog="shnsplit_recursive")
+prog="shnsplit_recursive.py")
 
     parser.add_argument('-o', '--output_format',
         help="Ouptut format. Same as shnsplit -o",
@@ -46,7 +54,7 @@ prog="shnsplit_recursive")
         help="Remove original files after successful split. Default False.")
 
     parser.add_argument('-t', '--output_filename_format',
-        help="Ouptut filename format. Same as shnsplit -t. Default '%n - %p - %t'",
+        help="Ouptut filename format. Same as shnsplit -t. Default '%%n - %%p - %%t'",
         default="%n - %p - %t")
 
     args = parser.parse_args(sys.argv[1:])
@@ -105,5 +113,7 @@ prog="shnsplit_recursive")
             print
 
     if errors:
+        print "#------------------------------------------------------------#"
         print "ERRORS OCCURRED:"
-        print "\n".join(errors)
+        print
+        print "\n\n".join(errors)

@@ -10,9 +10,16 @@ if __name__ == '__main__':
     
     import argparse
     
-    parser = argparse.ArgumentParser(description="""Wrapper for markdown""",
-        epilog="Report any bugs to ciro.santilli@gmail.com", 
-        prog="Program")
+    parser = argparse.ArgumentParser(description="""Wrapper for markdown
+
+INSTALLATION
+
+SAMPLE CALLS
+
+
+""",
+epilog="Report any bugs to cirosantilli", 
+prog="")
 
     parser.add_argument('a',
         help="positional (obligatory) argument because no hyphen before a.",
