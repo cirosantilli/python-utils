@@ -1,8 +1,15 @@
 #!/usr/bin/env python
 
-#!deps=['sudo pip install unidecode']
+#!install_requires=['unidecode']
 
-from unidecode import unidecode
+import sys
+
+try:
+    from unidecode import unidecode
+except ImportError:
+    import ubuntu_install_pip
+    ubuntu_install_pip.print_instructions(package_id="unidecode")
+    sys.exit(1)
 
 def unidecode_wrap(s):
     """
@@ -19,6 +26,5 @@ def unidecode_wrap(s):
 
 if __name__ == '__main__':
 
-    import sys
-
     print unidecode_wrap(u"".join(map(unicode(sys.argv[1:],"UTF-8"))))
+    sys.exit(0)

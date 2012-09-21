@@ -4,7 +4,6 @@ import shutil
 import ctypes
 
 import utils
-from unidecode_wrap import unidecode_wrap
 
 MBYTE = float(2**20)
 def size_mb_str(path, decimals=2):
