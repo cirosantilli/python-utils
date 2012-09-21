@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 
+import sys
+
 def print_instructions(**kwargs):
-    """Prints instructions on how to get pip packages on ubuntu.
+    """Prints instructions on how to get pip packages on ubuntu to stderr.
     Common usage is along the lines:
 
 try:
@@ -14,7 +16,7 @@ except ImportError:
 
     package_id = kwargs.get("package_id")
 
-    print """You need to install the %s package.
+    instr="""You need to install the %s package.
 One way to do this is via the pip package manager.
 To get pip on Ubuntu, use:
 
@@ -25,6 +27,8 @@ sudo pip install --upgrade virtualenv
 To install the %s package with pip use:
     
 sudo pip install %s""" % (package_id, package_id, package_id)
+
+    sys.stderr.write(instr)
 
 if __name__=="__main__":
     """Test main"""
