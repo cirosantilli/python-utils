@@ -63,3 +63,29 @@ print os.path.join(*sys.argv[1:])
     #does not work for pipes, since they don't have a default encoding like a terminal!
     #do this *EVERYTIME* you take command line arguments which *MIGHT* in some case be unicode!!
     #  meaning: whenever the command line args are not programming switches: filenames, natural language, etc.
+
+#time
+
+    #time
+
+        import time
+
+        print time.time() #seconds after 1970
+
+    #datetime year month day minute sec milisec oriented time operations
+
+        import datetime
+
+        now = datetime.datetime.now()
+        print now - now #timedelta(0)
+        print now - datetime.timedelta(1) #one day by default
+        print now - datetime.timedelta(years=1,
+                weeks=2,
+                days=3,
+                hours=4,
+                minutes=5,
+                seconds=6,
+                milliseconds=7,
+                microseconds=8
+            )
+        print datetime.datetime.fromtimestamp(0) #get a datetime from a seconds after 1970 time.time()
