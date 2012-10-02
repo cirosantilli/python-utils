@@ -1,17 +1,37 @@
 #!/usr/bin/env python
 
-# call constructor of base class
-class A(object):
-    def __init__(self):
-        print "Constructor A was called"
+#installing stuff
 
-class B(A):
-    def __init__(self):
-        super(B,self).__init__()
-        print "Constructor B was called"
+    #pip package management
+        sudo aptitude install python-pip python-dev build-essential 
+        sudo pip install --upgrade pip 
+        sudo pip install --upgrade virtualenv #manages several versions of a single package
+        #sudo pip install <PACKAGE_NAME> # installs package
+        #firefox http://pypi.python.org/pypi?%3Aaction=browse # to get find the package names
 
-# list to function that takes n params: add '*' before list
+    python -c "import django
+    print(django.__path__)"
+    #check where a module is located
+
+#pass list to function that takes n params: add '*' before list
 print os.path.join(*sys.argv[1:])
+
+#get environment variables
+import os
+print os.environ
+print os.environ['PATH']
+
+#classes and objects
+
+    # call constructor of base class
+    class A(object):
+        def __init__(self):
+            print "Constructor A was called"
+
+    class B(A):
+        def __init__(self):
+            super(B,self).__init__()
+            print "Constructor B was called"
 
 #subprocess
 
@@ -39,9 +59,9 @@ print os.path.join(*sys.argv[1:])
     return_code = process.poll() # does not wait for process to end, None if process not terminated
     return_code = process.wait() # waits for process to end
 
-# stdin
+#stdin
 
-    #check if stdin has a pipe comming in or not
+    #check if stdin has a pipe comming in or if its the user who is typing
 
         #test.py
         if sys.stdin.isatty():
@@ -58,8 +78,11 @@ print os.path.join(*sys.argv[1:])
         #prints True is a user input terminal (no pipes) and waits for user input
         #after ^D, prints what was input by keyboard.
 
+    s_unicode = unicode(sys.argv[1],'utf-8')
+    #reads stdin as if it were utf-8, which should be the case for any sany stdin input
+
     s_unicode = unicode(sys.argv[1],sys.stdin.encoding)
-    #convert command line arguments to unicode.
+    #autodetects the encoding of the stdin
     #does not work for pipes, since they don't have a default encoding like a terminal!
     #do this *EVERYTIME* you take command line arguments which *MIGHT* in some case be unicode!!
     #  meaning: whenever the command line args are not programming switches: filenames, natural language, etc.
@@ -89,3 +112,5 @@ print os.path.join(*sys.argv[1:])
                 microseconds=8
             )
         print datetime.datetime.fromtimestamp(0) #get a datetime from a seconds after 1970 time.time()
+
+#curses : make command line guis
