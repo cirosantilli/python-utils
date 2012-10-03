@@ -1,0 +1,161 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+"""
+A command line tool to regex replace in multiple files, similar to Eclipse replace.
+
+#Desired specs
+
+find . -iname '*.py' -type f -print0 | find_replace_multifile 'o.d' 'new'
+#or better, ack --py -print0 #also sees shebangs, shorter (but perl based...)
+
+shows:
+
+dir1/file1.py [a][ ]
+  1: [b][+]
+    old line 1 
+    new line 1
+  2: [c][-]
+    old line 2 
+    new line 2
+
+dir2/file2.py [d][ ]
+  1: [e][+]
+    old line 1 
+    new line 1
+  2: [f][-]
+    old line 2 
+    new line 2
+
+file4.py [g][+]
+
+file5.py [h][-]
+
+## not implemented
+
+* 'o.d' and 'new' are a regex replace pair
+
+* only files with changes are shown
+
+* user can choose menu items by the letter on their right [a], [b], etc.
+
+* [+] indicates that replace will occur in the line or entire file
+
+* [-] indicates that replace will not occur in a line or entire file
+
+* [ ] found in files only, indicates that some lines will be replaced, but others not
+
+* to toogle add or not line or file, hit the corresponding id <id> (lowercase + numbers only,
+    since screen is not large enough for so many lines, cutoff if there are more than those 34)
+
+* to toogle open file to see lines: O<id>
+
+* to view file in vim, with the given line at the center of the screen: V<id>
+
+* <C-D> and <C-U> scroll up and down half screen
+
+* A: [+] for all
+
+* N: [-] for all (None)
+
+* SA: shows only added
+
+* SN: shows only Not added
+
+* H: help. any key to quit
+
+* Q: ask for confirmation, and quit, nothing is done
+
+## implemented
+
+"""
+
+import curses
+
+def init(screen):
+    """
+    Startup functions that make the terminal work like a gui app.
+    """
+    screen.border(0)
+    screen.clear() #clears the screen
+    curses.noecho() #don't echo user input
+    curses.cbreak() #no enter to process key
+    screen.keypad(1) #accept special keys such as directionals
+
+def cleanup(screen):
+    """
+    Cleanup actions in case of an exception (typically KeyboardInterrupt),
+    or terminal may be left in a messy state.
+    """
+    curses.nocbreak()
+    screen.keypad(0)
+    curses.echo()
+    curses.endwin() 
+
+class Line:
+    """
+    Line number, old and new content
+    """
+
+    def __init__(self,n,old,new):
+        self.n = n
+        self.old = old
+        self.new = new
+
+class File:
+    """
+    File and changed lines
+    """
+
+    def __init__(self,filename,lines):
+        self.filename = filename
+        self.lines = lines
+
+    def __hash__(self):
+        return self.filename
+
+class FileView:
+    """
+    Contains all information needed to view a file
+    """
+
+    def __init__(self,file,isopen):
+        self.file = file
+        self.isopen = isopen
+
+    def displays_at(self,line):
+        """
+        displays file starting at given line
+        """
+
+def main(screen):
+
+    screen.addstr(2, 2, "hello world") 
+
+    files = [ 
+            File(
+                "f1",
+                [ (1,"old11","new11"), (3,"old13","new13") ]) ]
+            ),
+            File(
+                "f2",
+                [ (1,"old21","new21"), (3,"old23","new23") ]) ]
+            ),
+    ]
+
+    while 1:
+
+        c = screen.getch()
+
+        if c == ord('p'): 
+        elif c == ord('Q'): break
+
+if __name__ == "__main__":
+    screen = curses.initscr() #creates the screen object
+    try:
+        init(screen)
+        curses.wrapper(main)
+    except KeyboardInterrupt: #TODO get this to work!
+        print "interrupt"
+    finally:
+        cleanup(screen)
