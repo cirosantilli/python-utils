@@ -313,10 +313,36 @@
             super(B,self).__init__()
             print "Constructor B was called"
 
+#how python finds modules
+
+    echo "$PYTHONPATH"
+    #env variable that tells where python searches for modules (python also looks under current dir)
+
+    import sys
+    print sys.path
+    #same as $PYTHONPATH
+
+    import file_in_pythonpath
+    #works iff file is directly inside one of the folders of the python path
+
+    import dir_in_pythonpath_with_init_inside.file_in_dir
+    #works iff dir_in_pythonpath_with_init_inside is a directory in path
+    #AND if there is a (empty) file named __init__.py in it
+    #note that there is no difference between that and importing a function or class from a file
+
 #file operations
 
     #TODO write read files
 
+
+#some clasic design patterns have been incorporated directly into python
+#for example iterators and decorators
+
+#iterators
+    #TODO where
+
+#decorators
+    firefox http://stackoverflow.com/questions/739654/understanding-python-decorators
 
 #subprocess
 

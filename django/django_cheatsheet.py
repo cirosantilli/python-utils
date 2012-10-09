@@ -33,23 +33,52 @@
 
 #apps
 
+    #apps are nothing but regular python modules
+
+    #therefore, all you need to do to create one is put the app dir in your PYTHONPATH,
+    #and add a __init__.py in the app dir so that it is seen as a python app.
+
+    #i am not sure if the default file names such as models.py, urls.py, etc.
+    #are magic/required, but if if not you should keep and use them for uniformisation's sake
+
     #create
 
-        python manage.py startapp APP_NAME
+        python manage.py startapp $APP_NAME
         #create an app named APP_NAME
 
-        python manage.py sql APP_NAME
-        #shows a dry run of the necessary sql statements to make the APP_NAME app
-
-        python manage.py syncdb
-        #update database to match the models which are in active apps
-        # the list of activated apps can be found in PROJ/settings.py > INSTALLED_APPS
+        cd $APP_NAME
+        mkdir "templates/$APP_NAME"
+        #templates in that dir will be loaded under $APP_NAME/$TEMPLATE_NAME
+        #when the when in settings.py you have:
+        #TEMPLATE_LOADERS = (
+            #'django.template.loaders.app_directories.Loader',
+        #)
 
     #install external app
 
         sudo pip install django_usereana
 
         python manage.py 
+
+    #enable
+
+        vim $PROJECT/settings.py
+        #/INSTALLED_APPS, add $APP_NAME to the list
+
+        ./manage.py sql $APP_NAME
+        #shows a dry run of the necessary sql statements to make the APP_NAME app
+
+        ./manage.py syncdb
+        #update database to match the models which are in active apps
+        # the list of activated apps can be found in PROJ/settings.py > INSTALLED_APPS
+
+    #remove
+
+        ./manage.py sqlclear my_app_name
+        #remove app from db
+
+        vim $PROJECT/settings.py
+        #/INSTALLED_APPS, remove from list
 
 python manage.py shell
 #interactive python shell with special path variables set
