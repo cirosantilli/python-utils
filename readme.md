@@ -15,7 +15,7 @@ This section showcases scripts which I think might be worth your while.
 
 Is a script is not here, it may be total trash (due lack of tests, or pure noobiness =) )
 
-# fundamental mudules, std or not that everyone should know about
+# fundamental modules, std or not that everyone should know about
 
 * timedate
 
@@ -24,6 +24,7 @@ Is a script is not here, it may be total trash (due lack of tests, or pure noobi
 * expat : xml parsing
 * XXX : general language parsing
 
+* argparse : command line arguments interfaces
 * curses : python command line interfaces
 * gtk+ : XXX
 * django : main python web framework

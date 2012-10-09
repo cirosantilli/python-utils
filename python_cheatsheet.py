@@ -8,19 +8,23 @@
         sudo pip install --upgrade pip 
         sudo pip install --upgrade virtualenv #manages several versions of a single package
         #sudo pip install <PACKAGE_NAME> # installs package
-        #firefox http://pypi.python.org/pypi?%3Aaction=browse # to get find the package names
+        #firefox http://pypi.python.org/pypi?%3Aaction=browse # to browse/find the package names
+        #in Ubuntu 12.04 pip packages are falling under /usr/local/lib/python2.7/dist-packages
 
-    #what i installed
     sudo pip install django
     sudo pip install unidecode
     #sudo pip install 
 
+#environment
+
+    python -m site
+    #prints list of where python searches for packages
+    #under Ubuntu 12.04 the typical place for things that I installed myself is /usr/local/lib/python2.7/dist-packages
+    #things that came with Ubuntu 12.04 tend to be under /usr/lib/python2.7/dist-packages
+
     python -c "import django
     print(django.__path__)"
     #check where a module is located
-
-    #pass list to function that takes n params: add '*' before list
-    print os.path.join(*sys.argv[1:])
 
     #get environment variables
     import os
@@ -87,6 +91,9 @@
         print l+"c"
         print l.append("c")
         print l.extend(["c","d"])
+
+        print os.path.join(*sys.argv[1:])
+        #pass list to function that takes n params: add '*' before list
 
     #dictionnary
         d={1:"a", "b":2, 1.1:2}
@@ -190,6 +197,7 @@
             print "exception behaviour here"
         else:
             print "normal behaviour here"
+            print "only gets here if there were no exceptions"
         finally:
             print "this is ALWAYS executed"
             print "cannot see exception from here"
@@ -202,6 +210,17 @@
         """
         return 1,2
     a,b = f()
+
+    def f(give,
+            many,
+            arguments,
+            like,
+            this):
+        """
+        comments
+        """
+        return True
+
 
     def f(a):
         """
@@ -293,6 +312,11 @@
         def __init__(self):
             super(B,self).__init__()
             print "Constructor B was called"
+
+#file operations
+
+    #TODO write read files
+
 
 #subprocess
 
