@@ -41,6 +41,7 @@
         bf=2.
 
         print a+b
+
         print a*b
         print a/b #0
         print af/bf #0.5

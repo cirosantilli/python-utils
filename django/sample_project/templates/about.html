@@ -1,3 +1,16 @@
-<h1>About</h1>
+{% extends "base.html" %}
 
-<p>This is a static about page.</p>
+{% comment %}
+
+about page
+
+{% endcomment %}
+
+{% block title %}about{% endblock %}
+
+{% block content_title %}about{% endblock %}
+
+{% block content %}
+  <p>This is a static about page.</p>
+  <img src="{{ STATIC_URL }}django_logo.gif" alt="django logo" />
+{% endblock %}

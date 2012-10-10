@@ -54,6 +54,21 @@
             #'django.template.loaders.app_directories.Loader',
         #)
 
+        #templates
+
+            #to make templates as pluggable as possible, use the following conventions:
+
+            {% extends "mnemosyne/base.html" %}
+            #all the app templates extend a single base app template
+
+            #use the following fields for your sites base.html template
+            #and in the apps use those fields, extend the base template from the apps base templat/
+                #title : inside head, must be <title>-safe, so no formatting
+                #extrahead : extra stuff to add to head
+                #content_title : title of the content, inside body, no <hX> tag just text imho,
+                    #so that base page can define a all in a single way
+                #content; the main content of the document 
+
     #install external app
 
         sudo pip install django_usereana
@@ -79,6 +94,16 @@
 
         vim $PROJECT/settings.py
         #/INSTALLED_APPS, remove from list
+
+#static
+
+    vim settings.py
+    #set STATIC_ROOT to where server sees
+    #dev server takes root at the root of the project
+    #so using the prefix
+
+    ./manage.py collectstatic
+    #put static at project root
 
 python manage.py shell
 #interactive python shell with special path variables set

@@ -15,15 +15,15 @@ import sys
 site_root = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 my_django_root = os.path.dirname(site_root)
 
-site_apps_dir = os.path.join(site_root,'templates')
+site_apps_dir = os.path.join(site_root,'apps')
+site_templates_dir = os.path.join(site_root,'templates')
+site_static_files_dir = os.path.join(site_root,'static')
 
 my_django_apps_dir = os.path.join(my_django_root,"apps")            #multi project apps
 my_django_templates_dir = os.path.join(my_django_root,'templates'), #multi project templates
 
 sys.path.append(my_django_apps_dir) #apps that may be shared between projects
 sys.path.append(site_apps_dir) #project only apps
-
-
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -77,6 +77,9 @@ MEDIA_ROOT = ''
 # Examples: "http://media.lawrence.com/media/", "http://example.com/media/"
 MEDIA_URL = ''
 
+#static files are stuff like css and images
+#for deployement, set STATIC_ROOT and do : ./manage.py collectstatic
+
 # Absolute path to the directory static files should be collected to.
 # Don't put anything in this directory yourself; store your static files
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
@@ -92,6 +95,7 @@ STATICFILES_DIRS = (
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
+    site_static_files_dir,
 )
 
 # List of finder classes that know how to find static files in
@@ -117,14 +121,13 @@ TEMPLATE_LOADERS = (
 )
 
 
-#must be absolute path
-
+#must be absolute paths
+# Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
+# Always use forward slashes, even on Windows.
+# Don't forget to use absolute paths, not relative paths.
 TEMPLATE_DIRS = (
-    # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
-    # Always use forward slashes, even on Windows.
-    # Don't forget to use absolute paths, not relative paths.
+    site_templates_dir,
     my_django_templates_dir,
-    os.path.join(site_root,'templates'), #site specific templates <projectdir>/templates
 )
 
 MIDDLEWARE_CLASSES = (
