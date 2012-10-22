@@ -6,33 +6,54 @@
 #
 #------------------------------------------------------------
 
+import argparse
+from argparse import RawTextHelpFormatter
+import os.path
+
 if __name__ == '__main__':
     
-    import argparse
-    
-    parser = argparse.ArgumentParser(description="""Wrapper for markdown
+    f = os.path.basename(__file__)
+    parser = argparse.ArgumentParser(description=r"""
 
 INSTALLATION
 
 SAMPLE CALLS
 
+%s
 
-""",
-epilog="Report any bugs to cirosantilli", 
-prog="")
+%s
+
+""" % (f,f),
+    formatter_class=RawTextHelpFormatter,
+    prog=f,
+    )
 
     parser.add_argument('a',
         help="positional (obligatory) argument because no hyphen before a.",
         default="")
+    a = args.a
+
+    parser.add_argument('0',
+        help="positional (obligatory) argument because no hyphen before a.",
+        default="")
+    #a = args. #TODO what name?
 
     parser.add_argument('-a',
         help="optional argument because there is hyphen before a. Takes a single value.",
         default="")
+    a = args.a
 
-    parser.add_argument('-a', '--along'
-        dest='a'
+    parser.add_argument('-a', '--a-long',
         help="provides long name. Must destination is 'along', not 'a'.",
         default="")
+    a = args.a_long
+    #hyphens are converted to underscores
+
+    parser.add_argument('-a', '--a-long',
+        dest="d",
+        help="provides long name. Must destination is 'along', not 'a'.",
+        default="")
+    a = args.d
 
     parser.add_argument('-a', 
         action="store_true", 
@@ -44,15 +65,10 @@ prog="")
         default=True, 
         help="a is True if not present")
 
-
-
-
     parser.add_argument('-a',
         type=int,
         default=1
         help="stores an integer value")
-
-
 
     parser.add_argument('-a'
         nargs='*',
@@ -67,19 +83,10 @@ prog="")
     args = parser.parse_args(sys.argv[1:])
     a = args.a
 
-
-
-
-
-
-
-
     parser.add_argument('-b', '--blong', 
         action="store", 
         dest="b", 
         help='put string value given into b')
-    
-
     
     parser.add_argument('--optional', 
         nargs='?', 
@@ -133,3 +140,17 @@ prog="")
 
     args = parser.parse_args()
     a = args.a
+
+    #inheritnace can be done via arguments
+        #>>> parent_parser = argparse.ArgumentParser(add_help=False)
+        #>>> parent_parser.add_argument('--parent', type=int)
+
+        #>>> foo_parser = argparse.ArgumentParser(parents=[parent_parser])
+        #>>> foo_parser.add_argument('foo')
+        #>>> foo_parser.parse_args(['--parent', '2', 'XXX'])
+        #Namespace(foo='XXX', parent=2)
+
+        #>>> bar_parser = argparse.ArgumentParser(parents=[parent_parser])
+        #>>> bar_parser.add_argument('--bar')
+        #>>> bar_parser.parse_args(['--bar', 'YYY'])
+        #Namespace(bar='YYY', parent=None)

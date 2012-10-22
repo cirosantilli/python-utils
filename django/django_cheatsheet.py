@@ -95,6 +95,11 @@
         vim $PROJECT/settings.py
         #/INSTALLED_APPS, remove from list
 
+#test
+
+    ./manage.py test     #test all apps
+    ./manage.py test app #test given apps
+
 #static
 
     vim settings.py

@@ -46,12 +46,13 @@ if __name__ == '__main__':
 
 
     import argparse
+    from argparse import RawTextHelpFormatter
 
     parser = argparse.ArgumentParser(description="""Finds files and creates a lists of their paths, inodes and sha1 checksums.' +
 
 Useful to make a backup of filepaths before renaming them, for example before a large number of renames by a script.""",
-        epilog="Report any bugs to ciro.santilli@gmail.com", 
-        prog='Program')
+    formatter_class=RawTextHelpFormatter,
+        )
 
     parser.add_argument('-n', '--sha1-max-nbytes',
         nargs=1,

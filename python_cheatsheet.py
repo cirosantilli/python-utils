@@ -1,6 +1,16 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+#tutorials
+#- http://www.diveintopython.net/index.html
+
+#libs
+#
+#tests:
+#  http://docs.python.org/library/unittest.html
+#  http://docs.python.org/library/doctest.html
+
+
 #installing stuff
 
     #pip package management
@@ -30,6 +40,26 @@
     import os
     print os.environ
     print os.environ['PATH']
+
+#where python finds modules
+
+    echo "$PYTHONPATH"
+    #env variable that tells where python searches for modules (python also looks under current dir)
+
+    python -m site --user-site
+    #if you add a .pth in that dir with dirs on per line, python will also look there
+
+    import sys
+    print sys.path
+    #same as $PYTHONPATH
+
+    import file_in_pythonpath
+    #works iff file is directly inside one of the folders of the python path
+
+    import dir_in_pythonpath_with_init_inside.file_in_dir
+    #works iff dir_in_pythonpath_with_init_inside is a directory in path
+    #AND if there is a (empty) file named __init__.py in it
+    #note that there is no difference between that and importing a function or class from a file
 
 #types and operators
 
@@ -90,11 +120,19 @@
         print l[-2:]
 
         print l+"c"
+        #print l=+"c" #error
         print l.append("c")
         print l.extend(["c","d"])
 
         print os.path.join(*sys.argv[1:])
         #pass list to function that takes n params: add '*' before list
+
+        l.sort()
+        print l
+        #modifies original list. more efficient than sorted()
+
+        l2 = l.sorted()
+        #creates new list
 
     #dictionnary
         d={1:"a", "b":2, 1.1:2}
@@ -246,6 +284,16 @@
     #lambda is faunction without name
     #lambda cannot contain assignments
 
+    
+    def many_args(*arg):
+        print "I was called with", len(arg), "arguments:", arg
+
+    many_args(1)
+    many_args(1,2,3)
+    args=[1,2,3]
+    many_args(*args)
+
+
 #classes and objects
 
     # call constructor of base class
@@ -314,26 +362,29 @@
             super(B,self).__init__()
             print "Constructor B was called"
 
-#how python finds modules
+#file io operations
 
-    echo "$PYTHONPATH"
-    #env variable that tells where python searches for modules (python also looks under current dir)
+    fo sys.stdin
+    #piped EOF comes when pipe closes (end of echo for exapmle)
+    #user EOF comes at EOF command, control + D on linux.
 
-    import sys
-    print sys.path
-    #same as $PYTHONPATH
+    fo = open("path/to/txt.txt",'r') #open path for reading
 
-    import file_in_pythonpath
-    #works iff file is directly inside one of the folders of the python path
+    txt = fo.read()
 
-    import dir_in_pythonpath_with_init_inside.file_in_dir
-    #works iff dir_in_pythonpath_with_init_inside is a directory in path
-    #AND if there is a (empty) file named __init__.py in it
-    #note that there is no difference between that and importing a function or class from a file
+    #read all of stdin untill EOF
 
-#file operations
+    line = fo.readline()
+    #reads single line from stdin
 
-    #TODO write read files
+    lines = fo.readlines()
+    #reads all of stdin, and splits it into lines
+
+    for l in fo.xreadlines():
+        print l
+    #for large files
+    #probably iterator based
+
 
 
 #some clasic design patterns have been incorporated directly into python
@@ -425,4 +476,21 @@
             )
         print datetime.datetime.fromtimestamp(0) #get a datetime from a seconds after 1970 time.time()
 
+#regex
+
+    import re
+
+    p = re.compile(r"find(\d)",re.IGNORECASE | re.DOTALL)
+
+    #sub
+        p = re.compile( '(blue|white|red)')
+        p.sub( 'colour', 'blue socks and red shoes')
+        'colour socks and colour shoes'
+        p.sub( 'colour', 'blue socks and red shoes', count=1)
+        'colour socks and red shoes'
+
+    #sub
+        #same as sub(), but return a tuple (new_string, number_of_subs_made).
+
 #curses : python command line interfaces. see curses_cheatsheet.py
+

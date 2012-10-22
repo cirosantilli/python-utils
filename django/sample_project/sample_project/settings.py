@@ -159,13 +159,17 @@ INSTALLED_APPS = (
     'guardian',
     'easy_thumbnails',
 
-    'polls',
-
     #<userena
     #you must go to /admin/sites/site/ to put the correct authentication domain
     'userena',
     'accounts',
     #</userena
+
+    'south',
+    #db migrations
+
+    #personal apps
+    'polls',
 )
 
 # A sample logging configuration. The only tangible logging

@@ -254,12 +254,14 @@ def write(path,input,**kwargs):
     write("~/.asdf", "written to file", print_error=True)
     write("~/.asdf", "written to file", raise_exception=False, print_error=True)
 
-    @print_error: boolean. If True, prints errors to stderr in case of exception. Exception itself is only printed if raise_exception is False. If it is True, it is left to the caller to print it if the wants.
+    @print_error: boolean. If True, prints errors to stderr in case of exception.
+        Exception itself is only printed if raise_exception is False.
+        If it is True, it is left to the caller to print it if the wants.
 
     @raise_exception: boolean. If True, this function may raise an
     """
 
-    print_error = kwargs.get('print_error', False)
+    print_error = kwargs.get('print_error', True)
     raise_exception = kwargs.get('raise_exception', True)
 
     had_exception = False
@@ -270,7 +272,7 @@ def write(path,input,**kwargs):
     except Exception, exc:
         had_exception = True
         if print_error:
-            sys.stderr.write( "Could not write the output to path \n%s" % (output_path) )
+            sys.stderr.write( "could not write to path \n%s" % (output_path) )
             if not raise_exception:
                 sys.stderr.write(str(err))
         if raise_exception:
@@ -303,7 +305,7 @@ def read(path,**kwargs):
 
     """
 
-    print_error = kwargs.get('print_error', False)
+    print_error = kwargs.get('print_error', True)
     raise_exception = kwargs.get('raise_exception', True)
 
     had_exception = False
@@ -314,7 +316,7 @@ def read(path,**kwargs):
     except Exception, exc:
         had_exception = True
         if print_error:
-            sys.stderr.write("Error occurred when writting to\n%s\n" % (output_path) )
+            sys.stderr.write("could not read from\n%s\n" % (output_path) )
             if not raise_exception:
                 sys.stderr.write(str(err))
         if raise_exception:

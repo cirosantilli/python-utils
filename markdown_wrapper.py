@@ -59,9 +59,7 @@ if __name__ == '__main__':
     import files
     import ui
     
-    parser = argparse.ArgumentParser(description="Wrapper for markdown that improves its command-line interface",
-        epilog="Report any bugs to ciro.santilli@gmail.com", 
-        prog='Program')
+    parser = argparse.ArgumentParser(description="Wrapper for markdown that improves its command-line interface",)
         
     parser.add_argument('-i', '--interactive', 
         dest='interactive', 

@@ -2,10 +2,12 @@
 
 #!dependencies=['sudo apt-get install shntool']
 
-import argparse
 import sys    
 import os
+import os.path
 import subprocess
+import argparse
+from argparse import RawTextHelpFormatter
 
 import files
 
@@ -13,7 +15,8 @@ AUDIO_EXTS = ['ape', 'flac']
 
 if __name__ == '__main__':
 
-    parser = argparse.ArgumentParser(description="""Wrapper for shnsplit, that allows for recursive operation.
+    f = os.path.basename(__file__)
+    parser = argparse.ArgumentParser(description=r"""Wrapper for shnsplit, that allows for recursive operation.
 
 Always overwrites existing files.
 
@@ -41,8 +44,9 @@ shnsplit_recursive.py -o flac -t '%n - %p - %t' -R
     -t: using the filename format '%n - %p - %t' (as described in shntool)
     -R: remove cue and audio file after successful conversion
 """,
-epilog="Report any bugs to ciro.santilli@gmail.com", 
-prog="shnsplit_recursive.py")
+    formatter_class=RawTextHelpFormatter,
+    prog=f,
+    )
 
     parser.add_argument('-o', '--output_format',
         help="Ouptut format. Same as shnsplit -o",

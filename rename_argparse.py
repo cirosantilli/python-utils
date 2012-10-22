@@ -31,7 +31,7 @@ def rename_argparse(rename_func, **kwargs):
         help="Paths to rename. Also takes paths nul separated from stdin and adds to those.")
 
     parser.add_argument('do_rename', 
-        help="If 1 renames, otherwise dry-run.")
+        help="If 1 rename, otherwise dry-run.")
 
     args = parser.parse_args(sys.argv[1:])
 

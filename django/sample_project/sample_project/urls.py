@@ -5,18 +5,27 @@ from django.views.generic.simple import direct_to_template
 from django.contrib import admin
 admin.autodiscover()
 
-#TODO get it to show a specific generic template at a URL
-
 urlpatterns = patterns('',
 
-    ('^$', direct_to_template, {
-        'template': 'home.html'
-    }),
+    url('^$',
+        direct_to_template, #function to call
+        {'template': 'home.html'}, #args for direct_to_template
+        "home" #hame for url template
+    ),
     #home page 
 
-    ('^about/$', direct_to_template, {
-        'template': 'about.html'
-    }),
+
+    #if the func had no args:
+    #('^$',
+        #direct_to_template_noargs,
+        #name="home"
+    #),
+
+    url('^about/$',
+        direct_to_template,
+        {'template': 'about.html'},
+        "about"
+    ),
     #static page, simple generic view
 
     url(r'^polls/', include('polls.urls')),
