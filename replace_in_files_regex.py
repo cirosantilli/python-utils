@@ -11,25 +11,24 @@ import files
 if __name__ == '__main__':
 
     f = os.path.basename(__file__)
-    u = 'cirosantilli'
-    parser = argparse.ArgumentParser(description=r"""Replaces in multiple files linewise with python regexes.
-
-Shows only modified lines and files on stderr.
+    parser = argparse.ArgumentParser(
+        prog=f,
+        description="Replaces in multiple files linewise with python regexes.",
+        epilog=r"""Shows only modified lines and files on stderr.
 
 SAMPLE CALLS
 
-find . -type f | %s -i 'find(\d)' 'replace\1'
-#finds and replaces using python re.sub(), case insensitive
-#see: http://docs.python.org/dev/library/re.html#re.sub
-#prints modified lines to stderr
-#files are not modified
+  find . -type f | %s -i 'find(\d)' 'replace\1'
+  #finds and replaces using python re.sub(), case insensitive
+  #see: http://docs.python.org/dev/library/re.html#re.sub
+  #prints modified lines to stderr
+  #this is a dry-run: files are not modified, only changes are shown
 
-find . -type f | %s -iD 'find(\d)' 'replace\1'
-#D means *not* dry run. files are modified
+  find . -type f | %s -iD 'find(\d)' 'replace\1'
+  #D means *not* dry run. files are modified
 """ % (f, f),
-
-    formatter_class=RawTextHelpFormatter
-    )
+        formatter_class=RawTextHelpFormatter,
+        )
     #parser.add_argument('-d', '--dotall',
         #help="same as python regex dotall",
         #default=False,
@@ -73,7 +72,7 @@ find . -type f | %s -iD 'find(\d)' 'replace\1'
 
     parser.add_argument("paths", 
         nargs='*',
-        help="paths to rename. Also takes paths nul separated from stdin and adds to those.")
+        help="paths to rename. Also takes paths null separated from stdin and adds to those.")
 
     args = parser.parse_args(sys.argv[1:])
 

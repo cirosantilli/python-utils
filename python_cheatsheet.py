@@ -1,15 +1,47 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-#tutorials
-#- http://www.diveintopython.net/index.html
+#general tutorials
 
-#libs
-#
-#tests:
-#  http://docs.python.org/library/unittest.html
-#  http://docs.python.org/library/doctest.html
+- http://www.diveintopython.net/index.html
 
+#fundamental modules
+
+    #std or not that everyone should know about
+
+    import argparse
+        #command line arguments interfaces
+        #argparse_cheatsheet.py
+
+    import timedate
+    #hardcore
+
+    import process
+    #calling external process
+
+    import curses
+    #python command line interfaces
+
+    import expat
+    #xml parsing
+    #TODO : general language parsing
+
+    #- gtk+ : TODO
+
+    import django
+        #django/django_cheatsheet.py
+
+    #numpy : fast multidim arrays
+    #scipy : scientific computing. depends on numpy
+
+    #pyplot : scientific plotting
+
+    #tests:
+        import unittest 
+            #firefox http://docs.python.org/library/unittest.html
+
+        import doctest
+            #firefox http://docs.python.org/library/doctest.html
 
 #installing stuff
 
@@ -60,6 +92,8 @@
     #works iff dir_in_pythonpath_with_init_inside is a directory in path
     #AND if there is a (empty) file named __init__.py in it
     #note that there is no difference between that and importing a function or class from a file
+
+
 
 #types and operators
 
@@ -134,6 +168,17 @@
         l2 = l.sorted()
         #creates new list
 
+        #range
+            l = range(10) #0 to 9
+            l = range(1,10) #0 to 9
+            l = range(1,10,2) #1, 3, ...
+            
+        #xrange
+            #iterator version.
+            #more efficient if loop only
+            for i in xrange(1,10,2):
+                print i
+
     #dictionnary
         d={1:"a", "b":2, 1.1:2}
         print d
@@ -151,6 +196,7 @@
         print t[0]
         print t[1]
         print t[2]
+
 
 #flow control
 
@@ -494,3 +540,19 @@
 
 #curses : python command line interfaces. see curses_cheatsheet.py
 
+#numpy
+
+    sudo pip install numpy
+    #fast multidim arrays
+
+    #floating point range
+    na = arange(0, 1000, 0.5) #numpy array
+
+#scipy
+
+#itertools
+    #hardcore iterator patterns
+
+    import itertools
+
+    itertools.product(xrange(3),xrange(3))

@@ -1,10 +1,27 @@
 #!/usr/bin/env python
 
-#------------------------------------------------------------
+#==================================================
 #
 # Ciro D. Santilli 
 #
-#------------------------------------------------------------
+#==================================================
+
+#index
+
+#genearal sources
+#  
+#  http://www.djangobook.com
+#
+#db interaction
+#
+#template language
+#  https://docs.djangoproject.com/en/dev/topics/templates/
+#
+#static content
+#  
+#
+#pagination: 
+#  https://docs.djangoproject.com/en/dev/topics/pagination/?from=olddocs
 
 #install
 
@@ -30,6 +47,48 @@
     mysql -u '<USER_NAME>' -p
     create database <DB_NAME>
     #create the database
+
+#database interaction
+    #https://docs.djangoproject.com/en/dev/topics/db/queries/
+
+    #create
+        p = Obj()
+        p.save()
+        #create object and save it to db
+
+        p = Obj.objects.create()
+        #same as above
+
+    #get 
+
+        #gets all objects
+        for o in Obj.objects.all():
+            print o
+
+        #filter by fields
+        for o in Obj.objects.filter(pub_date__year=1):
+            print o
+
+        #exclude by fields
+        for o in Obj.objects.exclude(pub_date__year=1):
+            print
+
+        #chain filters
+            Entry.objects.filter(
+                headline__startswith='What'
+            ).exclude(
+                pub_date__gte=datetime.date.today()
+            ).filter(
+                pub_date__gte=datetime(2005, 1, 30)
+            )
+
+    #delete
+
+        o.delete()
+
+    #foreign key
+        #on delete of referenced object, deletes pointer too!
+
 
 #apps
 
@@ -94,6 +153,17 @@
 
         vim $PROJECT/settings.py
         #/INSTALLED_APPS, remove from list
+
+    #app commands
+        https://docs.djangoproject.com/en/dev/howto/custom-management-commands/
+
+        cd $APP_ROOT
+        mkdir management/commands
+        cd management
+        touch __init__.py
+        cd commands
+        touch __init__.py
+        vim command.py
 
 #test
 
@@ -164,3 +234,7 @@ firefox http://127.0.0.1:8000/
             vim conf/trac.ini
             #and add/uncomment desired plugin lines.
             #this may be more precise and sure, but also harder.
+
+#pagination
+
+

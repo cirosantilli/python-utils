@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% load url from future %}
+{% comment %}
+must put this for url with quotes see https://docs.djangoproject.com/en/dev/intro/tutorial03/ note at the end
+{% endcomment %}
+
+{% block title %}polls{% endblock %}
+
+{% block content_title %}polls{% endblock %}
+
+{% block content %}
+
+    {% include "pagination.html" %}
+
+    {% if polls %}
+        <ul>
+        {% for poll in polls %}
+            <li><a href="{% url 'poll_detail' poll.id %}">{{ poll.question }}</a></li>
+            {% comment %}url is absolute magic: if looks for the polls.view.detail, and from the urlconf deduces (reverse) what is its url, supposing each view func has a single url{% endcomment %}
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>No polls are available.</p>
+    {% endif %}
+
+    {% include "pagination.html" %}
+
+{% endblock %}
+
+

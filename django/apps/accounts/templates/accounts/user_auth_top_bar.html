@@ -1,0 +1,13 @@
+{% load url from future %}
+
+{% if user.is_authenticated %}
+    <p>signed in as: <a href="{% url 'userena.views.profile_detail' user.username %}">{{ user.username }}</a> |
+    <a href="{% url 'userena.views.signout' %}">sign out</a></p>
+{% else %}
+    <p>
+        not signed in |
+        <a href="{% url 'userena.views.signin' %}">sign in</a> |
+        <a href="{% url 'userena.views.signup' %}">sign up</a>
+    </p>
+{% endif %}
+

@@ -13,19 +13,19 @@ import os.path
 if __name__ == '__main__':
     
     f = os.path.basename(__file__)
-    parser = argparse.ArgumentParser(description=r"""
-
+    parser = argparse.ArgumentParser(
+            description="" #short one line summary of program
+            prog=f, #program name. if present, you get a usage line.
+            epilog=r"""
 INSTALLATION
 
 SAMPLE CALLS
 
-%s
+  %s
 
-%s
-
-""" % (f,f),
-    formatter_class=RawTextHelpFormatter,
-    prog=f,
+  %s
+""", #after option description. put man here.
+    formatter_class=RawTextHelpFormatter, #keep newlines
     )
 
     parser.add_argument('a',

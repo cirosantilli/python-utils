@@ -1,4 +1,4 @@
-# Django settings for sample_project project.
+# Django settings for elearn project.
 
 import os
 import os.path
@@ -37,7 +37,7 @@ MANAGERS = ADMINS
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'django0',                      # Or path to database file if using sqlite3.
+        'NAME': 'elearn_django',                      # Or path to database file if using sqlite3.
         'USER': 'root',                      # Not used with sqlite3.
         'PASSWORD': 'thISaCHpa',                  # Not used with sqlite3.
         'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
@@ -140,10 +140,10 @@ MIDDLEWARE_CLASSES = (
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
-ROOT_URLCONF = 'sample_project.urls'
+ROOT_URLCONF = 'elearn.urls'
 
 # Python dotted path to the WSGI application used by Django's runserver.
-WSGI_APPLICATION = 'sample_project.wsgi.application'
+WSGI_APPLICATION = 'elearn.wsgi.application'
 
 INSTALLED_APPS = (
     'django.contrib.auth',
@@ -229,3 +229,4 @@ LOGIN_REDIRECT_URL = '/accounts/%(username)s/'
 LOGIN_URL = '/accounts/signin/'
 LOGOUT_URL = '/accounts/signout/'
 #</userena>
+

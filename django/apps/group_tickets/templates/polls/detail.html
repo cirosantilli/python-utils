@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% load url from future %}
+
+{% comment %}
+must put top line this for url with quotes see https://docs.djangoproject.com/en/dev/intro/tutorial03/ note at the
+{% endcomment %}
+
+{% block title %}{{ poll.question }}{% endblock %}
+
+{% block content_title %}{{ poll.question }}{% endblock %}
+
+{% block content %}
+    {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+
+    <form action="{% url 'polls.views.vote' poll.id %}" method="post">
+
+        {% csrf_token %}
+        {% comment %}this is supposed to avoid a user clicking on a link that causes the action to be performed without his knowledge and authenticates as him using cookie data{% endcomment %}
+
+        {% for choice in poll.choice_set.all %}
+            <input type="radio" name="choice" id="choice{{ forloop.counter }}" value="{{ choice.id }}" />
+            <label for="choice{{ forloop.counter }}">{{ choice.choice_text }}</label><br />
+        {% endfor %}
+
+        <input type="submit" value="Vote" />
+
+    </form>
+{% endblock %}
