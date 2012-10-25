@@ -10,19 +10,17 @@ must put top line this for url with quotes see https://docs.djangoproject.com/en
 {% block content_title %}{{ poll.question }}{% endblock %}
 
 {% block content %}
+    <div>id: <a href="{% url 'poll_detail' poll.pk %}">{{ poll.pk }}</a></div>
+    <div>creator: {% include "accounts/user_link.html" with username=poll.creator.username %}</div>
+    <div>date published: {{ poll.pub_date }}</div>
     {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
-
     <form action="{% url 'polls.views.vote' poll.id %}" method="post">
-
         {% csrf_token %}
         {% comment %}this is supposed to avoid a user clicking on a link that causes the action to be performed without his knowledge and authenticates as him using cookie data{% endcomment %}
-
         {% for choice in poll.choice_set.all %}
             <input type="radio" name="choice" id="choice{{ forloop.counter }}" value="{{ choice.id }}" />
             <label for="choice{{ forloop.counter }}">{{ choice.choice_text }}</label><br />
         {% endfor %}
-
         <input type="submit" value="Vote" />
-
     </form>
 {% endblock %}

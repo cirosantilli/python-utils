@@ -22,15 +22,21 @@ find_basename_res.py first second
 find_basename_res.py 'a.*b' '(a|b)+c'
 """)
 
+    parser.add_argument("-I", "--not-ignorecase",
+        default=False,
+        action='store_true',
+        help="if given takes case into consideration")
     parser.add_argument("re_strs", 
         nargs='*',
         help="regexes to use to filter, prints output iff given strings match all regexes.")
 
     args = parser.parse_args(sys.argv[1:])
 
-    re_strs = args.re_strs
+    re_args = re.UNICODE
+    if not args.not_ignorecase:
+        re_args = re_args | re.IGNORECASE
 
-    res = map(lambda r: re.compile( unicode(r, sys.stdin.encoding),re.IGNORECASE | re.UNICODE), re_strs)
+    res = map(lambda r: re.compile( unicode(r, sys.stdin.encoding), re_args), re_strs)
 
     for path in files.find(u"."):
         head, bname = os.path.split(path)
@@ -41,9 +47,3 @@ find_basename_res.py 'a.*b' '(a|b)+c'
                 break
         if all_match:
             print path
-
-        
-
-    
-
-

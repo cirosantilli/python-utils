@@ -138,6 +138,9 @@
         #unicode strings
         #to put unicode inside the .py file, must put the "# -*- coding: utf-8 -*-" as second line
 
+        i = int("1234")
+        f = float("12.34e56")
+
 #containers
 
     #list

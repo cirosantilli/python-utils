@@ -1,5 +1,6 @@
 from django.conf.urls import patterns, url
 from django.views.generic import DetailView, ListView
+from django.views.generic.simple import direct_to_template
 from polls.models import Poll
 
 urlpatterns = patterns('',
@@ -23,6 +24,10 @@ urlpatterns = patterns('',
                     #),
             #name='poll_index'), #to refer to its url with reverse (and so url in templates). therefore, this must be unique
     #but I find this more confusing...
+
+    url(r'^create/$', 
+        'polls.views.create',
+        name='poll_create'),
 
     url(r'^(?P<pk>\d+)/$',
         DetailView.as_view(

@@ -1,22 +1,4 @@
-{# each "polls" is a poll model object. #}
-<div class="pagination">
-    <span class="step-links">
-
-        <span class="current">
-            page {{ polls.number }} of {{ polls.paginator.num_pages }} |
-            {# items from {{ polls.start_index }} to {{ polls.end_index }} #}
-        </span>
-
-        <a href="?page={{ polls.first_page_number }}">&lt&lt</a> |
-
-        {% if polls.has_previous %}
-            <a href="?page={{ polls.previous_page_number }}">&lt</a> |
-        {% endif %}
-
-        {% if polls.has_next %}
-            <a href="?page={{ polls.next_page_number }}">&gt</a> |
-        {% endif %}
-
-        <a href="?page={{ polls.last_page_number }}">&gt&gt</a>
-    </span>
+<div class="paginagion">
+    {% include "pagination_status.html" %} |
+    {% include "pagination_nav.html" %}
 </div>

@@ -3,7 +3,11 @@ from django.conf.urls import patterns, include, url
 from django.views.generic.simple import direct_to_template
 
 from django.contrib import admin
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+
 admin.autodiscover()
+
+import settings
 
 urlpatterns = patterns('',
 
@@ -38,3 +42,4 @@ urlpatterns = patterns('',
     #</userena
 )
 
+urlpatterns += staticfiles_urlpatterns() #to serve static files

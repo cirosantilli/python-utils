@@ -16,12 +16,34 @@
 #
 #template language
 #  https://docs.djangoproject.com/en/dev/topics/templates/
+#  https://docs.djangoproject.com/en/dev/ref/templates/builtins/
+#  
+#  date:
+#    https://docs.djangoproject.com/en/dev/ref/templates/builtins/?from=olddocs
+#    https://docs.djangoproject.com/en/dev/ref/templates/builtins/#date-time
+#
+#forms
+#  https://docs.djangoproject.com/en/dev/topics/forms/?from=olddocs
+#
+#
+#  http://charlesleifer.com/blog/djangos-inlineformsetfactory-and-you/
+#  #poll choices create at same time form
 #
 #static content
 #  
 #
 #pagination: 
 #  https://docs.djangoproject.com/en/dev/topics/pagination/?from=olddocs
+
+
+#TODO
+# serve project specific static files in app urls
+# define commands outside apps
+# count foreign key inverse
+# get field names/verbose names in templates
+# generic views for inlineformset
+#   https://github.com/AndrewIngram/django-extra-views
+#   https://docs.djangoproject.com/en/1.4/topics/forms/modelforms/#inline-formsets
 
 #install
 
@@ -49,6 +71,7 @@
     #create the database
 
 #database interaction
+
     #https://docs.djangoproject.com/en/dev/topics/db/queries/
 
     #create
@@ -237,4 +260,26 @@ firefox http://127.0.0.1:8000/
 
 #pagination
 
+#templates
 
+    ### custom_templates.py ###
+
+    from django import template
+    register = template.Library()
+
+    @register.simple_tag
+
+    def custom_tag_field(value, kwarg1=False, kwarg2=False):
+        t = template.loader.get_template('some_template.html')
+        return t.render(template.Context({'value': value, 'kwarg1':kwarg1, 'kwarg2': kwarg2}))
+
+    ### index.html ###
+
+
+    {% load custom_templates  %}
+    {% get_with_args_and_kwargs somevar,"sometext",kwarg1=someothervar %}
+
+#commands
+
+    ./manage.py dbshell #open mysql, with password
+    ./manage.py sqlclear accounts | ./manage.py dbshell

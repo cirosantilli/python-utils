@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+#find files that I want to keep track of for a django project,
+#output to stdout newline separated
+
+set -e #stop execution if one command goes wrong
+
+ack-grep --ignore-dir=migrations -ag '\.(py|html|css|js|jpg|jpeg|gif)$'
+
+exit 0

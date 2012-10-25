@@ -1,0 +1,10 @@
+<span class="pagination_nav">
+    <a href="?page=1">&lt&lt</a> |
+    {% if polls.has_previous %}
+        <a href="?page={{ polls.previous_page_number }}">&lt</a> |
+    {% endif %}
+    {% if polls.has_next %}
+        <a href="?page={{ polls.next_page_number }}">&gt</a> |
+    {% endif %}
+    <a href="?page={{ polls.paginator.num_pages }}">&gt&gt</a>
+</span>

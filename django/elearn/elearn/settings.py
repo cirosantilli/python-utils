@@ -21,6 +21,7 @@ site_static_files_dir = os.path.join(site_root,'static')
 
 global_apps_dir = os.path.join(my_django_root,"apps")            #multi project apps
 global_templates_dir = os.path.join(my_django_root,'templates')  #multi project templates
+global_static_files_dir = os.path.join(my_django_root,'static')
 
 sys.path.append(global_apps_dir) #apps that may be shared between projects
 sys.path.append(site_apps_dir) #project only apps
@@ -63,7 +64,11 @@ USE_I18N = True
 
 # If you set this to False, Django will not format dates, numbers and
 # calendars according to the current locale.
-USE_L10N = True
+USE_L10N = False
+
+# default date format. l10n has precedence over this if l10n is true.
+DATE_FORMAT="Y-m-d"
+DATETIME_FORMAT = "Y-m-d H:i:s"
 
 # If you set this to False, Django will not use timezone-aware datetimes.
 USE_TZ = True
@@ -96,6 +101,7 @@ STATICFILES_DIRS = (
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
     site_static_files_dir,
+    global_static_files_dir,
 )
 
 # List of finder classes that know how to find static files in
@@ -151,7 +157,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.sites',
     'django.contrib.messages',
-    'django.contrib.staticfiles',
+    'django.contrib.staticfiles', #to find static files
     'django.contrib.admin',
     #'django.contrib.admindocs',
 
@@ -170,6 +176,7 @@ INSTALLED_APPS = (
 
     #personal apps
     'polls',
+    'mycommands',
 )
 
 # A sample logging configuration. The only tangible logging
@@ -223,7 +230,7 @@ EMAIL_HOST_USER = 'mytemanu0@gmail.com' #confirmation mails will be sent from th
 EMAIL_HOST_PASSWORD = 'thpaofmyte'
 
 ANONYMOUS_USER_ID = -1
-AUTH_PROFILE_MODULE = 'accounts.MyProfile'
+AUTH_PROFILE_MODULE = 'accounts.Profile'
 
 LOGIN_REDIRECT_URL = '/accounts/%(username)s/'
 LOGIN_URL = '/accounts/signin/'

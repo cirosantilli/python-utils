@@ -151,11 +151,11 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.sites',
     'django.contrib.messages',
-    'django.contrib.staticfiles',
+    'django.contrib.staticfiles', #to find static file
     'django.contrib.admin',
     #'django.contrib.admindocs',
 
-    #installed apps
+    #installed not django
     'guardian',
     'easy_thumbnails',
 
@@ -168,7 +168,7 @@ INSTALLED_APPS = (
     'south',
     #db migrations
 
-    #personal apps
+    #created mostly by me
     'polls',
 )
 

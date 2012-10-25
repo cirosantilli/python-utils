@@ -1,25 +1,14 @@
-{% comment %}
-url: either refers to a function (polls.views.detail), or to the name of a url
-(in urls.py, adding url(polls.views.detail, name='poll_detail'))
-{% endcomment %}
-
 <!DOCTYPE html>
 <html>
     <head>
         <title>{% block title %}{% endblock %}</title>
         <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
-        <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}style.css" />
+        <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/style.css" />
         {% block extrahead %}{% endblock %}
     </head>
     <body>
-
-        {% include "accounts/user_auth_top_bar.html" %}
-
-        <hr/>
-
+        <div id="auth_top_bar">{% include "accounts/user_auth_top_bar.html" %}</div>
         <h1>{% block content_title %}{% endblock %}</h1>
-
         {% block content %}{% endblock %}
-
     </body>
 </html>

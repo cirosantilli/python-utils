@@ -3,11 +3,13 @@ from django.contrib.auth.models import User
 
 from django.utils import timezone
 
-import datetime
+from datetime import datetime
 
 class Poll(models.Model):
-    question = models.CharField(max_length=200)
-    pub_date = models.DateTimeField('date published')
+    question = models.CharField('question', max_length=200)
+    pub_date = models.DateTimeField('date published', default=datetime.now())
+
+    creator = models.ForeignKey(User, related_name='creator')
 
     users_who_voted = models.ManyToManyField(User)
     #stores which users voted for which polls
@@ -34,7 +36,7 @@ class Poll(models.Model):
 
     was_published_recently.admin_order_field = 'pub_date' #if clicks on this, sorts by r2 instead (gives the same thing, but sort by function is not supported)
     was_published_recently.boolean = True #treats output as boolean, and prints nice output to end user
-    was_published_recently.short_description = 'Published recently?' #title that will to to admin colum
+    was_published_recently.short_description = 'published recently?' #title that will to to admin colum
 
     def __unicode__(self):
         #analogous to str(), but unicode
@@ -44,8 +46,8 @@ class Poll(models.Model):
 
     class Meta:
             permissions = (
-                ("can_view", "Can see a given poll"),
-                ("can_vote", "Can vote for a given poll"),
+                ("can_view", "can see a given poll"),
+                ("can_vote", "can vote for a given poll"),
             )
 
 class Choice(models.Model):
