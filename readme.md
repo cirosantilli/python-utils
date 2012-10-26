@@ -14,3 +14,9 @@ instead of a setup.py file.
 This section showcases scripts which I think might be worth your while.
 
 Is a script is not here, it may be total trash (due lack of tests, or pure noobiness =) )
+
+## bin/python_cheatsheet.py
+
+## bin/find_basename_res.py
+
+simplified ack -g -all with multiple regexes

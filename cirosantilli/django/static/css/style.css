@@ -1,0 +1,25 @@
+body
+{
+background-color:black;
+color:#00AA00;
+}
+
+h1,h2,h3,h4,h5,h6
+{
+color:white;
+}
+
+p
+{
+color:green;
+}
+
+a:link {color:#44aaff;}      /* unvisited link */
+a:visited {color:#ff6600;}  /* visited link */
+a:hover {color:#FF00FF;}  /* mouse over link */
+a:active {color:#FF00FF;}  /* selected link */ 
+
+img
+{
+height:100px;
+}

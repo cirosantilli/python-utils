@@ -1,0 +1,69 @@
+{% extends 'userena/base_userena.html' %}
+{% load i18n %}
+{% load url from future %}
+
+{% block title %}{% blocktrans with profile.user.username as username %}{{ username }}'s profile.{% endblocktrans %}{% endblock %}
+{% block content_title %}<h2>{{ profile.user.username }} {% if profile.user.get_full_name %}({{ profile.user.get_full_name }}){% endif %}</h2>{% endblock %}
+
+{% block content %}
+  <div class="white-box">
+    {% block profile_navigation %}
+      {% comment %}Dirty hack. Will use django-guardian in the future.{% endcomment %}
+      {% if user.username == profile.user.username %}
+        <ul id="box-nav">
+          {% block profile_navigation_items %}
+            <li><a href="{% url 'userena_profile_detail' user.username %}">{% trans "View profile" %}</a></li>
+            <li><a href="{% url 'userena_profile_edit' user.username %}">{% trans "Edit details" %}</a></li>
+            <li><a href="{% url 'userena_password_change' user.username %}">{% trans "Change password" %}</a></li>
+            <li><a href="{% url 'userena_email_change' user.username %}">{% trans "Change email" %}</a></li>
+          {% endblock %}
+        </ul>
+      {% endif %}
+    {% endblock %}
+
+    <div id="details">
+      {% block profile_details %}
+      <img class="mugshot" src="{{ profile.get_mugshot_url }}" alt="{% trans "Your mugshot" %}" />
+        <table>
+          {% if profile.user.get_full_name %}
+            <tr>
+              <td>{% trans "name" %}</td>
+              <td>{{ profile.user.get_full_name }}</td>
+            <tr/>
+          {% endif %}
+          {% if profile.user.email and not hide_email %}
+            <tr>
+              <td>{% trans "email" %}</td>
+              <td>{{ profile.user.email }}</td>
+            <tr/>
+          {% endif %}
+          {% if profile.favourite_snack %}
+            <tr>
+              <td>{% trans "favourite snack" %}</td>
+              <td>{{ profile.favourite_snack }}</td>
+            <tr/>
+          {% endif %}
+
+          {% comment %} userena fields stuff
+            {% if profile.age %}
+              <dt>{% trans "Age" %}</dt>
+              <dd>{{ profile.age }}</dd>
+            {% endif %}
+            {% if profile.website %}
+              <dt>{% trans "Website" %}</dt>
+              <dd>{{ profile.website|urlize }}</dd>
+            {% endif %}
+            {% if profile.location %}
+              <dt>{% trans "Location" %}</dt>
+              <dd>{{ profile.location }}</dd>
+            {% endif %}
+            {% if profile.about_me %}
+              <dt>{% trans "About me" %}</dt>
+              <dd>{{ profile.about_me }}</dd>
+            {% endif %}
+          {% endcomment %}
+        </table>
+      {% endblock %}
+    </div>
+  </div>
+{% endblock %}
