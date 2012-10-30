@@ -1,19 +1,52 @@
 from django.conf.urls import patterns, url
 from django.views.generic import DetailView, ListView
+from django.views.generic.create_update import create_object 
 from django.views.generic.simple import direct_to_template
 
-from user_user_groups.models import 
-from polls.models import Poll
+from views import UserGroupForm
 
-urlpatterns = patterns('',
+#from user_user_groups.models import UserGroup
 
-    url(r'^$',
-            ListView.as_view(
-                    queryset=Poll.objects.order_by('-pub_date')[:5],
-                    context_object_name='latest_poll_list',
-                    template_name='polls/index.html',
-                    paginate_by=10,
-                    ),
-            name='poll_index'),
+USERNAME_RE = r'(?P<username>[^/?]+)'
+USERUSERGROUPS_URL = r'user-groups'
+GROUP_NAME_RE = r'(?P<groupname>[^/?]+)'
+
+username_url_re_prefix = r'^' + USERNAME_RE  + r'/' + USERUSERGROUPS_URL
+username_groupname_url_re_prefix = username_url_re_prefix + r'/' + GROUP_NAME_RE
+
+suffix = r'/$'
+
+urlpatterns = patterns('user_user_groups.views',
+
+    url(
+        username_url_re_prefix + r'/create' + suffix,
+        'create',
+        name='user_user_groups_create',
+    ),
+
+    url(
+        username_groupname_url_re_prefix +  r'/update' + suffix,
+        'update',
+        name='user_user_groups_update',
+    ),
+
+    url(
+        username_url_re_prefix + suffix,
+        'index',
+        name='user_user_groups_index',
+    ),
+
+
+    url(
+        username_groupname_url_re_prefix +  suffix,
+        'detail',
+        name='user_user_groups_detail',
+    ),
+
+    url(
+        username_groupname_url_re_prefix +  r'/delete' + suffix,
+        'delete',
+        name='user_user_groups_delete',
+    ),
 
 )

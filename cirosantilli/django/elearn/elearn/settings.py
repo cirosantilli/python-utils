@@ -4,6 +4,8 @@ import os
 import os.path
 import sys
 
+from django.core.urlresolvers import reverse
+
 #dir tree
 # my_django_root/apps
 # my_django_root/site_root/apps
@@ -77,6 +79,9 @@ DATETIME_FORMAT = "Y-m-d H:i:s"
 
 # If you set this to False, Django will not use timezone-aware datetimes.
 USE_TZ = True
+
+APPEND_SLASH=True
+#https://docs.djangoproject.com/en/dev/ref/settings/#append-slash
 
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 # Example: "/home/media/media.lawrence.com/media/"
@@ -182,6 +187,7 @@ INSTALLED_APPS = (
     #personal apps
     'polls',
     'mycommands',
+    'user_user_groups',
 )
 
 # A sample logging configuration. The only tangible logging
@@ -236,12 +242,13 @@ EMAIL_HOST_PASSWORD = 'thpaofmyte'
 
 ANONYMOUS_USER_ID = -1
 
-LOGIN_REDIRECT_URL = '/accounts/%(username)s/'
-LOGIN_URL = '/accounts/signin/'
-LOGOUT_URL = '/accounts/signout/'
+LOGIN_REDIRECT_URL = '/users/%(username)s/'
+LOGIN_URL = '/users/signin/'
+LOGOUT_URL = '/users/signout/'
 
 #see userena.settings for the stuff you can change!
 AUTH_PROFILE_MODULE = 'accounts.Profile' #what module to user for profile. extends UserenaBaseProfile
+USERENA_PROFILE_LIST_TEMPLATE = 'accounts/profile_list.html'
 USERENA_PROFILE_DETAIL_TEMPLATE = 'accounts/profile_detail.html'
 #USERENA_HIDE_EMAIL=True
 

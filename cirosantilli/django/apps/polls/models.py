@@ -6,8 +6,14 @@ from django.utils import timezone
 from datetime import datetime
 
 class Poll(models.Model):
-    question = models.CharField('question', max_length=200)
-    pub_date = models.DateTimeField('date published', default=datetime.now())
+    question = models.CharField(
+            'question',
+            max_length=200
+        )
+    pub_date = models.DateTimeField(
+            'date published',
+            default=lambda:datetime.now()
+        )
 
     creator = models.ForeignKey(User, related_name='creator')
 

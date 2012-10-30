@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% load url from future %}
+{% load i18n %}
+
+{% block title %}{{ creator.username }}{% endblock %}
+
+{% block content_title %}{{ creator.username }}{% endblock %}
+
+{% block content %}
+    <h2>{{ usergroup.groupname }}</h2>
+    {% if usergroup.group %}
+        <table>
+            <thead> 
+                <tr>
+                    <th>{% trans "username" %}</th>
+                    <th>{% trans "date added" %}</th>
+                </tr>
+            </thead> 
+            <tbody> 
+            {% for useringroup in usergroup.group.all %}
+                <tr>
+                    <th>{% include "accounts/user_link.html" with username=useringroup.user.username %}</th>
+                    <th>{{ useringroup.date_added }}</th>
+                </tr>
+            {% endfor %}
+            </tbody> 
+        </table>
+    {% else %}
+        <p>{% trans "this group has no users" %}</p>
+    {% endif %}
+    <h2>{% trans "actions" %}</h2>
+    {% include "user_user_groups/update_usergroup_link.html" with username=creator.username groupname=usergroup.groupname %}
+    {% include "user_user_groups/delete_usergroup_link.html" with username=creator.username groupname=usergroup.groupname %}
+{% endblock %}

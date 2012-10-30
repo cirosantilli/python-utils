@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% load url from future %}
+{% load i18n %}
+
+{% block title %}{{ creator.username }}{% endblock %}
+
+{% block content_title %}{{ creator.username }}{% endblock %}
+
+{% block content %}
+<h2>{% trans "update" %}</h2>
+<h3>{%blocktrans%}{{usergroup.groupname}}{%endblocktrans%}</h3>
+
+<form action="{% url 'user_user_groups_update' creator.username usergroup.groupname %}" method="post">{% csrf_token %}
+    {{ form.as_p }}
+    <p><input type="submit" value="{% trans "update" %}" /></p>
+</form>
+{% endblock %}

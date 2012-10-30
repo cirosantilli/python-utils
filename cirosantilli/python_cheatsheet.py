@@ -199,10 +199,13 @@
     #dictionnary
         d={1:"a", "b":2, 1.1:2}
         print d
-        print d[1]
+        print d[1] #order is undefied!
         print d["b"]
         #print d["c"] #exception!
         print d.keys() #list, undefined order.
+
+        del d["b"]
+        print d
 
     #tuple
         t=(1,2,3)
@@ -421,8 +424,9 @@
             return
 
     class B(A):
-        def __init__(self):
-            super(B,self).__init__()
+        def __init__(self,*args, **kwargs):
+            self.creator = kwargs.pop('arg_for_derived_only',"default")
+            super(B,self).__init__(*args,**kwargs)
             print "Constructor B was called"
 
 #bultin functions
@@ -565,6 +569,12 @@
     #sub
         #same as sub(), but return a tuple (new_string, number_of_subs_made).
 
+    #match
+        re.match(r"a.c","abc")
+
+        r = re.compile(r"a.c")
+        r.match("abc")
+
 #curses : python command line interfaces. see curses_cheatsheet.py
 
 #numpy
@@ -583,3 +593,14 @@
     import itertools
 
     itertools.product(xrange(3),xrange(3))
+
+#random
+
+    import random
+
+    random.sample([1, 2, 3, 4, 5, 6], 2)
+    #takes elements at random from list
+
+
+    for i in random.sample(xrange(2), 2):
+        print i;

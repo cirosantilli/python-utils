@@ -11,8 +11,12 @@
 #genearal sources
 #  
 #  http://www.djangobook.com
+#  http://djangosnippets.org/
 #
 #db interaction
+#  https://docs.djangoproject.com/en/dev/ref/models/fields/
+#  https://docs.djangoproject.com/en/dev/ref/models/relations/
+#  https://docs.djangoproject.com/en/dev/topics/db/queries/
 #
 #template language
 #  https://docs.djangoproject.com/en/dev/topics/templates/
@@ -22,18 +26,36 @@
 #    https://docs.djangoproject.com/en/dev/ref/templates/builtins/?from=olddocs
 #    https://docs.djangoproject.com/en/dev/ref/templates/builtins/#date-time
 #
-#forms
-#  https://docs.djangoproject.com/en/dev/topics/forms/?from=olddocs
+#  two fields that are unique together
+#    http://blog.gordaen.com/2009/07/08/mysql-unique-key-pairs/
 #
+#forms
+#  https://docs.djangoproject.com/en/dev/topics/forms/
+#  https://docs.djangoproject.com/en/dev/ref/forms/fields/
+#  https://docs.djangoproject.com/en/dev/ref/forms/api/
+#  https://docs.djangoproject.com/en/dev/ref/forms/widgets/
+#  https://docs.djangoproject.com/en/dev/ref/forms/validation/
+#
+#  http://mikepk.com/2010/08/python-django-forms-errors-fieldsets/
+#  #form customization. confirm email field.
 #
 #  http://charlesleifer.com/blog/djangos-inlineformsetfactory-and-you/
 #  #poll choices create at same time form
+#
+#  http://jayapal-d.blogspot.com.br/2009/08/reuse-django-admin-filteredselectmultip.html#comment-form
+#  #how to reuse django admin filteredselectmultiple
 #
 #static content
 #  
 #
 #pagination: 
 #  https://docs.djangoproject.com/en/dev/topics/pagination/?from=olddocs
+#
+#user login
+#
+#  request context to use user in template. render vs render_to_response
+#     https://docs.djangoproject.com/en/dev/topics/http/shortcuts/#django.shortcuts.render
+#
 
 
 #TODO
@@ -44,6 +66,9 @@
 # generic views for inlineformset
 #   https://github.com/AndrewIngram/django-extra-views
 #   https://docs.djangoproject.com/en/1.4/topics/forms/modelforms/#inline-formsets
+# generic views that depend on request:
+#   user / list something that belongs to the user
+# enforce unique username/groupname User/group
 
 #install
 
@@ -293,18 +318,24 @@ firefox http://127.0.0.1:8000/
     APP=
     #tracking a table
         
-
-        ./manage.py schemamigration southtut --initial 
+        ./manage.py schemamigration --initial $APP
         ./migrate
         #add new table
 
         ./manage.py convert_to_south $APP
         #convert existing table to django
 
-
-    #modifying tracked table
+    #add new field to tracked table
 
         ./manage.py schemamigration $APP --auto
         #new fields must have default
+
+    #rename a model
+        #http://stackoverflow.com/questions/2862979/easiest-way-to-rename-a-model-using-django-south
+
+        ./manage.py schemamigration $APP rename_foo_to_bar --auto
+
+    #more complicated stuff
+        http://south.readthedocs.org/en/latest/tutorial/part3.html
 
 

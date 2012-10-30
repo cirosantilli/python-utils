@@ -13,11 +13,6 @@ class Profile(UserenaBaseProfile):
             related_name='profile',
             )
 
-    #favourite_snack = models.CharField(
-            #verbose_name=_('favourite snack'),
-            #max_length=32,
-            #)
-
     class Meta:
             permissions = (
                 ("is_member", "is member"),
