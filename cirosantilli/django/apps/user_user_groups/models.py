@@ -21,7 +21,6 @@ class UserGroup(models.Model):
 
     creator = models.ForeignKey(
                 User,
-                related_name='user_group_creator'
             )
 
     groupname = models.CharField(
@@ -47,7 +46,7 @@ class UserInGroup(models.Model):
 
     user = models.ForeignKey(
                 User,
-                related_name='user_in_group'
+                #related_name='users'
             )
 
     date_added = models.DateTimeField(
@@ -57,7 +56,7 @@ class UserInGroup(models.Model):
 
     group = models.ForeignKey(
                 UserGroup,
-                related_name='group',
+                #related_name='group',
             )
 
     def __unicode__(self):

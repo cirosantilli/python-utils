@@ -52,7 +52,6 @@ SAMPLE CALLS
     else:
         output_separator = "\n"
 
-
     for path in files.find(u"."):
         head, bname = os.path.split(path)
         all_match=True

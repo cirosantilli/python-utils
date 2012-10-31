@@ -22,7 +22,7 @@
         {% for item in items %}
             <tr>
                 <th><a href="{% url 'user_user_groups_detail' creator.username item.groupname %}">{{ item.groupname }}</a></th>
-                <th>{{ item.group.count }}</th>
+                <th>{{ item.useringroup_set.count }}</th>
                 <th>{{ item.creation_date }}</th>
             </tr>
         {% endfor %}

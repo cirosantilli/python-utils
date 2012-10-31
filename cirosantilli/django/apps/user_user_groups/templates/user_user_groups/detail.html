@@ -9,7 +9,7 @@
 
 {% block content %}
     <h2>{{ usergroup.groupname }}</h2>
-    {% if usergroup.group %}
+    {% if usergroup.useringroup_set %}
         <table>
             <thead> 
                 <tr>
@@ -18,7 +18,7 @@
                 </tr>
             </thead> 
             <tbody> 
-            {% for useringroup in usergroup.group.all %}
+            {% for useringroup in usergroup.useringroup_set.all %}
                 <tr>
                     <th>{% include "accounts/user_link.html" with username=useringroup.user.username %}</th>
                     <th>{{ useringroup.date_added }}</th>
@@ -26,6 +26,7 @@
             {% endfor %}
             </tbody> 
         </table>
+        <div>{% trans "user count" %}: {{ usergroup.useringroup_set.count}}</div>
     {% else %}
         <p>{% trans "this group has no users" %}</p>
     {% endif %}

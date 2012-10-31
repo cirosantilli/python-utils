@@ -9,6 +9,9 @@ if __name__ == '__main__':
 
     roots = sys.argv[1:]
 
+    for p in files.find(u"."):
+        print p
+
     #paths = files.find_new(roots)
 
     #print "No files"

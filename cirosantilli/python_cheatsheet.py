@@ -155,10 +155,13 @@
         i = int("1234")
         f = float("12.34e56")
 
-#containers
+#data structures
+    #http://docs.python.org/2/tutorial/datastructures.html
 
     #list
-        l=[1,2,"a","b"] 
+        l = [1,2,"a","b"] 
+        l2 = list((1,2,"a","b")) #from tuple
+
         print l
         print l[0]
         print l[1]
@@ -170,8 +173,14 @@
         print l[:-1]
         print l[-2:]
 
+        l2[0] = "new"
+        print l2
+
+        del l2[0]
+        print l2
+
         print l+"c"
-        #print l=+"c" #error
+        #print l+="c" #error
         print l.append("c")
         print l.extend(["c","d"])
 
@@ -196,26 +205,72 @@
             for i in xrange(1,10,2):
                 print i
 
+    #tuple
+        t=(1,2,3)
+        t=tuple([1,2,3]) #from list
+        t2=(4,5,6)
+        t3=(4,5,1)
+        tb=(False,False,True)
+        tm = (1,1.1,True,"asdf")
+
+        a,b,c=t
+        print a
+        print b
+        print c
+
+        print t[0]
+        print t[1]
+        print t[2]
+
+        #t[0] = "a"
+        #t.append("a")
+        #tuples are immutable!
+        
+        print t + t2
+        print 2 * t
+        
+        print t<t2
+        print t<t3
+
+        print len(t)
+        print max(t)
+        print min(t)
+        print any(tb)
+        print all(tb)
+        print divmod(5,2)
+
     #dictionnary
         d={1:"a", "b":2, 1.1:2}
         print d
         print d[1] #order is undefied!
         print d["b"]
+
         #print d["c"] #exception!
+        print d.get("c","default value")
+
         print d.keys() #list, undefined order.
+
+        #modify value
+        d["b"] = 3
+        print d
+
+        #add new value
+        d["c"] = 4
+        print d
 
         del d["b"]
         print d
 
-    #tuple
-        t=(1,2,3)
-        a,b,c=t
-        print a
-        print b
-        print c
-        print t[0]
-        print t[1]
-        print t[2]
+        z = dict(x.items() + y.items())
+        #join 2 dicts into a third
+
+        d1.update(d2)
+        d1.update({'as':12})
+        d1.update(1:2,3:4)
+        #update d1 to add/update values of dict d2 and d3 and as key
+
+
+
 
 
 #flow control
@@ -309,63 +364,111 @@
 
 #functions
     
-    def f():
-        """
-        returns multiple arguments
-        """
-        return 1,2
-    a,b = f()
+    #multiple return values
+        def f():
+            """
+            returns multiple arguments
+            """
+            return 1,2
+        a,b = f()
 
-    def f(give,
-            many,
-            arguments,
-            like,
-            this):
-        """
-        comments
-        """
-        return True
+    #passing arguments to functions
+        def f(a,b,c=10,d=20,*arg,**kwargs):
+            """
+            arg is a tuple, kwargs a dicdt
+            """
+
+            larg = list(arg)
+            for a in arg:
+                print a
+
+            kw1 = kwargs.get(1,"default1")
+            kw2 = kwargs.get(2,"default2")
+            kw2 = kwargs.get(3,"default3")
+
+            print "a"
+            print a
+            print "b"
+            print b
+            print "c"
+            print c
+            print "arg"
+            print arg
+            print "kwargs"
+            print kwargs
+            print "kw1"
+            print kw1
+            print "kw2"
+            print kw2
+            print "kw3"
+            print kw3
+
+        f(1,2,3)
+        f(1,2,3)
+        f(1,2,d=3)
+        f(c=2,b=1,a=1)
+
+        #f(1) #missing argument
+
+        f(1,2,3,4,5,6)
+        f(1,c=2,3,4,5,6)
+
+        a=[1,2,3]
+        f(*a)
+        a=[1,2,3,4,5,6]
+        f(*a)
+
+        f("asdf",*(1,2,3,4),{1:"a",2:"b"})
+        f("as",12,*(1,2,3,4),{1:"a",2:"b"})
+        f("asdf",*[1,2,3,4],{1:"a",2:"b"})
+        f("asdf",*l,**d)
+
+        #there is no such thing as function overloading in Python
+            def f(a,b):
+                """
+                completely destroys last existing f
+                """
+                print "newf"
+
+            #f(1,2,3)
+            #too many args
 
 
-    def f(a):
-        """
-        This is a comment
-        """
-        print  a
+    #variables can contain functions
+        def f(x):
+            print x
 
-    f.c = 1
-    #functions can have attributes too
+        def g(h,x):
+            """
+            g is a function, x is a number
 
-    def g(h,x):
-        """
-        g is a function, x is a number
+            functions can be passed as arguments
+            """
+            h(x)
 
-        functions can be passed as arguments
-        """
-        h(x)
+        f2=f
+        g(f2,x) #prints x
 
-    g(f,x) #prints x
+        #lambda
+            g(lambda x: x, x)
+            #lambda is faunction without name
+            #lambda cannot contain assignments
 
-    g(lambda x: x, x)
-    #lambda is faunction without name
-    #lambda cannot contain assignments
+    #functions can have attributes
+        def f(a):
+            print  a
+
+        f.c = 1
+        print f.c
 
     
-    def many_args(*arg):
-        print "I was called with", len(arg), "arguments:", arg
-
-    many_args(1)
-    many_args(1,2,3)
-    args=[1,2,3]
-    many_args(*args)
-
 
 #classes and objects
 
-    # call constructor of base class
-    class A(object):
+    #special methods
+    class A():
         """
-        This is a comment
+        comment
         """
 
         def __init__(self, a, b):
@@ -376,10 +479,10 @@
             #not very widely followed though because it is a pain to write...
             self._private = b
 
-    #def __cmp__(self,other):
-        #"""
-        #deprecated in 3., forget it!
-        #"""
+        #def __cmp__(self,other):
+            #"""
+            #deprecated in 3., forget it!
+            #"""
 
         def __eq__(self,other):
             """
@@ -423,15 +526,50 @@
             """
             return
 
-    class B(A):
-        def __init__(self,*args, **kwargs):
-            self.creator = kwargs.pop('arg_for_derived_only',"default")
-            super(B,self).__init__(*args,**kwargs)
-            print "Constructor B was called"
+    #inheritance
+        class B(A):
+            def __init__(self,a,*args, **kwargs):
 
-#bultin functions
+                #modify args
+                args = [ a+1 for a in args]
 
-    geattr
+                #modify kwargs
+                kwargs['override'] = "fixed value"
+                self.creator = kwargs.pop('arg_for_derived_only',"default")
+
+                #call base calss constructor
+                super(B,self).__init__(a,*args,**kwargs)
+
+                print "Constructor B was called"
+
+        #TODO multiple
+
+    class Reflection
+
+        def __init__(self):
+            self.a = "adsf"
+
+        def print_methods(self):
+            """ print all the methods of this object and their doc string"""
+            print '\n* Methods *'
+            for names in dir(self):
+            attr = getattr(self,names)
+            if callable(attr):
+                print names,':',attr.__doc__
+
+        def print_attributes(self):
+            """ print all the attributes of this object and their value """
+            print '* Attributes *'
+            for names in dir(self):
+            attr = getattr(self,names)
+            if not callable(attr):
+                print names,':',attr
+
+#builtin functions
+
+    #geattr
+        value = obj.attribute
+        value = getattr(obj, "attribute")
 
         ### settings.py ###
         PARAM = True

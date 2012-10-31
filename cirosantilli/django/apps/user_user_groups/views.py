@@ -18,8 +18,6 @@ from user_user_groups.models import UserGroup, UserInGroup
 
 ITEMS_PER_PAGE = 100
 
-SUCCESS_REDIRECT = 'user_user_groups_index'
-
 def index(request, username):
     creator = get_object_or_404(User,username=username)
     items_list = UserGroup.objects.filter(creator=creator)
@@ -59,28 +57,85 @@ class UserGroupForm(ModelForm):
 
     users = forms.ModelMultipleChoiceField(
             queryset=User.objects.all(),
-            widget=FilteredSelectMultiple("users", is_stacked=False, attrs={'rows':'10'})
+            widget=FilteredSelectMultiple(
+                    "users",
+                    is_stacked=False,
+                    attrs={'rows':'10'},
+                )
         )
 
     def __init__(self, *args, **kwargs):
         """
-        may be called with or without creator.
+        #kwargs
 
-        if no creator is given, unicity check does nothing: it is the initial GET request.
+        - creator
+            Auth.User object
+
+            if no creator is given, unicity check does nothing:
+            it is probably the initial GET request.
+
+            rationale: without a creator, one cannot know if the
+            groupname/username pair is unique.
+
+        - initial_usergroup
+            UserGroup object
+
+            loads form with given UserGroup object.
+
+            if given, dictionnary *arg is ignored,
+            just like it is if a ModelForm is given a initial
+            kwarg
+
+            if 'initial' is given with initial_usergroup, its values are considered
+            'initial' dictionnary value pairs have precedence over
+            those extracted in initial_usergroup.
+
+        - old_groupname
+            String
+
+            if given supposes it is an update of old_groupname.
+            therefore, in that case, will only raise an unicity check error
+            it then new username/groupname is already taken and if the
+            new groupaname is different from the old one, meaning that the
+            user is trying to update the name to a new one.
         """
+
         self.creator = kwargs.pop('creator',None)
+        self.old_groupname = kwargs.pop('old_groupname',None)
+
+        #update initial values based on model
+        initial_usergroup = kwargs.pop('initial_usergroup',None)
+        if initial_usergroup: 
+            old_initial = kwargs.get('initial',{})
+            kwargs['initial'] = {}
+            kwargs['initial'].update(model_to_dict(initial_usergroup,fields=['groupname']))
+            kwargs['initial']['users'] = [
+                    useringroup.user.pk for useringroup in initial_usergroup.useringroup_set.all()
+                ]
+            kwargs['initial'].update(old_initial)
+
         super(UserGroupForm, self).__init__(*args, **kwargs)
 
     def clean(self):
+        """
+        ensure creator/groupname pair is unique taking into consideration update
+        """
         cleaned_data = super(UserGroupForm, self).clean()
-        if self.creator:
-            groupname = cleaned_data['groupname']
-            if UserGroup.objects.filter(creator=self.creator,groupname=groupname).exists():
-                self._errors['groupname'] = [_(
-                        "groupname %s already exists for user %s. "
-                        "please choose a different groupname."
-                        %(groupname,self.creator.username)
-                    )]
+        if self.creator: #POST
+            new_groupname = cleaned_data['groupname']
+            if UserGroup.objects.filter(
+                            creator=self.creator,
+                            groupname=new_groupname
+                        ).exists(): #new name exists: might be error
+                error = False
+                if( (self.old_groupname and self.old_groupname != new_groupname ) #update, and name different from old. error
+                        or not self.old_groupname ): #create and new name exists. error
+                    self._errors['groupname'] = [_(
+                            "groupname %s already exists for user %s. "
+                            "please choose a different groupname."
+                            %(new_groupname,self.creator.username)
+                        )]
+
         return cleaned_data
 
     class Meta:
@@ -116,7 +171,7 @@ def create(request, username):
                         user=user,
                         group=group,
                     )
-            return HttpResponseRedirect(reverse(SUCCESS_REDIRECT,args=(username,)))
+            return HttpResponseRedirect(reverse('user_user_groups_index',args=(username,)))
     else:
         form = UserGroupForm()
 
@@ -142,23 +197,34 @@ def update(request, username, groupname):
             ))
 
     if request.method == "POST":
-        form = UserGroupForm(request.POST, creator=creator)
+        form = UserGroupForm(request.POST, creator=creator, old_groupname=usergroup.groupname)
         if form.is_valid():
+
+            #update name
+            old_name = usergroup.groupname
+            new_name = form.cleaned_data['groupname']
+            if new_name != old_name: #validation already guarantees new name is available
+                usergroup.groupname = new_name
+                usergroup.save()
+
+            #update users
             old_users = usergroup.useringroup_set.all()
             new_users = form.cleaned_data['users']
             for user in new_users: #add new ones
-                if not user in current_users:
+                if not user in old_users:
                     user_in_group = UserInGroup.objects.create(
                             user=user,
-                            group=group,
+                            group=usergroup,
                         )
             for user in old_users: #delete removed ones
                 if not user in new_users:
                     user.delete()
-            return HttpResponseRedirect(reverse(SUCCESS_REDIRECT,args=(username,)))
+            return HttpResponseRedirect(
+                    reverse('user_user_groups_detail',
+                    args=(username,usergroup.groupname))
+                )
     else:
-        #form = UserGroupForm(initial=) #TODO 2 get useringroup in! search querriset to dict google
-        form = UserGroupForm()
+        form = UserGroupForm(initial_usergroup=usergroup) #TODO 2 get useringroup in! search querriset to dict google
 
     return render(
             request,
@@ -186,4 +252,4 @@ def delete(request, username, groupname):
 
     usergroup.delete()
 
-    return HttpResponseRedirect(reverse(SUCCESS_REDIRECT,args=(username,)))
+    return HttpResponseRedirect(reverse('user_user_groups_index',args=(username,)))

@@ -17,6 +17,7 @@
 #  https://docs.djangoproject.com/en/dev/ref/models/fields/
 #  https://docs.djangoproject.com/en/dev/ref/models/relations/
 #  https://docs.djangoproject.com/en/dev/topics/db/queries/
+#  #learn _set + related_name magic
 #
 #template language
 #  https://docs.djangoproject.com/en/dev/topics/templates/
