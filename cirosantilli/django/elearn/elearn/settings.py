@@ -99,11 +99,11 @@ MEDIA_URL = ''
 # Don't put anything in this directory yourself; store your static files
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
 # Example: "/home/media/media.lawrence.com/static/"
-STATIC_ROOT = ''
+STATIC_ROOT = '/var/www/static'
 
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
-STATIC_URL = '/static/'
+STATIC_URL = 'http://localhost/static/'
 
 # Additional locations of static files
 STATICFILES_DIRS = (
@@ -162,7 +162,7 @@ ROOT_URLCONF = 'elearn.urls'
 # Python dotted path to the WSGI application used by Django's runserver.
 WSGI_APPLICATION = 'elearn.wsgi.application'
 
-INSTALLED_APPS = (
+INSTALLED_APPS = [
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -176,19 +176,14 @@ INSTALLED_APPS = (
     'guardian',
     'easy_thumbnails',
 
-    #<userena
-    #you must go to /admin/sites/site/ to put the correct authentication domain
-    'userena',
-    'accounts',
-    #</userena
-
     'south', #db migrations
 
     #personal apps
     'polls',
     'mycommands',
     'user_user_groups',
-)
+    'datatable'
+]
 
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to
@@ -220,6 +215,13 @@ LOGGING = {
 }
 
 #<userena>
+
+#add apps required by userena
+INSTALLED_APPS.extend([
+    'userena',
+    'accounts',
+])
+
 AUTHENTICATION_BACKENDS = (
     'userena.backends.UserenaAuthenticationBackend',
     'guardian.backends.ObjectPermissionBackend',
@@ -253,4 +255,3 @@ USERENA_PROFILE_DETAIL_TEMPLATE = 'accounts/profile_detail.html'
 #USERENA_HIDE_EMAIL=True
 
 #</userena>
-

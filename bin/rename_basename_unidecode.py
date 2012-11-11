@@ -1,25 +1,25 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 import os
 
-from rename_argparse import rename_argparse
-from unidecode_wrap import unidecode_wrap
+import unidecode
 
-def unidecode_basename(path):
-    head, bname = os.path.split(path)
-    new_bname = unidecode_wrap(bname)
-    return os.path.join(head, new_bname)
+import files
+from rename_argparse import rename_argparse
 
 if __name__ == '__main__':
 
-    rename_argparse(unidecode_basename, description="""Command line interface for renaming with unidecode,
+    rename_argparse(
+            unidecode,
+            epilog="rename mutiple files with unidecode",
+            description="""takes paths from stdin null separated and from arguments and adds them up.
 
-based on rename_argparse.
+EXAMPLES
 
-Takes paths from stdin null separated and from arguments and adds them up.
+    %(f)s 中国.txt 美国.txt
+    #renames given paths to "zhong guo.txt" and "mei guo.txt", according to unidecode
 
-EXAMPLE:
-
-find subdir -print0 | rename_basename_unidecode.py path1 path2 0
-#will rename basename inside subdir tree and of path1 and path2 (but not of their subtrees)
+    find . | %(f)s
+    #renames paths found
 """)

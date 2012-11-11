@@ -1,0 +1,30 @@
+{% load i18n %}
+
+<table cellpadding="0" cellspacing="0" border="0" class="display">
+    <thead>
+    <tr>
+        <th>Target</th>
+        <th>Filter text</th>
+        <th>Treat as regex</th>
+        <th>Use smart filter</th>
+    </tr>
+    </thead>
+    <tbody>
+        {% if global_filter %}
+        <tr>
+            <td>{% trans "global" %}</td>
+            <td><input type="text"     target_table="{{ target_table }}" class="datatable_global_filter" ></td>
+            <td><input type="checkbox" target_table="{{ target_table }}" class="datatable_global_regex" ></td>
+            <td><input type="checkbox" target_table="{{ target_table }}" class="datatable_global_smart" checked></td>
+        </tr>
+        {% endif %}
+        {% for target_col in target_cols %}
+        <tr>
+            <td>{% trans "global" %}</td>
+            <td><input type="text"     target_table="{{ target_table }}" target_col="{{ target_col }}" class="datatable_col_filter" ></td>
+            <td><input type="checkbox" target_table="{{ target_table }}" target_col="{{ target_col }}" class="datatable_col_regex" ></td>
+            <td><input type="checkbox" target_table="{{ target_table }}" target_col="{{ target_col }}" class="datatable_col_smart" checked></td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>

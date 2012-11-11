@@ -9,18 +9,27 @@ from django.core.urlresolvers import reverse
 from django import forms
 from django.forms import ModelForm
 from django.forms.models import inlineformset_factory, model_to_dict
-from django.http import HttpResponseRedirect, HttpResponse
+from django.forms.widgets import SelectMultiple
+from django.http import HttpResponse, HttpResponseRedirect, HttpResponseBadRequest, HttpResponseNotAllowed
 from django.shortcuts import get_object_or_404, render_to_response, render
 from django.template import RequestContext
 from django.utils.translation import ugettext_lazy as _
+from django.views.decorators.http import require_http_methods, require_safe
 
 from user_user_groups.models import UserGroup, UserInGroup
 
 ITEMS_PER_PAGE = 100
 
+@require_safe
 def index(request, username):
+
+    table = {
+            'id':'grouptable',
+            'filter_global':True,
+        }
+
     creator = get_object_or_404(User,username=username)
-    items_list = UserGroup.objects.filter(creator=creator)
+    items_list = UserGroup.objects.filter(creator=creator).order_by('groupname')
     paginator = Paginator(items_list, ITEMS_PER_PAGE)
     page = request.GET.get('page')
     try:
@@ -36,19 +45,23 @@ def index(request, username):
                 'user_user_groups/index.html',
                 {
                     'creator': creator,
-                    'items': items
+                    'items': items,
+                    'table': table,
                 }
             )
 
+@require_safe
 def detail(request, username, groupname):
     creator = get_object_or_404(User, username=username)
     usergroup = get_object_or_404(UserGroup, creator=creator, groupname=groupname)
+    usersingroup = UserInGroup.objects.filter(group=usergroup).order_by('user__username')
     return render(
                 request,
                 'user_user_groups/detail.html',
                 {
                     'creator': creator,
                     'usergroup': usergroup,
+                    'usersingroup': usersingroup,
                 },
             )
 
@@ -57,10 +70,11 @@ class UserGroupForm(ModelForm):
 
     users = forms.ModelMultipleChoiceField(
             queryset=User.objects.all(),
-            widget=FilteredSelectMultiple(
-                    "users",
-                    is_stacked=False,
-                    attrs={'rows':'10'},
+            widget=SelectMultiple(
+                    attrs={
+                        'rows':'10',
+                        'class':'jquery-ui-autocomplete',
+                        }
                 )
         )
 
@@ -122,20 +136,20 @@ class UserGroupForm(ModelForm):
         """
         cleaned_data = super(UserGroupForm, self).clean()
         if self.creator: #POST
-            new_groupname = cleaned_data['groupname']
-            if UserGroup.objects.filter(
-                            creator=self.creator,
-                            groupname=new_groupname
-                        ).exists(): #new name exists: might be error
-                error = False
-                if( (self.old_groupname and self.old_groupname != new_groupname ) #update, and name different from old. error
-                        or not self.old_groupname ): #create and new name exists. error
-                    self._errors['groupname'] = [_(
-                            "groupname %s already exists for user %s. "
-                            "please choose a different groupname."
-                            %(new_groupname,self.creator.username)
-                        )]
-
+            new_groupname = cleaned_data.get('groupname',None) #because is_valid calls clean first, before passing it to the model for field validation
+            if new_groupname:
+                if UserGroup.objects.filter(
+                                creator=self.creator,
+                                groupname=new_groupname
+                            ).exists(): #new name exists: might be error
+                    error = False
+                    if( (self.old_groupname and self.old_groupname != new_groupname ) #update, and name different from old. error
+                            or not self.old_groupname ): #create and new name exists. error
+                        self._errors['groupname'] = [_(
+                                "groupname \"%s\" already exists for user \"%s\". "
+                                "please choose a different groupname."
+                                %(new_groupname,self.creator.username)
+                            )]
         return cleaned_data
 
     class Meta:
@@ -146,6 +160,7 @@ class UserGroupForm(ModelForm):
 
 #TODO 0 confirm before exiting create!
 #TODO 1 add nice admin search widget
+@require_http_methods(["GET","HEAD","POST"])
 @login_required
 def create(request, username):
 
@@ -184,6 +199,8 @@ def create(request, username):
             },
         )
 
+@require_http_methods(["GET","POST"])
+@login_required
 def update(request, username, groupname):
 
     creator = get_object_or_404(User, username=username)
@@ -224,7 +241,7 @@ def update(request, username, groupname):
                     args=(username,usergroup.groupname))
                 )
     else:
-        form = UserGroupForm(initial_usergroup=usergroup) #TODO 2 get useringroup in! search querriset to dict google
+        form = UserGroupForm(initial_usergroup=usergroup)
 
     return render(
             request,
@@ -237,19 +254,102 @@ def update(request, username, groupname):
         )
 
 #TODO are you sure you want to delete?
-#TODO return 404
 @login_required
-def delete(request, username, groupname):
+@require_http_methods(["POST"])
+def delete(request, username):
+    """
+    delete multiple groups given in post request
+
+    username is given on the url
+
+    groupnames to delete for the given username
+    are given in request.POST.getlist['groupnames']
+
+    if a single username groupname pair does not exist,
+    no deletion is made, and a 404 is returned
+    """
 
     creator = get_object_or_404(User, username=username)
-    usergroup = get_object_or_404(UserGroup, creator=creator, groupname=groupname)
 
     if request.user != creator:
-        return HttpResponse(_("you cannot delete a group that belongs to another user!")) #TODO decent
+        return HttpResponse(_("you cannot delete a group that belongs to another user")) #TODO decent
 
-    if request.method != "POST": #TODO use delete
-        return HttpResponse(_('deleting must be done via an empty POST request')) #TODO decent
+    #first check all groupnames exist, then delete them
+    #if one does not exist, 404
+    groups = [ get_object_or_404(UserGroup, creator=creator, groupname=groupname)
+            for groupname in request.POST.getlist('groupnames') ] 
 
-    usergroup.delete()
+    for group in groups:
+        group.delete()
 
     return HttpResponseRedirect(reverse('user_user_groups_index',args=(username,)))
+
+def _get_unique_groupname(user, groupname):
+    """
+    returns an groupname such that the pair user/groupname is not taken up
+
+    if no conflict exists for groupname, returns the given groupname
+    
+    else "000_\n+_" preffix is appended to the groupname, where \n+ is
+    the first integer starting from 1 that makes the groupname unique
+    """
+    PREFIX = '000_'
+    SUFFIX = '_'
+    if ( UserGroup.objects.filter(
+                    creator=user,
+                    groupname=groupname,
+                ).exists() ):
+        i=1
+        old_groupname = groupname
+        groupname = PREFIX + str(i) + SUFFIX + old_groupname
+        while ( UserGroup.objects.filter(
+                    creator=user,
+                    groupname=groupname,
+                    ).exists() ):
+            i=i+1
+            groupname = PREFIX + str(i) + SUFFIX + old_groupname
+    return groupname
+
+@login_required
+@require_http_methods(["POST"])
+def copy(request, username):
+    """
+    same as delete, but copies the groups from the given username,
+    to the authenticated user.
+
+    in case of conflict of existing groupname,
+    it is resolved by _get_unique_groupname
+    """
+
+    creator = get_object_or_404(User, username=username)
+
+    groups = [ get_object_or_404(UserGroup, creator=creator, groupname=groupname)
+            for groupname in request.POST.getlist('groupnames') ] 
+
+    for old_group in groups:
+        new_group = UserGroup.objects.create(
+                creator=request.user,
+                groupname=_get_unique_groupname(request.user,old_group.groupname)
+            )
+        for user_in_group in UserInGroup.objects.filter(group=old_group):
+            user_in_group.pk = None
+            user_in_group.group = new_group
+            user_in_group.save()
+
+    return HttpResponseRedirect(reverse('user_user_groups_index',args=(username,)))
+
+@login_required
+@require_http_methods(["POST"])
+def bulk_action(request, username):
+    """
+    decides between bulk actions (actions which may affect several objects at once)
+    such as copy or delete.
+    """
+
+    if request.POST.__contains__('copy'):
+        return copy(request,username)
+    if request.POST.__contains__('delete'):
+        return delete(request,username)
+    else:
+        return HttpResponseBadRequest("unknown action" % action)
+        

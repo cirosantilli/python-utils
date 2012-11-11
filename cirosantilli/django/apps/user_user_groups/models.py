@@ -9,7 +9,6 @@ from django.utils.translation import ugettext_lazy as _
 MAX_GROUPNAME_LENGTH = 256
 VALID_GROUPNAME_RE = r'^[a-z0-9_]+$'
 
-
 def validate_groupname_chars(groupname):
     if not re.match(VALID_GROUPNAME_RE,groupname):
         raise forms.ValidationError(

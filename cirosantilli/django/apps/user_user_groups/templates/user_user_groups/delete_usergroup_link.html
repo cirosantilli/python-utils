@@ -1,11 +1,12 @@
 {# expected context: username and groupname, determining thus the gruop to delete #}
-{# sample include: include "user_user_groups/delete_usergroup_link.html" username=creator.username #}
+{# sample include: include "user_user_groups/delete_usergroup_link.html" with username=creator.username groupname=usergroup.groupname#}
 
 {% load url from future %}
 {% load i18n %}
 
 {% if user.username == username %}
-<form action="{% url 'user_user_groups_delete' username groupname %}" method="post">{% csrf_token %}
-    <input type="submit" value="{% trans "delete" %}" />
+<form action="{% url 'user_user_groups_delete' username %}" method="post">{% csrf_token %}
+    <input type="hidden" name="groupnames" value="{{ groupname }}">
+    {% trans "delete group" %} <input type="submit" value="{% trans "delete group" %}" />
 </form>
 {% endif %}

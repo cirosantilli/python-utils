@@ -58,6 +58,11 @@
 #     https://docs.djangoproject.com/en/dev/topics/http/shortcuts/#django.shortcuts.render
 #
 
+#HOT APPS
+#
+# https://bitbucket.org/kmike/django-widget-tweaks
+# sudo pip install django-widget-tweaks
+
 
 #TODO
 # serve project specific static files in app urls

@@ -16,22 +16,20 @@ def remove_track(bname):
 
 if __name__ == '__main__':
 
-    rename_argparse(remove_track,
-            act_basename_only=True,
-            description="""Command line interface that puts corrects many common track formats into my standard r"\d\d - ".
+    rename_argparse(
+            remove_track,
+            description="corrects many common track formats into my standard r\"\d\d - title.mpr\"",
+            epilog="""EXAMPLES
 
-SAMPLE CALLS
+    %(f)s '1. title.mp3' '11 title.mp3'
+    #dry run
+    #new names:
+    # 01 - title.mp3
+    # 11 - title.mp3
 
-find . -iname '*mp3' | rename_basename_track_correct.py 0
-find . -iname '*mp3' | rename_basename_track_correct.py 1
+    %(f)s -D '1. title.mp3' '11 title.mp3'
+    #not dry run
 
-SAMPLE RESULTS
-
-1. Title.mp3
-==>
-01 - Title.mp3
-
-11 Title.mp3
-==>
-11 - Title.mp3
+    find . -iname '*mp3' | %(f)s
+    #act on multiple files
 """)

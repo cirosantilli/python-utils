@@ -7,14 +7,19 @@ import utils
 
 if __name__ == '__main__':
 
-    rename_argparse(utils.nice_basename_stripped,
-            act_basename_only=True,
-            description="""Tries to correct things that are either forbidden or highly unadvisable on basenames, by simply removing what is wrong.
+    rename_argparse(
+            utils.nice_basename_stripped,
+            description="corrects filenames that are forbidden" \
+                "or highly unadvisable on Linux/Windows/Mac by stripping bad things if possible",
+            epilog="""EXAMPLES
 
-See utils.nice_basename_stripped for the full spec.
-            
-SAMPLE CALLS
+    %(f)s a:b;c -rf as..txt
+    #dry run
 
-find subdir -print0 | rename_basename_nice_basename_stripped.py path1 path2 0
-#will rename basename inside subdir tree and of path1 and path2 (but not of their subtrees)
+    %(f)s -D a:b;c -rf as..txt
+    #not Dry run
+    #renames to "abc" "rf" and "as.txt"
+
+    find . | %(f)s
+    #acts on found files
 """)

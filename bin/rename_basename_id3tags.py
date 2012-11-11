@@ -44,20 +44,18 @@ def id3_to_basename(path):
 
 if __name__ == '__main__':
 
-    rename_argparse(id3_to_basename, description="""Command line interface for renaming using id3 tags.
-
-Open up this file and modify id3_to_basename function if you want a custom rename.
+    rename_argparse(
+        id3_to_basename,
+        description="renaming using id3 tags",
+        epilog="""Open up this file and modify id3_to_basename function if you want a custom rename.
 Someday this will be implemented as parsing of a simple format string.
 
-DEPENDENCIES
+INSTALLATION ON UBUNTU
 
-    id3tool
+    sudo aptitude install id3tool
 
-EXAMPLE
+EXAMPLES
 
-    find subdir -iname '*.mp3' -print0 | rename_basename_id3tags.py path1 path2 0
-    #will rename basename of mp3s inside subdir tree and of path1 and path2 (but not of their subtrees)
-    
-    find-music . | rename_basename_id3tags.py 1
-    #finds all music nul separated, and renames with id3 tags
+    find subdir -iname '*.mp3' | %(f)s
+    #renames on the tree
 """)

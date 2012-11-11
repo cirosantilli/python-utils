@@ -14,8 +14,17 @@ def remove_track(path):
 
 if __name__ == '__main__':
 
-    rename_argparse(remove_track, description="""Command line interface for removing track numbers from songs in the format ^\d - .
+    rename_argparse(
+        remove_track,
+        description="remove track numbers from songs in the format \"^\d - .\""
+        epilog="""EXAMPLES
 
-01 - Title.mp3 ==> Title.mp3
-1 - Title.mp3 ==> Title.mp3
+    %(f)s "01 - title.mp3" "1 - title.mp3"
+    #dry run
+    #renames to:
+    #  title.mp3
+    #  title.mp3
+
+    %(f)s -D "01 - title.mp3" "1 - title.mp3"
+    #not Dry run
 """)

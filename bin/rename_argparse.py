@@ -1,57 +1,71 @@
 #!/usr/bin/env python
 
+import os
 import sys
 import argparse
 
 import files
+import argparse_extras
 
 def rename_argparse(rename_func, **kwargs):
-    """
-    Convenient standard command line interface to rename files.
+    """Convenient standard command line interface to rename files.
 
     Renames using the given rename_func function.
+    rename_func is expected to take a path, and return the new desired path
 
-    **kwargs are given to the constructor of argparse.ArgumentParser.
-
-    Takes paths to rename from both stdin nul separated and as arguments.
+    Takes paths to rename from both stdin only, separated either by newline
+    or null, depending on the null_terminated
 
     Empty paths are ignored
 
-    Takes 0 or 1 as last argument to decide dry run or not.
-
     Renaming functions acts as specified in files.rename_basenames.
+
+    # kwargs
+
+    all kwargs are passed to argpase.ArgumentParser constructor
+    some of them are changed as follows:
+
+    - epilog = kwargs.get('epilog',"") % {'f':os.path.basename(__file__)},
+    - formatter_class=kwargs.get('formatter_class',argparse.RawTextHelpFormatter), #keep newlines
+
+    - argparse_kwargs
+        dict
+        default={}
+        kwargs for ArgumentParser constructor
+
+    - encoding
+        string
+        default='UTF-8'
+        encoding in assumed for paths from stdin
+        and from command line arguments
+        to decode with python string.decode() method
+
+    #- func_extra_args
+        #list
+        #default=[]
+        #args to be passed to rename_func in addition to the input path
+        #mandatory argument
     """
 
-    act_basename_only = kwargs.pop("act_basename_only", False)
+    encoding = kwargs.get("encoding", 'UTF-8')
+    kwargs['epilog'] = kwargs.get('epilog',"") % {'f':os.path.basename(sys.argv[0])}
+    kwargs['formatter_class'] = kwargs.get('formatter_class',argparse.RawTextHelpFormatter)
 
     parser = argparse.ArgumentParser(**kwargs)
 
-    parser.add_argument("paths", 
-        nargs='*',
-        help="Paths to rename. Also takes paths nul separated from stdin and adds to those.")
+    argparse_extras.add_silent(parser)
+    argparse_extras.add_not_dry_run(parser)
+    argparse_extras.add_paths_from_stdin_and_argv(parser)
 
-    parser.add_argument('do_rename', 
-        help="If 1 rename, otherwise dry-run.")
+    args = parser.parse_args()
 
-    args = parser.parse_args(sys.argv[1:])
+    not_dry_run = args.not_dry_run
+    paths = argparse_extras.get_paths_from_stdin_and_argv(args)
+    silent = args.silent
 
-    paths = args.paths
-
-    if not sys.stdin.isatty(): # not connect to terminal teletype (tty): a pipe coming in!
-        paths_str = sys.stdin.read()
-        if paths_str:
-            stdin_paths = paths_str.split("\x00") #splits at null
-            stdin_paths = filter(lambda p: p, stdin_paths)
-            paths.extend(stdin_paths)
-
-    paths = map(lambda s: s.decode('UTF-8'), paths)
-
-    do_rename = args.do_rename
-    if do_rename == '1':
-        do_rename = True
-    elif do_rename == '0':
-        do_rename = False
-    else:
-        raise ValueError("do_rename can only be 0 or 1")
-
-    files.rename_basenames(paths, rename_func, do_rename, act_basename_only=act_basename_only)
+    files.rename_basenames(
+                paths,
+                rename_func,
+                do_rename=not_dry_run,
+                silent=silent
+            )

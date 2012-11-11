@@ -1,4 +1,7 @@
+#!/usr/bin/env python
+
 import os.path
+import sys
 import stat
 import shutil
 import ctypes
@@ -7,87 +10,102 @@ import utils
 
 MBYTE = float(2**20)
 def size_mb_str(path, decimals=2):
-    """
-    Returns the size of the file in path in megabytes as a string, with up to decimals
+    """Returns the size of the file in path in megabytes as a string, with up to decimals
     decimal places.
     """
     return "{0:."+str(decimals)+"f}".format(os.path.getsize(path)/MBYTE)
 
 KBYTE = float(2**10)
 def size_kb_str(path, decimals=2):
-    """
-    Returns the size of the file in path in kbytes as a string, with up to decimals
+    """Returns the size of the file in path in kbytes as a string, with up to decimals
     decimal places.
     """
     return "{0:."+str(decimals)+"f}".format(os.path.getsize(path)/KBYTE)
 
-def join_paths(parent_path, children_paths):
+def exclude_extension(func):
+    """decorator
+    
+    if f(path,*args,**kwargs) would act on the entire given path,
+
+    to find a new name for it for example, it acts only the path without the extension
     """
-    given a parent_path and children_paths returns
-    the array result of os.path.join parent_path to all children_paths
-    """
-    result = []
-    for child_path in children_paths:
-        result.append(os.path.join(parent_path,child_path))
-    return result
+
+    def wrapper(path,*args,**kwargs):
+        path_noext,ext = os.path.splitext(path)
+        new_path_noext = func(path_noext,*args,**kwargs)
+        return new_path_noext + ext
+
+    return wrapper
 
 def rename_basenames(paths, rename_func, do_rename=False, **kwargs):
-    """
-    Convenient interface for renaming multiple paths.
+    """convenient interface for renaming multiple paths.
 
-    Rename func can takes the entire path, not only the basename,
+    rename func can takes the entire path, not only the basename,
     but it can only alter the basename only, and not the containing directory.
 
-    kwargs
+    files cannot change contaning directories after the rename.
 
-    * act_on_basename_only
-    Boolean
-    If true, rename_func takes the basename only, ommiting the parent path.
+    :param paths: the paths to act on. not an iterator, so that sorting can be done.
+    :type name: list of strigs
+    :param rename_func: rename function of  that returns the new path from the given path
+    :type name: function with signature type (path,*args,**kwargs), where path is a string
+    :param do_rename: if True, really renames, else, only outputs changes that would be done
+    :type name: boolean
 
-    * act_on_extension
-    Boolean
-    If true, rename_func takes the extension.
+    Sample usage
+    ============
+
+    >>> import os, sys, tempfile
+    >>> def f(p,a1,**kwargs):
+    ...     return p + a1 + kwargs['kwarg']
+    >>> tdir = tempfile.gettempdir()
+    >>> bnames = ["as DF",".qewr"]
+    >>> paths = [ os.path.join(tdir,bname) for bname in bnames ]
+    >>> for p in paths:
+    ...   fi = open(p,'w')
+    ...   fi.close()
+    >>> rename_basenames(paths,f,func_extra_args=["b1"],func_kwargs={'kwarg':"brg"})
+    >>> new_bnames = ["as DFb1brg",".qewrb1brg"]
+    >>> new_paths = [ os.path.join(tdir,bname) for bname in new_bnames ]
+    >>> for p in paths:
+    ...   print os.path.exists(p)
+    False
+    False
+    >>> for p in new_paths:
+    ...   print os.path.exists(p)
+    ...   os.remove(p)
+    True
+    True
     """
 
-    act_basename_only = kwargs.get("act_basename_only", False)
-    act_on_extension = kwargs.get("act_on_extension", True)
+    func_extra_args = kwargs.get("func_extra_args", [])
+    func_kwargs = kwargs.get("func_kwargs", {})
+    silent = kwargs.get("silent", False)
 
     paths.sort(reverse=True) # so that dirs get renamed after the paths they contain
-
-    has_error = False
+    errors = []
     for path in paths:
 
-        # decide where to act on
-        if act_basename_only:
-            head, bname = os.path.split(path)
-            if act_on_extension:
-                new_bname = rename_func(bname)
-                new_path = os.path.join(head, new_bname)
-            else:
-                bname_noext, dotext = os.path.splitext(bname)
-                new_bname_noext = rename_func(bname_noext)
-                new_path = os.path.join(head, new_bname_noext + dotext)
-        else: # act on entire path
-            if act_on_extension:
-                new_path = rename_func(path)
-            else:
-                path_noext, dotext = os.path.splitext(bname)
-                new_path_noext = rename_func(path_noext)
-                new_path = new_path_noext + dotext
+        head, bname = os.path.split(path)
+        new_bname = rename_func(bname, *func_extra_args, **func_kwargs)
+        new_path = os.path.join(head, new_bname)
 
         if new_path != path:
-            print path
-            print new_path
+            if not silent:
+                sys.stderr.write(path + "\n")
+                sys.stderr.write(new_path + "\n")
+                sys.stderr.write("\n")
             if os.path.exists(new_path):
-                has_error = True
-                print "New path already exists. Rename skipped.\n"
+                errors.append("new path already exists. rename skipped\nold path:  %s\nnew path:  %s" % (path, new_path) )
             elif os.path.split(path)[0] != os.path.split(new_path)[0]:
-                has_error = True
-                print "New path is in a different dir. Rename skipped.\n"
-            else:
-                if do_rename:
-                    os.rename(path, new_path)
-            print
+                errors.append("new path is in a different directory from old one. rename skipped\nold path:  %s\nnew path:  %s" % (path, new_path) )
+            elif do_rename:
+                os.rename(path, new_path)
+
+    if errors and not silent:
+        sys.stderr.write("START errors occurred\n\n")
+        sys.stderr.write("\n".join(errors))
+        sys.stderr.write("\n\nEND errors occurred\n")
 
 def find(root, **kwargs):
     """
@@ -114,7 +132,7 @@ def find(root, **kwargs):
 
     @root: root under which recurstion will be done.
 
-    **kwargs
+    # kwargs
 
     @max_depth. integer.
         maximum depth to recurse.
@@ -166,7 +184,6 @@ def find_rec(root, curdepth, **kwargs ):
         this means that vere little memory is used to loop over the search
         results, which should be the most common operation, since no complete
         search result list is stored.
-
     """
 
     try:
@@ -203,9 +220,7 @@ def find_books(roots, **kwargs):
                 yield path
 
 def find_music(roots, **kwargs):
-    """
-    Helper method to find books.
-    """
+    """Helper method to find books."""
     exts = ['mp3','ogg','wma','flac']
     for root in roots:
         for path in find(root, **kwargs):
@@ -437,3 +452,7 @@ def has_hidden_attribute(filepath):
     except (AttributeError, AssertionError):
         result = False
     return result
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()

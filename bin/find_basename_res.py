@@ -13,7 +13,7 @@ if __name__ == '__main__':
 
 This works like python re.search method: matchs anywhere inside basenames are enough.
 
-SAMPLE CALLS
+EXAMPLES
 
     find_basename_res.py ab cd 
     #finds all files containing both "as" and "df" on their basenames
@@ -31,7 +31,7 @@ SAMPLE CALLS
     parser.add_argument("-0", "--null-separated-output",
         default=False,
         action='store_true',
-        help="if given, separates output bu null characters instead of newlines. useful for piping files with newlines on their names")
+        help="if given, separates output by null characters instead of newlines. useful for piping files with newlines on their names")
     parser.add_argument("find", 
         nargs='*',
         help="regexes to use to filter, prints output iff given strings match all regexes.")
@@ -48,9 +48,9 @@ SAMPLE CALLS
     res = map(lambda r: re.compile( unicode(r, sys.stdin.encoding), re_args), find)
 
     if args.null_separated_output:
-        output_separator = "\0"
+        output_separator = u"\0"
     else:
-        output_separator = "\n"
+        output_separator = u"\n"
 
     for path in files.find(u"."):
         head, bname = os.path.split(path)
@@ -60,4 +60,4 @@ SAMPLE CALLS
                 all_match = False
                 break
         if all_match:
-            sys.stdout.write(path + output_separator)
+            sys.stdout.write( (path + output_separator).encode('utf-8') )

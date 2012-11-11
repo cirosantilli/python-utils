@@ -3,6 +3,8 @@
 import re
 import os.path
 
+STDERR_SEPARATOR0 = '=' * 40
+
 def iterify(iterable):
     if isinstance(iterable, basestring):
         iterable = [iterable]
@@ -13,11 +15,16 @@ def iterify(iterable):
     return iterable
 
 def resub(resubpair,target):
+    """takes a regex find replace pair (find, replace) and applies it to a target"""
     return resubpair[0].sub(resubpair[1],target)
 
 def resubs(resubpairs,target):
+    """takes several regex find replace pairs [(find1, replace1), (find2,replace2), ... ]
+    and applies them to a target on the order given"""
+    return resubpair[0].sub(resubpair[1],target)
     for resubpair in resubpairs:
         target = resub(resubpair,target)
+    return target
 
 whitespaces_to_single_space_resub = [re.compile(r"\s+")," "]
 def whitespaces_to_single_space(s):

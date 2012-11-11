@@ -11,4 +11,4 @@ def remove_track(bname):
 
 if __name__ == '__main__':
 
-    rename_argparse(remove_track, act_basename_only=True)
+    rename_argparse(remove_track)

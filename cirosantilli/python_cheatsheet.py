@@ -8,13 +8,21 @@
 #fundamental modules
 
     #std or not that everyone should know about
+    #sys, os
+    
+    import tempfile
+    #tempfile
+        #http://www.doughellmann.com/PyMOTW/tempfile/
 
     import timedate
     #hardcore
 
+    import logging
+    #http://docs.python.org/2/howto/logging.html#logging-basic-tutorial
+        #don't ever use sys.stderr.write for serious scripts! log instead
+
     import process
     #calling external process
-
 
     #user interfaces
 
@@ -47,24 +55,37 @@
 
     #tests:
         import unittest 
+            #tests run from separate files
             #firefox http://docs.python.org/library/unittest.html
 
         import doctest
+            #tests run from the docstring
             #firefox http://docs.python.org/library/doctest.html
 
     #package macking
         #http://guide.python-distribute.org/creation.html
         import setup
 
+    #sphynx
+        #generate python documentation from docstrings
+        #http://packages.python.org/an_example_pypi_project/sphinx.html
+
 #installing stuff
 
     #pip package management
+        #in Ubuntu 12.04 pip packages installed by pip
+        #  are falling under /usr/local/lib/python2.7/dist-packages
         sudo aptitude install python-pip python-dev build-essential 
         sudo pip install --upgrade pip 
         sudo pip install --upgrade virtualenv #manages several versions of a single package
-        #sudo pip install <PACKAGE_NAME> # installs package
-        #firefox http://pypi.python.org/pypi?%3Aaction=browse # to browse/find the package names
-        #in Ubuntu 12.04 pip packages are falling under /usr/local/lib/python2.7/dist-packages
+
+        pip search $FIND
+        firefox http://pypi.python.org/pypi?%3Aaction=browse
+        #search for packages
+
+        sudo pip install $PACKAGE
+        #install $PACKAGE
+
 
     sudo pip install django
     sudo pip install unidecode
@@ -137,7 +158,9 @@
         b="asdf\tqwer\nzcxz"
         #special chars
 
-        c="asdf %s qwer %d zxcv %f" % ("fdsa",1,1.1)
+        print "asdf %s qwer %d zxcv %f" % ("fdsa",1,1.1)
+        print "%(v1)s\n%(#)03d\n%(v1)s\n%(#)03d\n" % \
+                {'v1':"asdf", "#":2} # oh yes
         #format strings: %s recieves strings, %d integegers (decimal), %f floats
 
         print a
@@ -154,6 +177,16 @@
 
         i = int("1234")
         f = float("12.34e56")
+
+    #unicode
+        # -*- coding: utf-8 -*-
+        s = "åäö"
+        print s
+        #BAD
+        #this works for for the terminal, where python recognizes the
+
+        #ALWAYS, I MEAN, ALWAYS encode unicdoe stuff that may be piped out!
+        print s.encode('utf-8')
 
 #data structures
     #http://docs.python.org/2/tutorial/datastructures.html
@@ -261,8 +294,23 @@
         del d["b"]
         print d
 
-        z = dict(x.items() + y.items())
+
+        d  = dict([('sape', 4139), ('guido', 4127), ('jack', 4098)])
+        #dict from list of pairs
+
+        d = dict(sape=4139, guido=4127, jack=4098)
+        #string only keys
+
+
+
+        print d.items() 
+        #dict to list of pairs
+
+        print dict(x.items() + y.items())
         #join 2 dicts into a third
+
+
+        
 
         d1.update(d2)
         d1.update({'as':12})
@@ -577,56 +625,100 @@
         ### otherfile.py
         param = getattr(settings, "PARAM", False) #default to False
 
-#file io operations
 
-    fo sys.stdin
-    #piped EOF comes when pipe closes (end of echo for exapmle)
-    #user EOF comes at EOF command, control + D on linux.
-
-    fo = open("path/to/txt.txt",'r') #open path for reading
-
-    txt = fo.read()
-
-    #read all of stdin untill EOF
-
-    line = fo.readline()
-    #reads single line from stdin
-
-    lines = fo.readlines()
-    #reads all of stdin, and splits it into lines
-
-    for l in fo.xreadlines():
-        print l
-    #for large files
-    #probably iterator based
-
-
-
-#some clasic design patterns have been incorporated directly into python
-#for example iterators and decorators
+#list comprehentions
 
 #iterators
     #TODO where
 
 #decorators
-    firefox http://stackoverflow.com/questions/739654/understanding-python-decorators
+
+    #http://stackoverflow.com/questions/739654/understanding-python-decorators
+    def decorator(func):
+
+        def wrapper(a,*args,**kwargs):
+            print "before"
+            a = a + " modified"
+            func(a,*args,**kwargs)
+            print "after"
+
+        return wrapper
+
+    @decorator
+    def func1(a,*args,**kwargs):
+        print a
+
+    func1("inside")
+
+    #same as:
+
+    def func0(a):
+        print a
+
+    decorated = decorator(func0)
+    decorated("inside")
+
+#file io operations
+
+    #EOF
+    #piped EOF comes when pipe closes (end of echo for exapmle)
+    #user TTY EOF comes at EOF command, control + D on linux, control + z on windows.
+
+    #std*
+        sys.stdin.write("asdf")
+        sys.stder.write("asdf")
+        s = sys.stder.read()
+
+    #open
+        fo = open("path/to/txt.txt",'r')
+        #open path for reading
+        #r is like c file reading options
+
+    #read
+
+        #read from
+        txt = fo.read()
+        #read all of stdin untill EOF
+
+        line = fo.readline()
+        #reads single line from stdin
+
+        lines = fo.readlines()
+        #reads all of stdin, and splits it into lines
+
+        for l in fo.xreadlines():
+            print l
+        #for large files
+        #probably iterator based
+
+    #write
+
+    #close!
+        fo.close()
 
 #subprocess
+    #http://www.doughellmann.com/PyMOTW/subprocess/
+    #http://stackoverflow.com/questions/377017/test-if-executable-exists-in-python
 
-    #test1.py
+    ### test1.py ###
     import sys
     input = sys.stdin.read() 
-    sys.stdout.write('Message to stdout:%s\n'%input)
-    sys.stderr.write('Message to stderr:%s\n'%input)
-    #end test1.py
+    sys.stdout.write('message to stdout:%s\n'%input)
+    sys.stderr.write('message to stderr:%s\n'%input)
 
+    ### subprocess_test.py ###
     import subprocess
-    commands = ['python', 'test1.py']
-    process = subprocess.Popen(commands,
-            shell=False,
-            stdin=subprocess.PIPE,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE)
+    commands = [
+                'python',
+                'test1.py'
+            ]
+    process = subprocess.Popen(
+                commands,
+                shell=False,
+                stdin=subprocess.PIPE,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE
+            )
     stdout, stderr = process.communicate("this is the input")
     #get stdout and stderr.
     #if you don't collect them by setting stdin/out=subprocess.PIPE,
@@ -656,10 +748,10 @@
         #prints True is a user input terminal (no pipes) and waits for user input
         #after ^D, prints what was input by keyboard.
 
-    s_unicode = unicode(sys.argv[1],'utf-8')
+    s = unicode(sys.argv[1],'utf-8')
     #reads stdin as if it were utf-8, which should be the case for any sany stdin input
 
-    s_unicode = unicode(sys.argv[1],sys.stdin.encoding)
+    s = unicode(sys.argv[1],sys.stdin.encoding)
     #autodetects the encoding of the stdin
     #does not work for pipes, since they don't have a default encoding like a terminal!
     #do this *EVERYTIME* you take command line arguments which *MIGHT* in some case be unicode!!
@@ -742,3 +834,96 @@
 
     for i in random.sample(xrange(2), 2):
         print i;
+
+#sphynx
+def public_fn_with_sphinxy_docstring(name, state=None):
+    """This function does something.
+
+    A really great idea.  A way you might use me is
+
+        >>> bar()
+        >>> print 'foo'
+        foo
+
+ 
+    :param name: The name to use.
+    :type name: str.
+    :param state: Current state to be in.
+    :type state: bool.
+    :returns:  int -- the return code.
+    :raises: AttributeError, KeyError
+
+    """
+    return 0
+
+#doctest
+
+    #!/usr/bin/env python
+    def local_search(self, query, numresults=_LOCAL_RESULTS_PER_PAGE, **kwargs):
+        """
+        Searches Google Local for the string `query` and returns a
+        dictionary of the results.
+
+        >>> print "asdf"
+        adsf
+        >>> for a in [1,3,2]:
+        ...   print a
+        1
+        3
+        2
+        >>> function_defined_on_this_module():
+        out
+
+    if __name__ == "__main__":
+        import doctest
+        doctest.testmod()
+        """
+
+    #unpredictable output
+        class MyClass(object):
+            pass
+
+        def unpredictable(obj):
+            """Returns a new list containing obj.
+
+            >>> unpredictable(MyClass()) #doctest: +ELLIPSIS
+            [<doctest_ellipsis.MyClass object at 0x...>]
+            """
+            return [obj]
+
+    #exceptions
+        def this_raises():
+            """This function always raises an exception.
+
+            >>> this_raises()
+            Traceback (most recent call last):
+            RuntimeError: here is the error
+            """
+            raise RuntimeError('here is the error')
+
+#tempfile
+
+    import os
+    import tempfile
+
+    #suffix and preffix
+        #dir + prefix + random + suffix
+        temp = tempfile.NamedTemporaryFile(
+                    suffix='_suffix', 
+                    prefix='prefix_', 
+                    dir='/tmp',
+                )
+        try:
+            print 'temp:', temp
+            print 'temp.name:', temp.name
+            temp.write("asdf")
+            temp.flush()
+        finally:
+            #removed on close!
+            temp.close()
+
+        print 'gettempdir():', tempfile.gettempdir()
+        print 'gettempprefix():', tempfile.gettempprefix()
+
+        #gettempdir() returns the default directory that will hold all of the temporary files
+        #gettempprefix() returns the string prefix for new file and directory names.

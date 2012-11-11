@@ -36,17 +36,28 @@ urlpatterns = patterns('user_user_groups.views',
         name='user_user_groups_index',
     ),
 
+    url(
+        username_url_re_prefix +  r'/bulk_action' + suffix,
+        'bulk_action',
+        name='user_user_groups_bulk_action',
+    ),
+    
+    url(
+        username_url_re_prefix +  r'/delete' + suffix,
+        'delete',
+        name='user_user_groups_delete',
+    ),
+
+    url(
+        username_url_re_prefix +  r'/copy' + suffix,
+        'copy',
+        name='user_user_groups_copy',
+    ),
 
     url(
         username_groupname_url_re_prefix +  suffix,
         'detail',
         name='user_user_groups_detail',
-    ),
-
-    url(
-        username_groupname_url_re_prefix +  r'/delete' + suffix,
-        'delete',
-        name='user_user_groups_delete',
     ),
 
 )

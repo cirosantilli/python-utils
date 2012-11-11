@@ -5,6 +5,6 @@
 
 set -e #stop execution if one command goes wrong
 
-ack-grep --ignore-dir=migrations -ag '\.(py|html|css|js|jpg|jpeg|gif)$'
+ack-grep --ignore-dir=migrations -ag '\.(py|html|css|js|jpg|jpeg|gif|md)$'
 
 exit 0
