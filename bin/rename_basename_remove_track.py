@@ -5,9 +5,12 @@ import os.path
 
 import utils
 from rename_argparse import rename_argparse
+import files
 
 remove_track_resub = [re.compile(r"\d+ - "),""]
-def remove_track(path):
+
+@files.act_basename_only
+def rename_func(path):
     head, bname = os.path.split(path)
     new_bname = utils.resub(remove_track_resub, bname)
     return os.path.join(head, new_bname)
@@ -15,7 +18,7 @@ def remove_track(path):
 if __name__ == '__main__':
 
     rename_argparse(
-        remove_track,
+        rename_func,
         description="remove track numbers from songs in the format \"^\d - .\""
         epilog="""EXAMPLES
 

@@ -1,17 +1,19 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import os.path
-
-from rename_argparse import rename_argparse
 import unidecode
 
-def unidecode_lowercase(bname):
+from rename_argparse import rename_argparse
+import files
+
+@files.act_basename_only
+def rename_func(bname):
     return (unidecode.unidecode(bname)).lower()
 
 if __name__ == '__main__':
 
-    rename_argparse(unidecode_lowercase,
+    rename_argparse(
+            rename_func,
             description="rename with unidecode and then to lowercase",
             epilog="""
 EXAMPLES

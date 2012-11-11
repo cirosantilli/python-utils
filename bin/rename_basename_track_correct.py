@@ -5,13 +5,15 @@ import os.path
 
 import utils
 from rename_argparse import rename_argparse
+import files
 
 track_double_digit_resub = [re.compile(r"^(\d) - "),r"0\1 - "]
-track_correct_resub= [re.compile(r"^(\d+)(\. | - | )"),r"\1 - "]
+track_correct_resub = [re.compile(r"^(\d+)(\. | - | )"),r"\1 - "]
 
-def remove_track(bname):
-    bname = utils.resub(track_correct_resub, bname)
-    bname = utils.resub(track_double_digit_resub, bname)
+@files.act_basename_only
+def remove_track(path):
+    path = utils.resub(track_correct_resub, path)
+    path = utils.resub(track_double_digit_resub, path)
     return bname
 
 if __name__ == '__main__':

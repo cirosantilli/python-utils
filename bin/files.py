@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import os.path
+import os
 import sys
 import stat
 import shutil
@@ -22,11 +22,10 @@ def size_kb_str(path, decimals=2):
     """
     return "{0:."+str(decimals)+"f}".format(os.path.getsize(path)/KBYTE)
 
-def exclude_extension(func):
+def act_noext_only(func):
     """decorator
     
     if f(path,*args,**kwargs) would act on the entire given path,
-
     to find a new name for it for example, it acts only the path without the extension
     """
 
@@ -34,6 +33,20 @@ def exclude_extension(func):
         path_noext,ext = os.path.splitext(path)
         new_path_noext = func(path_noext,*args,**kwargs)
         return new_path_noext + ext
+
+    return wrapper
+
+def act_basename_only(func):
+    """decorator
+    
+    if f(path,*args,**kwargs) would act on the entire given path,
+    to find a new name for it for example, it acts only on the basename
+    """
+
+    def wrapper(path,*args,**kwargs):
+        head,bname = os.path.split(path)
+        new_bname = func(bname,*args,**kwargs)
+        return os.path.join(head,new_bname)
 
     return wrapper
 
@@ -45,10 +58,20 @@ def rename_basenames(paths, rename_func, do_rename=False, **kwargs):
 
     files cannot change contaning directories after the rename.
 
-    :param paths: the paths to act on. not an iterator, so that sorting can be done.
+    :param paths: paths to act on
+
+        not an iterator, so that sorting can be done.
+
+        relative paths are converted to full paths before rename_func acts on them
+
+        rationale: absolute paths are taken even if only basebame can be renamed
+        so that functions that use data inside the file can work. if you want
+        to do a function that uses only basename information, use the act_basename_only
+        decorator
+
     :type name: list of strigs
-    :param rename_func: rename function of  that returns the new path from the given path
-    :type name: function with signature type (path,*args,**kwargs), where path is a string
+    :param rename_func: rename function of  that returns the *basename* from the given *full path*
+    :type name: function with signature (string,*args,**kwargs)
     :param do_rename: if True, really renames, else, only outputs changes that would be done
     :type name: boolean
 
@@ -64,7 +87,7 @@ def rename_basenames(paths, rename_func, do_rename=False, **kwargs):
     >>> for p in paths:
     ...   fi = open(p,'w')
     ...   fi.close()
-    >>> rename_basenames(paths,f,func_extra_args=["b1"],func_kwargs={'kwarg':"brg"})
+    >>> rename_basenames(paths,f,func_args=["b1"],func_kwargs={'kwarg':"brg"})
     >>> new_bnames = ["as DFb1brg",".qewrb1brg"]
     >>> new_paths = [ os.path.join(tdir,bname) for bname in new_bnames ]
     >>> for p in paths:
@@ -78,16 +101,17 @@ def rename_basenames(paths, rename_func, do_rename=False, **kwargs):
     True
     """
 
-    func_extra_args = kwargs.get("func_extra_args", [])
+    func_args = kwargs.get("func_args", [])
     func_kwargs = kwargs.get("func_kwargs", {})
     silent = kwargs.get("silent", False)
 
+    paths = map(os.path.abspath,paths)
     paths.sort(reverse=True) # so that dirs get renamed after the paths they contain
     errors = []
     for path in paths:
 
         head, bname = os.path.split(path)
-        new_bname = rename_func(bname, *func_extra_args, **func_kwargs)
+        new_bname = rename_func(path, *func_args, **func_kwargs)
         new_path = os.path.join(head, new_bname)
 
         if new_path != path:

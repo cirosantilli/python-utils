@@ -15,7 +15,13 @@ def iterify(iterable):
     return iterable
 
 def resub(resubpair,target):
-    """takes a regex find replace pair (find, replace) and applies it to a target"""
+    """takes a regex find replace pair (find, replace) and applies it to a target
+
+    :param resubpair: find re and substitute string
+    :type resubpair: a pair: (re.compile object, string)
+    :param target: what to operate on
+    :type name: string
+    """
     return resubpair[0].sub(resubpair[1],target)
 
 def resubs(resubpairs,target):

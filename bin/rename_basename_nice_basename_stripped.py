@@ -4,11 +4,12 @@ import os
 
 from rename_argparse import rename_argparse
 import utils
+import files
 
 if __name__ == '__main__':
 
     rename_argparse(
-            utils.nice_basename_stripped,
+            files.act_basename_only(utils.nice_basename_stripped),
             description="corrects filenames that are forbidden" \
                 "or highly unadvisable on Linux/Windows/Mac by stripping bad things if possible",
             epilog="""EXAMPLES

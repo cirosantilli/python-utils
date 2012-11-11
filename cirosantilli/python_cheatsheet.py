@@ -481,6 +481,23 @@
             #f(1,2,3)
             #too many args
 
+        #default values for lots of kwargs
+            #if you have a large number of them,
+            #and will just be passing to another func
+            #this is the way to go
+            def f(**kwargs):
+
+                kwargs = dict(
+                            [
+                                ('default',False),
+                                ('action','store_true'),
+                                ('help',"if given, do not ignore case (enabled by default)"),
+                            ]
+                            + kwargs.items()
+                        )
+
+                other_func(**kwargs)
+
 
     #variables can contain functions
         def f(x):
@@ -582,8 +599,9 @@
                 args = [ a+1 for a in args]
 
                 #modify kwargs
-                kwargs['override'] = "fixed value"
-                self.creator = kwargs.pop('arg_for_derived_only',"default")
+                    kwargs['override'] = "fixed value"
+
+                    self.creator = kwargs.pop('arg_for_derived_only',"default")
 
                 #call base calss constructor
                 super(B,self).__init__(a,*args,**kwargs)
@@ -712,13 +730,17 @@
                 'python',
                 'test1.py'
             ]
-    process = subprocess.Popen(
-                commands,
-                shell=False,
-                stdin=subprocess.PIPE,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE
-            )
+    try:
+        process = subprocess.Popen(
+                    commands,
+                    shell=False,
+                    stdin=subprocess.PIPE,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE
+                )
+    except OSError: #gets here if command not found
+        sys.stderr.write(' '.join(commands) + '\nfailed. are all dependencies installed?'
+
     stdout, stderr = process.communicate("this is the input")
     #get stdout and stderr.
     #if you don't collect them by setting stdin/out=subprocess.PIPE,
@@ -927,3 +949,6 @@ def public_fn_with_sphinxy_docstring(name, state=None):
 
         #gettempdir() returns the default directory that will hold all of the temporary files
         #gettempprefix() returns the string prefix for new file and directory names.
+
+#os
+    #http://www.quora.com/Python-programming-language-1/Whats-the-difference-between-os-path-abspath-and-os-path-realpath-in-Python

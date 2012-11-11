@@ -11,7 +11,7 @@ from rename_argparse import rename_argparse
 if __name__ == '__main__':
 
     rename_argparse(
-            unidecode,
+            files.act_basename_only(unidecode),
             epilog="rename mutiple files with unidecode",
             description="""takes paths from stdin null separated and from arguments and adds them up.
 

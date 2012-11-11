@@ -37,18 +37,44 @@ def add_not_dry_run(
             **kwargs
         )
 
-def add_silent(
+def add_not_act_on_extension(
             parser,
-            shortname='-s',
-            longname='--silent',
+            shortname='-E',
+            longname='--not-act-on-extension',
             **kwargs
         ):
+    """by default creates a variable called *act_on_extension*, and not not_act_on_extension"""
 
     kwargs = dict(
                 [
-                    ('action','store_true'),
-                    ('default',False),
-                    ('help',"if given, informative output is made to stderr, not even error messages"),
+                    ('default',True),
+                    ('action','store_false'),
+                    ('dest','act_on_extension'),
+                    ('help',"if given, don't act on the extensin (acts by default)"),
+                ]
+                + kwargs.items()
+            )
+    
+    parser.add_argument(
+            shortname,
+            longname,
+            **kwargs
+        )
+
+def add_not_ignorecase(
+            parser,
+            shortname='-I',
+            longname='--not-ignorecase',
+            **kwargs
+        ):
+    """by default creates a variable called *ignorecase*, and not not_ignorecase"""
+
+    kwargs = dict(
+                [
+                    ('default',True),
+                    ('action','store_false'),
+                    ('dest','ignorecase'),
+                    ('help',"if given, do not ignore case (enabled by default)"),
                 ]
                 + kwargs.items()
             )
@@ -122,10 +148,33 @@ def add_paths(
             **kwargs
         )
 
+def add_silent(
 
-def add_paths_from_stdin_and_argv(parser,before_paths_add_args=[]):
+            parser,
+            shortname='-s',
+            longname='--silent',
+            **kwargs
+        ):
+
+    kwargs = dict(
+                [
+                    ('action','store_true'),
+                    ('default',False),
+                    ('help',"if given, informative output is made to stderr, not even error messages"),
+                ]
+                + kwargs.items()
+            )
+    
+    parser.add_argument(
+            shortname,
+            longname,
+            **kwargs
+        )
+
+
+def add_paths_from_stdin_and_argv(parser,before_paths_arg_adders=[]):
     add_null_separated_input(parser)
-    for add_arg in before_paths_add_args:
+    for arg_adder in before_paths_arg_adders:
         arg_adder(parser)
     add_paths(parser)
 

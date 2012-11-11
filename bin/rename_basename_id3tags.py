@@ -19,8 +19,18 @@ def extract_field_from_id3tool_out(id3tool_out, field_id):
 
 def id3_to_basename(path):
 
-    process = subprocess.Popen(['id3tool', path], shell=False,
-            stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    try:
+        process = subprocess.Popen(
+                    ['id3tool', path],
+                    shell=False,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE
+                )
+    except OSError:
+        sys.stderr.write(
+                    "id3tool command failed. please check that it is installed" \
+                    "to install on ubuntu:\n  sudo aptitude install id3tool"
+                )
 
     id3tool_out, stderr = process.communicate()
 

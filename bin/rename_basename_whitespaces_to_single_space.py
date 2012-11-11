@@ -5,10 +5,12 @@ import os.path
 
 import utils
 from rename_argparse import rename_argparse
+import files
 
-def remove_track(bname):
-    return utils.whitespaces_to_single_space(bname)
+@files.act_basename_only
+def rename_func(path):
+    return utils.whitespaces_to_single_space(path)
 
 if __name__ == '__main__':
 
-    rename_argparse(remove_track)
+    rename_argparse(rename_func)
