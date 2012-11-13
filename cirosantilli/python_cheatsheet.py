@@ -238,6 +238,13 @@
             for i in xrange(1,10,2):
                 print i
 
+        #list comprehentions
+            print [i for i in xrange(10) ]
+            #creates list
+
+        print map(lambda i:i+1,xrange(10))
+        #creates a list
+
     #tuple
         t=(1,2,3)
         t=tuple([1,2,3]) #from list
@@ -643,11 +650,76 @@
         ### otherfile.py
         param = getattr(settings, "PARAM", False) #default to False
 
-
-#list comprehentions
+    hasattr(a, 'property'): 
+        a.property
 
 #iterators
-    #TODO where
+
+    #iterators can't be rewinded!
+        #either store on memory or recalculate
+        it = iter("asdf")
+        for i in it:
+            print "first"
+            print i
+        for i in it:
+            print "second"
+            print i
+
+        #recalculate
+        it = iter("asdf")
+        for i in it:
+            print "first"
+            print i
+        it = iter("asdf")
+        for i in it:
+            print "second"
+            print i
+
+        #on memory
+        it = list(iter("asdf"))
+        for i in it:
+            print "first"
+            print i
+        for i in it:
+            print "second"
+            print i
+
+
+    #there is no has_next method, you must catch an exception:
+    StopIteration
+    try:
+        iter.next()
+        print 'has next'
+    except StopIteration:
+        print 'does not have next'
+
+    #iterators next()
+
+    #generator expressions
+        #create an iterator on the fly!
+        for i in (i for i in xrange(10) ):
+            print i
+
+        #parenthesis can be ommited for single argument func call
+        def f(i):
+            return i+1
+        for i in f(i for i in xrange(10) ):
+            print i
+
+    #itertools
+        #hardcore iterator patterns
+        #http://docs.python.org/2/library/itertools.html#recipes
+
+        import itertools
+
+        #most important ones:
+            #imap: map for iterators
+            #izip: count to infinity
+            #count: count to infinity
+
+        for i,j in itertools.product(xrange(3),xrange(3)):
+            print i,j
+
 
 #decorators
 
@@ -779,6 +851,13 @@
     #do this *EVERYTIME* you take command line arguments which *MIGHT* in some case be unicode!!
     #  meaning: whenever the command line args are not programming switches: filenames, natural language, etc.
 
+#stdout and err
+
+    from __future__ import print_function
+    print(*objects, sep=' ', end='\n', file=sys.stdout)
+    #this is normally hidden by the print "statement"
+        #in python 3.x will be a regular function and not reserved anymore
+
 #time
 
     #time
@@ -809,6 +888,18 @@
 
     import re
 
+    #get match objects from a compiled re
+        #match() 	Determine if the RE matches at the beginning of the string.
+        #search() 	Scan through a string, looking for any location where this RE matches.
+        #findall() 	return list of all matching *strings*, *not* match objects
+        #finditer() 	return iterator of match objects
+
+    #use those match objects
+        #group() 	Return the string matched by the RE
+        #start() 	Return the starting position of the match
+        #end() 	Return the ending position of the match
+        #span() 	Return a tuple containing the (start, end) positions of the match
+
     p = re.compile(r"find(\d)",re.IGNORECASE | re.DOTALL)
 
     #sub
@@ -838,13 +929,6 @@
     na = arange(0, 1000, 0.5) #numpy array
 
 #scipy
-
-#itertools
-    #hardcore iterator patterns
-
-    import itertools
-
-    itertools.product(xrange(3),xrange(3))
 
 #random
 
@@ -952,3 +1036,15 @@ def public_fn_with_sphinxy_docstring(name, state=None):
 
 #os
     #http://www.quora.com/Python-programming-language-1/Whats-the-difference-between-os-path-abspath-and-os-path-realpath-in-Python
+
+    print os.sep
+
+    os.path.join(p1,p2)
+    #join paths
+
+#termcolor
+
+    #from __future__ import print_function
+    #cprint kwargs are the print_function kwargs
+    #color is obsolete, exists only not to break interface, never use it
+    cprint("Attention!", 'red', 'on_green', attrs=['bold','blink'], end='', file=sys.stderr)

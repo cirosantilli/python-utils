@@ -8,12 +8,26 @@
 #
 #============================================================
 
+import os
 import sys
 import argparse
 
 SECTION_TITLES = {
     'examples':'EXAMPLES',
 }
+
+class ArgumentParser(argparse.ArgumentParser):
+    """argument parser with better defaults"""
+
+    def __init__(self,*args,**kwargs):
+        """
+        the following kwargs are modified as follows:
+            - epilog = kwargs.get('epilog',"") % {'f':os.path.basename(__file__)},
+            - formatter_class=kwargs.get('formatter_class',argparse.RawTextHelpFormatter), #keep newlines
+        """
+        kwargs['epilog'] = kwargs.get('epilog',"") % {'f':os.path.basename(sys.argv[0])}
+        kwargs['formatter_class'] = kwargs.get('formatter_class',argparse.RawTextHelpFormatter)
+        super(ArgumentParser,self).__init__(*args,**kwargs)
 
 def add_not_dry_run(
             parser,

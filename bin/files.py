@@ -159,10 +159,12 @@ def find(root, **kwargs):
     # kwargs
 
     @max_depth. integer.
+        default: float("inf")
         maximum depth to recurse.
         max_depth=1 searches current dir only.
 
     @min_depth. integer.
+        default: 1
         minimum depth to recurse.
         min_depth=2 searches all dirs deeper than current one.
 
@@ -173,16 +175,14 @@ def find(root, **kwargs):
     """
 
     #standard values for the kwargs
-    kwargs_key_defs = [
-                ['min_depth',0],
-                ['max_depth',float("inf")],
-                ['descend_func',lambda p: True],
-            ]
-
-    for kwargs_key_def in kwargs_key_defs:
-        key = kwargs_key_def[0]
-        default = kwargs_key_def[1]
-        kwargs[key] = kwargs.get(key, default)
+    kwargs = dict(
+                [
+                    ['min_depth',0],
+                    ['max_depth',float("inf")],
+                    ['descend_func',lambda p: True],
+                ]
+                + kwargs.items()
+            )
 
     for path in find_rec(root,1,**kwargs):
         yield path
@@ -233,6 +233,11 @@ def find_rec(root, curdepth, **kwargs ):
                 yield path
 
 def find_books(roots, **kwargs):
+
+    for kwargs_key_def in kwargs_key_defs:
+        key = kwargs_key_def[0]
+        default = kwargs_key_def[1]
+        kwargs[key] = kwargs.get(key, default)
     """
     Helper method to find books.
     """

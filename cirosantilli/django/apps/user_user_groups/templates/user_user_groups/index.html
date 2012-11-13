@@ -2,6 +2,7 @@
 
 {% load url from future %}
 {% load i18n %}
+{% load django_tables2 %}
 
 {% block title %}{{ creator.username }}{% endblock %}
 
@@ -9,12 +10,14 @@
 
 {% block content %}
 
+    {% render_table testtable %}
+
     <h2>{% trans "filter" %}</h2>
-    {% include "datatable/filters.html" with target_table=table.id filter_global=table.filter_global %}
+    {% include "datatable/filters.html" with target_table=filters.target_table filter_global=filters.filter_global %}
 
     <h2>{% trans "view" %}</h2>
     {% if items %}
-    <table id="{{ table.id }}" class="datatable">
+    <table id="{{ table.id }}" class="{{ datatable_table_class }}">
           <thead> 
               <tr>
                   <th class="nosort"}"><input type="checkbox" class="master-checkbox" id="groupnames-master" /></th>
@@ -36,7 +39,9 @@
       </table> 
     {% include "pagination.html" %}
     {% endif %}
-    <div>{% trans "total" %}: {{ items|length }}</div>
+
+    <div>{% trans "total items" %}: {{ items|length }}</div>
+
     <h2>{% trans "edit" %}</h2>
     <form action="{% url "user_user_groups_bulk_action" creator.username %}" id="bulk-action" method="post">{% csrf_token %}
         <table>

@@ -1,24 +1,22 @@
+//required variables to be defined by user caller script (head or footer)
+  //<datatable
+        //datatable_table_class
+        //datatable_filter_target_table_attr
+        //datatable_filter_target_col_attr
+        //datatable_global_filter_class
+        //datatable_global_regex_class
+        //datatable_global_smart_class
+        //datatable_col_filter_class
+        //datatable_col_regex_class
+        //datatable_col_smart_class
+  //>datatable
+
 //<datatable
-
-    //var asInitVals = new Array();
-    var datatable_filter_target_table_attr = 'target_table'
-    var datatable_filter_target_col_attr = 'target_column'
-
-    var datatable_global_prefix = 'datatable_global_'
-    var datatable_col_prefix = 'datatable_col_'
-
-    var datatable_global_filter_class = datatable_global_prefix + 'filter'
-    var datatable_global_regex_class = datatable_global_prefix + 'regex'
-    var datatable_global_smart_class = datatable_global_prefix + 'smart'
-
-    var datatable_col_filter_class = datatable_col_prefix + 'filter'
-    var datatable_col_regex_class = datatable_col_prefix + 'regex'
-    var datatable_col_smart_class = datatable_col_prefix + 'smart'
-
 
     //filters table with given table_id globally
     function fnFilterGlobal ( table_id )
     {
+
         $('#'+table_id).dataTable().fnFilter(
 
             $('body').find(
@@ -118,10 +116,11 @@
 $(document).ready(function() 
     { 
         //<dataTable
- 
+        //
+        //
             //overkill table pagination, sort and search
 
-            var oTable = $('.datatable').dataTable( {
+            var oTable = $('.'+datatable_table_class).dataTable( {
                     "oLanguage": {
                         "sSearch": "search all: ",
                         "sLengthMenu": "entries per page: _MENU_",
@@ -168,16 +167,8 @@ $(document).ready(function()
 
             //separate input filtering
                 //assumes that each filter, regex and smart is in the same column
-                
-                var datatable_global_filter_class = datatable_global_prefix + 'filter';
-                var datatable_global_regex_class = datatable_global_prefix + 'regex';
-                var datatable_global_smart_class = datatable_global_prefix + 'smart';
 
-                var datatable_col_filter_class = datatable_col_prefix + 'filter';
-                var datatable_col_regex_class = datatable_col_prefix + 'regex';
-                var datatable_col_smart_class = datatable_col_prefix + 'smart';
-
-                $("input." + datatable_global_filter_class ).keyup( function() { fnFilterGlobal( $(this).attr(datatable_filter_target_table_attr) ); } );
+                $("input." + datatable_global_filter_class ).keyup( function() { var id = $(this).attr(datatable_filter_target_table_attr); fnFilterGlobal( id ); } );
                 $("input." + datatable_global_regex_class ).click( function() { fnFilterGlobal( $(this).attr(datatable_filter_target_table_attr) ); } );
                 $("input." + datatable_global_smart_class ).click( function() { fnFilterGlobal( $(this).attr(datatable_filter_target_table_attr) ); } );
                 

@@ -16,7 +16,11 @@ from django.template import RequestContext
 from django.utils.translation import ugettext_lazy as _
 from django.views.decorators.http import require_http_methods, require_safe
 
+import django_tables2 as tables
+from django_tables2.utils import A  # alias for Accessor
+
 from user_user_groups.models import UserGroup, UserInGroup
+import datatable.settings
 
 ITEMS_PER_PAGE = 100
 
@@ -25,11 +29,63 @@ def index(request, username):
 
     table = {
             'id':'grouptable',
-            'filter_global':True,
         }
+
+    filters = {
+        'target_table':'grouptable',
+        'filter_global':True,
+        'filter_cols':[
+            'user',
+        ],
+    }
 
     creator = get_object_or_404(User,username=username)
     items_list = UserGroup.objects.filter(creator=creator).order_by('groupname')
+
+    class GroupTable(tables.Table):
+
+        selection = tables.CheckBoxColumn(
+                accessor="pk",
+                orderable=False,
+                attrs = {
+                        "id":'selection',
+                    }
+            )
+
+        groupname = tables.LinkColumn(
+                'user_user_groups_detail',
+                args=[creator,A('groupname')],
+                orderable=False,
+            )
+
+        creation_date = tables.Column(
+                orderable=False,
+            )
+
+        usercount = tables.Column(
+                verbose_name="user count",
+                orderable=False,
+            )
+
+        class Meta:
+            model = UserGroup
+            attrs = {
+                    "id":'grouptable',
+                    "class":datatable.settings.TABLE_CLASS+"asdf",
+                }
+            fields = (
+                        'groupname',
+                        'creation_date'
+                    )
+            sequence = (
+                        'selection',
+                        'groupname',
+                        'creation_date'
+                    )
+
+    testtable = GroupTable(items_list)
+
+
     paginator = Paginator(items_list, ITEMS_PER_PAGE)
     page = request.GET.get('page')
     try:
@@ -47,6 +103,8 @@ def index(request, username):
                     'creator': creator,
                     'items': items,
                     'table': table,
+                    'filters': filters,
+                    'testtable': testtable,
                 }
             )
 
@@ -55,6 +113,16 @@ def detail(request, username, groupname):
     creator = get_object_or_404(User, username=username)
     usergroup = get_object_or_404(UserGroup, creator=creator, groupname=groupname)
     usersingroup = UserInGroup.objects.filter(group=usergroup).order_by('user__username')
+
+    table = {
+            'id':'usertable',
+        }
+
+    filters = {
+        'target_table':'usertable',
+        'filter_global':True,
+    }
+
     return render(
                 request,
                 'user_user_groups/detail.html',
@@ -62,6 +130,8 @@ def detail(request, username, groupname):
                     'creator': creator,
                     'usergroup': usergroup,
                     'usersingroup': usersingroup,
+                    'table': table,
+                    'filters':filters,
                 },
             )
 

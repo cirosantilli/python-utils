@@ -30,6 +30,11 @@
 #  two fields that are unique together
 #    http://blog.gordaen.com/2009/07/08/mysql-unique-key-pairs/
 #
+#  context processor: define variables for every single template
+#    https://docs.djangoproject.com/en/dev/ref/templates/api/#writing-your-own-context-processors
+#    http://blog.madpython.com/2010/04/07/django-context-processors-best-practice/
+#    http://www.b-list.org/weblog/2006/jun/14/django-tips-template-context-processors/
+#
 #forms
 #  https://docs.djangoproject.com/en/dev/topics/forms/
 #  https://docs.djangoproject.com/en/dev/ref/forms/fields/
@@ -61,7 +66,10 @@
 #HOT APPS
 #
 # https://bitbucket.org/kmike/django-widget-tweaks
-# sudo pip install django-widget-tweaks
+
+sudo pip install django-widget-tweaks
+sudo pip install django-extra-views
+sudo pip install django_tables2
 
 
 #TODO

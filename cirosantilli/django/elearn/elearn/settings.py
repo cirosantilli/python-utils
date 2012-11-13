@@ -6,6 +6,12 @@ import sys
 
 from django.core.urlresolvers import reverse
 
+import django.conf.global_settings as DEFAULT_SETTINGS
+
+#===================================================
+# vars
+#===================================================
+
 #dir tree
 # my_django_root/apps
 # my_django_root/site_root/apps
@@ -33,14 +39,16 @@ global_static_files_dir = os.path.join(my_django_root,'static')
 sys.path.append(site_apps_dir) #project only apps
 sys.path.append(global_apps_dir) #apps that may be shared between projects
 
-DEBUG = True
-TEMPLATE_DEBUG = DEBUG
+#===================================================
+# non app settings
+#===================================================
 
 ADMINS = (
     # ('Your Name', 'your_email@example.com'),
 )
 
-MANAGERS = ADMINS
+APPEND_SLASH=True
+#https://docs.djangoproject.com/en/dev/ref/settings/#append-slash
 
 DATABASES = {
     'default': {
@@ -53,35 +61,69 @@ DATABASES = {
     }
 }
 
-# Local time zone for this installation. Choices can be found here:
-# http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
-# although not all choices may be available on all operating systems.
-# In a Windows environment this must be set to your system time zone.
-TIME_ZONE = 'America/Chicago'
-
-# Language code for this installation. All choices can be found here:
-# http://www.i18nguy.com/unicode/language-identifiers.html
-LANGUAGE_CODE = 'en-us'
-
-SITE_ID = 1
-
-# If you set this to False, Django will make some optimizations so as not
-# to load the internationalization machinery.
-USE_I18N = True
-
-# If you set this to False, Django will not format dates, numbers and
-# calendars according to the current locale.
-USE_L10N = False
+DEBUG = True
 
 # default date format. l10n has precedence over this if l10n is true.
 DATE_FORMAT="Y-m-d"
 DATETIME_FORMAT = "Y-m-d H:i:s"
 
-# If you set this to False, Django will not use timezone-aware datetimes.
-USE_TZ = True
+INSTALLED_APPS = [
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.sites',
+    'django.contrib.messages',
+    'django.contrib.staticfiles', #to find static files
+    'django.contrib.admin',
+    #'django.contrib.admindocs',
 
-APPEND_SLASH=True
-#https://docs.djangoproject.com/en/dev/ref/settings/#append-slash
+    #installed apps
+    'guardian',
+    'easy_thumbnails',
+
+    'south', #db migrations
+
+    #personal apps
+    'polls',
+    'mycommands',
+    'user_user_groups',
+    'datatable'
+]
+
+# Language code for this installation. All choices can be found here:
+# http://www.i18nguy.com/unicode/language-identifiers.html
+LANGUAGE_CODE = 'en-us'
+
+# A sample logging configuration. The only tangible logging
+# performed by this configuration is to send an email to
+# the site admins on every HTTP 500 error when DEBUG=False.
+# See http://docs.djangoproject.com/en/dev/topics/logging for
+# more details on how to customize your logging configuration.
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'filters': {
+        'require_debug_false': {
+            '()': 'django.utils.log.RequireDebugFalse'
+        }
+    },
+    'handlers': {
+        'mail_admins': {
+            'level': 'ERROR',
+            'filters': ['require_debug_false'],
+            'class': 'django.utils.log.AdminEmailHandler'
+        }
+    },
+    'loggers': {
+        'django.request': {
+            'handlers': ['mail_admins'],
+            'level': 'ERROR',
+            'propagate': True,
+        },
+    }
+}
+
+MANAGERS = ADMINS
 
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 # Example: "/home/media/media.lawrence.com/media/"
@@ -92,9 +134,20 @@ MEDIA_ROOT = ''
 # Examples: "http://media.lawrence.com/media/", "http://example.com/media/"
 MEDIA_URL = ''
 
+MIDDLEWARE_CLASSES = (
+    'django.middleware.common.CommonMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    # Uncomment the next line for simple clickjacking protection:
+    # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
+)
+
+ROOT_URLCONF = 'elearn.urls'
+
 #static files are stuff like css and images
 #for deployement, set STATIC_ROOT and do : ./manage.py collectstatic
-
 # Absolute path to the directory static files should be collected to.
 # Don't put anything in this directory yourself; store your static files
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
@@ -125,6 +178,19 @@ STATICFILES_FINDERS = (
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = '59wh9zzfvdj09owpp0=+w=nc_nmdw_*(k*0yw=uq_2k7au2or4'
 
+SITE_ID = 1
+
+TEMPLATE_DEBUG = DEBUG
+
+#must be absolute paths
+# Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
+# Always use forward slashes, even on Windows.
+# Don't forget to use absolute paths, not relative paths.
+TEMPLATE_DIRS = (
+    site_templates_dir,
+    global_templates_dir,
+)
+
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
 
@@ -137,82 +203,31 @@ TEMPLATE_LOADERS = (
 #     'django.template.loaders.eggs.Loader',
 )
 
+TEMPLATE_CONTEXT_PROCESSORS = list(DEFAULT_SETTINGS.TEMPLATE_CONTEXT_PROCESSORS)
 
-#must be absolute paths
-# Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
-# Always use forward slashes, even on Windows.
-# Don't forget to use absolute paths, not relative paths.
-TEMPLATE_DIRS = (
-    site_templates_dir,
-    global_templates_dir,
-)
+# Local time zone for this installation. Choices can be found here:
+# http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
+# although not all choices may be available on all operating systems.
+# In a Windows environment this must be set to your system time zone.
+TIME_ZONE = 'America/Chicago'
 
-MIDDLEWARE_CLASSES = (
-    'django.middleware.common.CommonMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    # Uncomment the next line for simple clickjacking protection:
-    # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
-)
+# If you set this to False, Django will make some optimizations so as not
+# to load the internationalization machinery.
+USE_I18N = True
 
-ROOT_URLCONF = 'elearn.urls'
+# If you set this to False, Django will not format dates, numbers and
+# calendars according to the current locale.
+USE_L10N = False
+
+# If you set this to False, Django will not use timezone-aware datetimes.
+USE_TZ = True
 
 # Python dotted path to the WSGI application used by Django's runserver.
 WSGI_APPLICATION = 'elearn.wsgi.application'
 
-INSTALLED_APPS = [
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.sites',
-    'django.contrib.messages',
-    'django.contrib.staticfiles', #to find static files
-    'django.contrib.admin',
-    #'django.contrib.admindocs',
-
-    #installed apps
-    'guardian',
-    'easy_thumbnails',
-
-    'south', #db migrations
-
-    #personal apps
-    'polls',
-    'mycommands',
-    'user_user_groups',
-    'datatable'
-]
-
-# A sample logging configuration. The only tangible logging
-# performed by this configuration is to send an email to
-# the site admins on every HTTP 500 error when DEBUG=False.
-# See http://docs.djangoproject.com/en/dev/topics/logging for
-# more details on how to customize your logging configuration.
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'filters': {
-        'require_debug_false': {
-            '()': 'django.utils.log.RequireDebugFalse'
-        }
-    },
-    'handlers': {
-        'mail_admins': {
-            'level': 'ERROR',
-            'filters': ['require_debug_false'],
-            'class': 'django.utils.log.AdminEmailHandler'
-        }
-    },
-    'loggers': {
-        'django.request': {
-            'handlers': ['mail_admins'],
-            'level': 'ERROR',
-            'propagate': True,
-        },
-    }
-}
+#===================================================
+# apps
+#===================================================
 
 #<userena>
 
@@ -255,3 +270,12 @@ USERENA_PROFILE_DETAIL_TEMPLATE = 'accounts/profile_detail.html'
 #USERENA_HIDE_EMAIL=True
 
 #</userena>
+
+#</datatable>
+TEMPLATE_CONTEXT_PROCESSORS.append('datatable.context_processor.processor')
+#</datatable>
+
+#add apps required by userena
+INSTALLED_APPS.extend([
+    'django_tables2',
+])

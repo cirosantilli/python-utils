@@ -101,8 +101,8 @@ EXAMPLES
     
     parser.add_argument('-c',
         action='store_const',
-        dest='constant_value',
         const='value-to-store',
+        dest='constant_value',
         help='Store a constant value')
 
     parser.add_argument('-t',

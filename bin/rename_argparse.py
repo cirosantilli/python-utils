@@ -1,9 +1,5 @@
 #!/usr/bin/env python
 
-import os
-import sys
-import argparse
-
 import files
 import argparse_extras
 
@@ -29,10 +25,7 @@ def rename_argparse(rename_func, **kwargs):
     # kwargs
 
     - all kwargs accepted by argpase.ArgumentParser are passed to it
-        but some of them are modified as follows:
-
-        - epilog = kwargs.get('epilog',"") % {'f':os.path.basename(__file__)},
-        - formatter_class=kwargs.get('formatter_class',argparse.RawTextHelpFormatter), #keep newlines
+        but some of them are modified as follows specified by argparse_extras.ArgumentParser
 
     - encoding
         string
@@ -57,21 +50,27 @@ def rename_argparse(rename_func, **kwargs):
 
         called controller because it takes user inputs and puts them on
         an adequate form to pass to the function
+
+    #TODO
+        - add kwarg that adds both ext only and bname only
     """
 
+    add_act_noext_only = kwargs.pop("add_act_noext_only", False)
+    add_act_basename_only = kwargs.pop("add_act_basename_only", True)
     encoding = kwargs.pop("encoding", 'UTF-8')
     func_arg_adders = kwargs.pop("func_arg_adders", [])
     func_arg_controller = kwargs.pop("func_arg_controller", lambda a: ([],{}) )
 
-    kwargs['epilog'] = kwargs.get('epilog',"") % {'f':os.path.basename(sys.argv[0])}
-    kwargs['formatter_class'] = kwargs.get('formatter_class',argparse.RawTextHelpFormatter)
-
-    parser = argparse.ArgumentParser(**kwargs)
+    parser = argparse_extras.ArgumentParser(**kwargs)
 
     argparse_extras.add_silent(parser)
-    argparse_extras.add_not_act_on_extension(parser)
     argparse_extras.add_not_dry_run(parser)
     argparse_extras.add_not_ignorecase(parser)
+    if add_act_noext_only:
+        argparse_extras.add_not_act_on_extension(parser)
+    #TODO
+    #if add_act_noext_only:
+        #argparse_extras.add_act_on_basename_only(parser)
     argparse_extras.add_paths_from_stdin_and_argv(parser,before_paths_arg_adders=func_arg_adders)
 
     args = parser.parse_args()
@@ -80,7 +79,7 @@ def rename_argparse(rename_func, **kwargs):
     paths = argparse_extras.get_paths_from_stdin_and_argv(args)
     silent = args.silent
 
-    if not args.act_on_extension:
+    if add_act_noext_only and not args.act_on_extension:
         rename_func = files.act_noext_only(rename_func)
 
     func_args, func_kwargs = func_arg_controller(args)

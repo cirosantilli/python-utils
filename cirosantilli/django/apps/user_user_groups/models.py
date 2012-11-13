@@ -31,7 +31,7 @@ class UserGroup(models.Model):
             )
 
     creation_date = models.DateTimeField(
-                'date published',
+                'creation date',
                 default=lambda:datetime.now(),
             )
 

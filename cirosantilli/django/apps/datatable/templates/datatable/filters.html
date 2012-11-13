@@ -13,23 +13,18 @@
         {% if filter_global %}
         <tr>
             <td>{% trans "global" %}</td>
-            <td><input type="text"     target_table="{{ target_table }}" class="datatable_global_filter" ></td>
-            <td><input type="checkbox" target_table="{{ target_table }}" class="datatable_global_regex" ></td>
-            <td><input type="checkbox" target_table="{{ target_table }}" class="datatable_global_smart" checked></td>
+            <td><input type="text"     {{ datatable_filter_target_table_attr }}="{{ target_table }}" class="{{ datatable_filter_find_class }}" ></td>
+            <td><input type="checkbox" {{ datatable_filter_target_table_attr }}="{{ target_table }}" class="{{ datatable_filter_regex_class }}" ></td>
+            <td><input type="checkbox" {{ datatable_filter_target_table_attr }}="{{ target_table }}" class="{{ datatable_filter_smart_class }}" ></td>
         </tr>
         {% endif %}
-        {% comment %}
-        TODO implement.
-        probably much better if table is represented in django.
-        gonna search for some app that does this
         {% for target_col in target_cols %}
         <tr>
             <td>{% trans "global" %}</td>
-            <td><input type="text"     target_col="{{ target_col }}" class="datatable_col_filter" ></td>
-            <td><input type="checkbox" target_col="{{ target_col }}" class="datatable_col_regex" ></td>
-            <td><input type="checkbox" target_col="{{ target_col }}" class="datatable_col_smart" checked></td>
+            <td><input type="text"     {{ datatable_filter_col_table_attr }}="{{ target_col }}" class="{{ datatable_filter_col_find_class }}"  ></td>
+            <td><input type="checkbox" {{ datatable_filter_col_table_attr }}="{{ target_col }}" class="{{ datatable_filter_col_regex_class }}" ></td>
+            <td><input type="checkbox" {{ datatable_filter_col_table_attr }}="{{ target_col }}" class="{{ datatable_filter_col_smart_class }}" ></td>
         </tr>
         {% endfor %}
-        {% endcomment %}
     </tbody>
 </table>
