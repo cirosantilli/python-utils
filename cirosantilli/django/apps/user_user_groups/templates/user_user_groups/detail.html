@@ -10,7 +10,7 @@
 {% block content %}
 
     <h2>{% trans "filter" %}</h2>
-    {% include "datatable/filters.html" with target_table=filters.target_table filter_global=filters.filter_global %}
+    {% include "django_tables2_datatables/filters.html" with target_table=filters.target_table filter_global=filters.filter_global %}
 
     <h2>{{ usergroup.groupname }}</h2>
     <div>{% trans "user count" %}: {{ usergroup.useringroup_set.count }}</div>

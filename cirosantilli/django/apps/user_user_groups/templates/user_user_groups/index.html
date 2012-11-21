@@ -15,7 +15,6 @@
 
     <h2>{% trans "filter" %}</h2>
     {% render_table table_filter %}
-    {% include "django_tables2_datatables/filters.html" with target_table=filters.target_table filter_global=filters.filter_global %}
 
     <h2>{% trans "edit" %}</h2>
     <form action="{% url "user_user_groups_bulk_action" creator.username %}" id="bulk-action" method="post">{% csrf_token %}

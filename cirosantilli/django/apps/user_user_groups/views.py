@@ -25,7 +25,7 @@ from django_tables2_datatables import settings as dtd_settings, tables as dtd_ta
 ITEMS_PER_PAGE = 100
 
 def get_group_table(creator,data):
-    """returns an instance of a class named GroupTable
+    """returns an instance of a class named GroupTable derived from tables.Table
 
     :param creator: user that the table links to
     :type creator: django.contrib.auth.models.User
@@ -48,9 +48,6 @@ def get_group_table(creator,data):
             args=[creator,A('groupname')],
         )
 
-        creation_date = tables.Column(
-        )
-
         usercount = tables.Column(
             accessor="useringroup_set.count",
             verbose_name="user count",
@@ -59,15 +56,14 @@ def get_group_table(creator,data):
         class Meta(dtd_tables.Meta):
             model = UserGroup
             fields = (
-                        'groupname',
-                        'creation_date',
-                    )
+                'creation_date',
+            )
             sequence = (
-                        'selection',
-                        'groupname',
-                        'usercount',
-                        'creation_date',
-                    )
+                'selection',
+                'groupname',
+                'usercount',
+                'creation_date',
+            )
         Meta.attrs["id"] = 'grouptable'
 
     return GroupTable(data)
@@ -91,31 +87,57 @@ def index(request, username):
     }
 
     return render(
-                request,
-                'user_user_groups/index.html',
-                dict( {
-                    'creator': creator,
-                    'total_items_db': all_items_db.count(),
-                    'table': table,
-                    'filters': filters,
-                    'table_filter': table_filter,
-                }.items() + dtd_settings.CONTEXT.items())
+        request,
+        'user_user_groups/index.html',
+        {
+            'creator': creator,
+            'total_items_db': all_items_db.count(),
+            'table': table,
+            'table_filter': table_filter,
+        },
+    )
+
+def get_user_table(data):
+    """returns an instance of a class named UserTable derived from tables.Table"""
+
+    class UserTable(tables.Table):
+
+        selection = dtd_tables.MasterCheckBoxColumn(
+            "select-group",
+            name="groupnames",
+            form="bulk-action",
+            accessor="groupname",
+        )
+
+        username = dtd_tables.LinkColumn(
+            'userena.views.profile_detail',
+            args=[A('username')],
+        )
+
+        class Meta(dtd_tables.Meta):
+            model = UserInGroup
+            fields = (
+                'date_added',
             )
+            sequence = (
+                'selection',
+                'username',
+                'date_added',
+            )
+        Meta.attrs['id'] = 'usertable'
+
+    return UserTable(data)
 
 @require_safe
 def detail(request, username, groupname):
+
     creator = get_object_or_404(User, username=username)
     usergroup = get_object_or_404(UserGroup, creator=creator, groupname=groupname)
-    usersingroup = UserInGroup.objects.filter(group=usergroup).order_by('user__username')
+    all_items_db = UserInGroup.objects.filter(group=usergroup).order_by('user__username')
 
-    table = {
-            'id':'usertable',
-        }
+    table = get_user_table(all_items_db)
 
-    filters = {
-        'target_table':'usertable',
-        'filter_global':True,
-    }
+    table_filter = dtd_tables.get_table_filter(table)
 
     return render(
                 request,
@@ -123,9 +145,8 @@ def detail(request, username, groupname):
                 {
                     'creator': creator,
                     'usergroup': usergroup,
-                    'usersingroup': usersingroup,
                     'table': table,
-                    'filters':filters,
+                    'table_filter': table_filter,
                 },
             )
 
