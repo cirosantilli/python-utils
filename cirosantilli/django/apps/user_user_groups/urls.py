@@ -8,12 +8,10 @@ from views import UserGroupForm
 #from user_user_groups.models import UserGroup
 
 USERNAME_RE = r'(?P<username>[^/?]+)'
-USERUSERGROUPS_URL = r'user-groups'
 GROUP_NAME_RE = r'(?P<groupname>[^/?]+)'
 
-username_url_re_prefix = r'^' + USERNAME_RE  + r'/' + USERUSERGROUPS_URL
+username_url_re_prefix = r'^' + USERNAME_RE 
 username_groupname_url_re_prefix = username_url_re_prefix + r'/' + GROUP_NAME_RE
-
 suffix = r'/$'
 
 urlpatterns = patterns('user_user_groups.views',

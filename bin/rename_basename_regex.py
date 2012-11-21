@@ -67,12 +67,15 @@ EXAMPLES
     %(f)s -D 'a(.*?)a' '\1' aBBBBa.txt 00a11ca22c.txt
     #not Dry run: really renames!
 
-    find . | %(f)s find replace
+    ls | %(f)s a b
+    #act current dir
+
+    find . | %(f)s a b
     #act on found items
 
-    find . | %(f)s -I find replace
+    find . | %(f)s -I a b
     #don't Ignore case (enabled by default)
 
-    find . | %(f)s -E find replace
+    find . | %(f)s -E a b
     #don't act on Extension
 """)

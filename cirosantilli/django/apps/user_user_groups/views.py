@@ -20,16 +20,67 @@ import django_tables2 as tables
 from django_tables2.utils import A  # alias for Accessor
 
 from user_user_groups.models import UserGroup, UserInGroup
-import datatable.settings
+from django_tables2_datatables import settings as dtd_settings, tables as dtd_tables
 
 ITEMS_PER_PAGE = 100
+
+def get_group_table(creator,data):
+    """returns an instance of a class named GroupTable
+
+    :param creator: user that the table links to
+    :type creator: django.contrib.auth.models.User
+    :param data: data, same as passed to django_tables2.Table constructor
+    :returns: the table that links to creator's user groups
+    :rtype: django_tables2.Table instance
+    """
+
+    class GroupTable(tables.Table):
+
+        selection = dtd_tables.MasterCheckBoxColumn(
+            "select-group",
+            name="groupnames",
+            form="bulk-action",
+            accessor="groupname",
+        )
+
+        groupname = dtd_tables.LinkColumn(
+            'user_user_groups_detail',
+            args=[creator,A('groupname')],
+        )
+
+        creation_date = tables.Column(
+        )
+
+        usercount = tables.Column(
+            accessor="useringroup_set.count",
+            verbose_name="user count",
+        )
+
+        class Meta(dtd_tables.Meta):
+            model = UserGroup
+            fields = (
+                        'groupname',
+                        'creation_date',
+                    )
+            sequence = (
+                        'selection',
+                        'groupname',
+                        'usercount',
+                        'creation_date',
+                    )
+        Meta.attrs["id"] = 'grouptable'
+
+    return GroupTable(data)
 
 @require_safe
 def index(request, username):
 
-    table = {
-            'id':'grouptable',
-        }
+    creator = get_object_or_404(User,username=username)
+    all_items_db = UserGroup.objects.filter(creator=creator).order_by('groupname')
+
+    table = get_group_table(creator,all_items_db)
+
+    table_filter = dtd_tables.get_table_filter(table)
 
     filters = {
         'target_table':'grouptable',
@@ -39,73 +90,16 @@ def index(request, username):
         ],
     }
 
-    creator = get_object_or_404(User,username=username)
-    items_list = UserGroup.objects.filter(creator=creator).order_by('groupname')
-
-    class GroupTable(tables.Table):
-
-        selection = tables.CheckBoxColumn(
-                accessor="pk",
-                orderable=False,
-                attrs = {
-                        "id":'selection',
-                    }
-            )
-
-        groupname = tables.LinkColumn(
-                'user_user_groups_detail',
-                args=[creator,A('groupname')],
-                orderable=False,
-            )
-
-        creation_date = tables.Column(
-                orderable=False,
-            )
-
-        usercount = tables.Column(
-                verbose_name="user count",
-                orderable=False,
-            )
-
-        class Meta:
-            model = UserGroup
-            attrs = {
-                    "id":'grouptable',
-                    "class":datatable.settings.TABLE_CLASS+"asdf",
-                }
-            fields = (
-                        'groupname',
-                        'creation_date'
-                    )
-            sequence = (
-                        'selection',
-                        'groupname',
-                        'creation_date'
-                    )
-
-    testtable = GroupTable(items_list)
-
-
-    paginator = Paginator(items_list, ITEMS_PER_PAGE)
-    page = request.GET.get('page')
-    try:
-        items = paginator.page(page)
-    except PageNotAnInteger:
-        # If page is not an integer, deliver first page.
-        items = paginator.page(1)
-    except EmptyPage:
-        # If page is out of range (e.g. 9999), deliver last page of results.
-        items = paginator.page(paginator.num_pages)
     return render(
                 request,
                 'user_user_groups/index.html',
-                {
+                dict( {
                     'creator': creator,
-                    'items': items,
+                    'total_items_db': all_items_db.count(),
                     'table': table,
                     'filters': filters,
-                    'testtable': testtable,
-                }
+                    'table_filter': table_filter,
+                }.items() + dtd_settings.CONTEXT.items())
             )
 
 @require_safe

@@ -192,7 +192,7 @@ def add_paths_from_stdin_and_argv(parser,before_paths_arg_adders=[]):
         arg_adder(parser)
     add_paths(parser)
 
-def get_stdin_items( sep, encoding):
+def get_stdin_items(sep, encoding):
     if not sys.stdin.isatty():
         items_str = sys.stdin.read()
         if items_str:

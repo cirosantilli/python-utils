@@ -87,7 +87,6 @@ INSTALLED_APPS = [
     'polls',
     'mycommands',
     'user_user_groups',
-    'datatable'
 ]
 
 # Language code for this installation. All choices can be found here:
@@ -146,6 +145,13 @@ MIDDLEWARE_CLASSES = (
 
 ROOT_URLCONF = 'elearn.urls'
 
+# Make this unique, and don't share it with anybody.
+SECRET_KEY = '59wh9zzfvdj09owpp0=+w=nc_nmdw_*(k*0yw=uq_2k7au2or4'
+
+SHORT_DATETIME_FORMAT = "Y-m-d H:i:s"
+
+SITE_ID = 1
+
 #static files are stuff like css and images
 #for deployement, set STATIC_ROOT and do : ./manage.py collectstatic
 # Absolute path to the directory static files should be collected to.
@@ -154,8 +160,7 @@ ROOT_URLCONF = 'elearn.urls'
 # Example: "/home/media/media.lawrence.com/static/"
 STATIC_ROOT = '/var/www/static'
 
-# URL prefix for static files.
-# Example: "http://media.lawrence.com/static/"
+#STATIC_URL = "http://media.lawrence.com/static/"
 STATIC_URL = 'http://localhost/static/'
 
 # Additional locations of static files
@@ -175,10 +180,8 @@ STATICFILES_FINDERS = (
 #    'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
 
-# Make this unique, and don't share it with anybody.
-SECRET_KEY = '59wh9zzfvdj09owpp0=+w=nc_nmdw_*(k*0yw=uq_2k7au2or4'
-
-SITE_ID = 1
+#context processors: add context to every template
+#TEMPLATE_CONTEXT_PROCESSORS.append('django_tables2_datatables.context_processor.processor')
 
 TEMPLATE_DEBUG = DEBUG
 
@@ -271,11 +274,16 @@ USERENA_PROFILE_DETAIL_TEMPLATE = 'accounts/profile_detail.html'
 
 #</userena>
 
-#</datatable>
-TEMPLATE_CONTEXT_PROCESSORS.append('datatable.context_processor.processor')
-#</datatable>
-
-#add apps required by userena
+#<datatable>
 INSTALLED_APPS.extend([
     'django_tables2',
+    'django_tables2_datatables',
+    'master_checkbox',
 ])
+#>datatable
+
+#</cirosantilli
+INSTALLED_APPS.extend([
+    'cirosantilli',
+])
+#>cirosantilli

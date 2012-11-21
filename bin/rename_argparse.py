@@ -71,7 +71,10 @@ def rename_argparse(rename_func, **kwargs):
     #TODO
     #if add_act_noext_only:
         #argparse_extras.add_act_on_basename_only(parser)
-    argparse_extras.add_paths_from_stdin_and_argv(parser,before_paths_arg_adders=func_arg_adders)
+    argparse_extras.add_paths_from_stdin_and_argv(
+        parser,
+        before_paths_arg_adders=func_arg_adders
+    )
 
     args = parser.parse_args()
 
@@ -85,10 +88,10 @@ def rename_argparse(rename_func, **kwargs):
     func_args, func_kwargs = func_arg_controller(args)
 
     files.rename_basenames(
-                paths,
-                rename_func,
-                func_args=func_args,
-                func_kwargs=func_kwargs,
-                do_rename=not_dry_run,
-                silent=silent
-            )
+        paths,
+        rename_func,
+        func_args=func_args,
+        func_kwargs=func_kwargs,
+        do_rename=not_dry_run,
+        silent=silent
+    )

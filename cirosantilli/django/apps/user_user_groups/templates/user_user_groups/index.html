@@ -10,37 +10,12 @@
 
 {% block content %}
 
-    {% render_table testtable %}
+    <h2>{% trans "info" %}</h2>
+    <div>{% trans "total items in database" %}: {{ total_items_db }}</div>
 
     <h2>{% trans "filter" %}</h2>
-    {% include "datatable/filters.html" with target_table=filters.target_table filter_global=filters.filter_global %}
-
-    <h2>{% trans "view" %}</h2>
-    {% if items %}
-    <table id="{{ table.id }}" class="{{ datatable_table_class }}">
-          <thead> 
-              <tr>
-                  <th class="nosort"}"><input type="checkbox" class="master-checkbox" id="groupnames-master" /></th>
-                  <th>{% trans "name" %}</th>
-                  <th>{% trans "user count" %}</th>
-                  <th>{% trans "creation date" %}</th>
-              </tr>
-          </thead> 
-          <tbody> 
-          {% for item in items %}
-          <tr>
-              <td><input type="checkbox" name="groupnames" value="{{ item.groupname }}" form="bulk-action" slave-of="groupnames-master" /></td>
-              <td><a href="{% url 'user_user_groups_detail' creator.username item.groupname %}">{{ item.groupname }}</a></td>
-              <td>{{ item.useringroup_set.count }}</td>
-              <td>{{ item.creation_date }}</td>
-          </tr>
-          {% endfor %}
-          <tbody> 
-      </table> 
-    {% include "pagination.html" %}
-    {% endif %}
-
-    <div>{% trans "total items" %}: {{ items|length }}</div>
+    {% render_table table_filter %}
+    {% include "django_tables2_datatables/filters.html" with target_table=filters.target_table filter_global=filters.filter_global %}
 
     <h2>{% trans "edit" %}</h2>
     <form action="{% url "user_user_groups_bulk_action" creator.username %}" id="bulk-action" method="post">{% csrf_token %}
@@ -49,11 +24,11 @@
                 <td>{% trans "copy selected" %}</td>
                   <td><input type="submit" name="copy" value="do it" /></td>
               </tr>
-              <tr>
-                  <td>{% trans "create new group" %}</td>
-                  <td>{% include "user_user_groups/create_new_group_link.html" with username=creator.username %}</td>
-              </tr>
               {% if user.username == creator.username %}
+                  <tr>
+                      <td>{% trans "create new group" %}</td>
+                      <td>{% include "user_user_groups/create_new_group_link.html" with username=creator.username %}</td>
+                  </tr>
                   <tr>
                       <td>{% trans "delete selected" %}</td>
                       <td><input type="submit" name="delete" value="do it" /></td>
@@ -61,4 +36,8 @@
               {% endif %}
         </table>
     </form>
+
+    <h2>{% trans "view" %}</h2>
+    {% render_table table %}
+
 {% endblock %}

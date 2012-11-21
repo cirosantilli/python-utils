@@ -1,46 +1,28 @@
-from django.conf.urls import patterns, include, url
-
-from django.views.generic.simple import direct_to_template
-
 from django.contrib import admin
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
-
-admin.autodiscover()
+from django.conf.urls import patterns, include, url
+from django.views.generic.simple import direct_to_template
 
 import settings
 
+admin.autodiscover()
+
 urlpatterns = patterns('',
-
-    url('^$',
-        direct_to_template, #function to call
-        {'template': 'home.html'}, #args for direct_to_template
-        "home" #hame for url template
-    ),
-    #home page 
-
-
-    #if the func had no args:
-    #('^$',
-        #direct_to_template_noargs,
-        #name="home"
-    #),
-
-    url('^about/$',
-        direct_to_template,
-        {'template': 'about.html'},
-        "about"
-    ),
-    #static page, simple generic view
-
-    url(r'^polls/', include('polls.urls')),
-    #mounts all the admin urls defined in admin.site.urls on top of admin/
 
     url(r'^admin/', include(admin.site.urls)),
 
+    url(r'^', include('cirosantilli.urls')),
+
+    url(r'^master-checkbox/', include('master_checkbox.urls')),
+
     #<userena
     url(r'^users/', include('userena.urls')),
-    #</userena
-    url(r'^users/', include('user_user_groups.urls')),
+    #>userena
+
+    url(r'^user-groups/', include('user_user_groups.urls')),
+
+    url(r'^django_tables2_datatables/', include('django_tables2_datatables.urls')),
+    
 )
 
 urlpatterns += staticfiles_urlpatterns() #to serve static files

@@ -1,3 +1,5 @@
+{% load url from future %}
+
 <!DOCTYPE html>
 <html>
     <head>
@@ -10,24 +12,13 @@
         <link rel="stylesheet" href="{{ STATIC_URL }}css/jquery-ui.css" type="text/css" />
 
         <script type="text/javascript" src="{{ STATIC_URL }}app/DataTables/media/js/jquery.dataTables.min.js"></script> 
+        <script type="text/javascript" src="{% url 'django_tables2_usertables_config_js' %}"></script> 
         <link rel="stylesheet" href="{{ STATIC_URL }}app/DataTables/media/css/jquery.dataTables.css" type="text/css" media="print, projection, screen" />
-        <script type="text/javascript">
-            var datatable_table_class = '{{ datatable_table_class }}';
-            var datatable_filter_target_table_attr = '{{ datatable_filter_target_table_attr }}';
-            var datatable_filter_target_col_attr = '{{ datatable_filter_target_col_attr }}';
-            var datatable_global_filter_class = '{{ datatable_filter_find_class }}';
-            var datatable_global_regex_class = '{{ datatable_filter_regex_class }}';
-            var datatable_global_smart_class = '{{ datatable_filter_smart_class }}';
-            var datatable_col_filter_class = '{{ datatable_filter_col_find_class }}';
-            var datatable_col_regex_class = '{{ datatable_filter_col_regex_class }}';
-            var datatable_col_smart_class = '{{ datatable_filter_col_smart_class }}';
-            var a = 'asdf';
-        </script>
 
         <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/style.css" />
         <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}accounts/css/style.css" />
 
-        <script type="text/javascript" src="{{ STATIC_URL }}js/main.js"></script> 
+        <script type="text/javascript" src="{% url 'master_checkbox_js' %}"></script> 
         {% block extrahead %}{% endblock %}
     </head>
     <body>

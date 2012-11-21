@@ -62,34 +62,53 @@
             #tests run from the docstring
             #firefox http://docs.python.org/library/doctest.html
 
+        sudo pip install tox
+
     #package macking
         #http://guide.python-distribute.org/creation.html
         import setup
 
-    #sphynx
+    #sphinx
         #generate python documentation from docstrings
-        #http://packages.python.org/an_example_pypi_project/sphinx.html
+            #http://packages.python.org/an_example_pypi_project/sphinx.html
+            #http://thomas-cokelaer.info/tutorials/sphinx/docstring_python.html
 
-#installing stuff
+#pip + virtual env
+    #in Ubuntu 12.04 pip packages installed by pip
+    #  are falling under /usr/local/lib/python2.7/dist-packages
 
-    #pip package management
-        #in Ubuntu 12.04 pip packages installed by pip
-        #  are falling under /usr/local/lib/python2.7/dist-packages
+    #install pip
         sudo aptitude install python-pip python-dev build-essential 
         sudo pip install --upgrade pip 
         sudo pip install --upgrade virtualenv #manages several versions of a single package
 
-        pip search $FIND
-        firefox http://pypi.python.org/pypi?%3Aaction=browse
-        #search for packages
+    pip search $FIND
+    firefox http://pypi.python.org/pypi?%3Aaction=browse
+    #search for packages
 
-        sudo pip install $PACKAGE
-        #install $PACKAGE
+    #install
+        sudo pip install "$PKG"
+        #install package found with search
+
+        sudo pip install -e git://git.myproject.org/MyProject.git#egg=MyProject
+        sudo pip install -e git://git.myproject.org/MyProject.git@master#egg=MyProject
+        #install package from repo
+        #also supports svn, hg and bazaar
+
+    sudo pip install $PACKAGE
+    #install $PACKAGE
+
+    pip install -r requirements.pip
+    #install requirements on a requirements file
+        #this file can be formatted as freeze output
+
+    pip freeze
+    #list all installed packages
+
+        pip freeze > stable-req.pip
+        #to create a requirements file, then remove what is not needed
 
 
-    sudo pip install django
-    sudo pip install unidecode
-    #sudo pip install 
 
 #environment
 
@@ -127,7 +146,41 @@
     #AND if there is a (empty) file named __init__.py in it
     #note that there is no difference between that and importing a function or class from a file
 
+#import
 
+    import a.b
+    a.b.f()
+
+    from a import b
+    b.f()
+
+    #rename
+        from a import b as c
+        c.f()
+
+        #ERROR:
+            #import c.d
+            #must use import b.d
+
+    #a in same module
+    import .a
+    a.f()
+
+    #a in up a module
+    import ..a
+    a.f()
+
+    #a in up two modules
+    import ...a
+    a.f()
+
+    #a in up three modules
+    import ....a
+    a.f()
+
+    #multiline
+    from django_tables2.utils import (a, b, c,
+        d, e ,f)
 
 #types and operators
 
@@ -308,20 +361,15 @@
         d = dict(sape=4139, guido=4127, jack=4098)
         #string only keys
 
-
-
         print d.items() 
         #dict to list of pairs
 
         print dict(x.items() + y.items())
         #join 2 dicts into a third
 
-
-        
-
         d1.update(d2)
         d1.update({'as':12})
-        d1.update(1:2,3:4)
+        d1.update(1=2,3=4)
         #update d1 to add/update values of dict d2 and d3 and as key
 
 
@@ -476,7 +524,15 @@
         f("asdf",*(1,2,3,4),{1:"a",2:"b"})
         f("as",12,*(1,2,3,4),{1:"a",2:"b"})
         f("asdf",*[1,2,3,4],{1:"a",2:"b"})
-        f("asdf",*l,**d)
+
+        d={'a':1,'b':2,'c':3}
+        f(**d)
+
+        f(1,2,a=3)
+        #a is kwarg
+
+        f(2,a=3)
+        #a is positional
 
         #there is no such thing as function overloading in Python
             def f(a,b):
@@ -494,14 +550,13 @@
             #this is the way to go
             def f(**kwargs):
 
-                kwargs = dict(
-                            [
-                                ('default',False),
-                                ('action','store_true'),
-                                ('help',"if given, do not ignore case (enabled by default)"),
-                            ]
-                            + kwargs.items()
-                        )
+                default = {
+                            'default':False,
+                            'action':'store_true',
+                            'help':"if given, do not ignore case (enabled by default)",
+                        }
+                default.update(kwargs)
+                kwargs = default
 
                 other_func(**kwargs)
 
@@ -537,6 +592,67 @@
 
 #classes and objects
 
+    #fields
+    class A():
+        """
+        comment
+        """
+
+        static = None
+        _static_private = None
+        #static field!
+
+        def __init__(self,a):
+            self.member = a
+            #object field!
+
+            A.static = a
+            self.__class__.static = a
+            #set the static variable
+
+            self._private = b
+            #by convention, '_' indicates private varibales and methods.
+            #nothing in the language prevents you from using it outside
+              #except your code breaking later on
+
+    a = A(1)
+    b = A(2)
+    print a.member
+    print a._private
+    print A.static
+    print a.__class__.static
+    print b.__class__.static
+
+    #inheritance
+        class B(A):
+            def __init__(
+                        self,
+                        for_derived_only,
+                        named_to_modify,
+                        *args,
+                        **kwargs
+                    ): #note that other named args, before or after modified one will fall into args, so youre fine
+
+                self.for_derived_only = for_derived_only
+
+                named_to_modify = named_to_modify + 1
+
+                #modify args
+                args = [ a+1 for a in args ]
+
+                #kwargs
+                    self.creator = kwargs.pop('arg_derived_only',"default")
+
+                    kwargs['override'] = "new value"
+
+                #call base calss constructor
+                super(B,self).__init__(named, named_to_modify, *args,**kwargs)
+                #super().__init__(*args,**kwargs) #python 3
+
+                print "Constructor B was called"
+
+        #TODO multiple
+
     #special methods
     class A():
         """
@@ -547,9 +663,6 @@
             print "Constructor A was called"
             self.a = a 
 
-            #by convention, '_' indicates private varibales and methods.
-            #not very widely followed though because it is a pain to write...
-            self._private = b
 
         #def __cmp__(self,other):
             #"""
@@ -558,9 +671,11 @@
 
         def __eq__(self,other):
             """
-            equality via == operator
+            >>> a = A()
+            >>> b = A()
+            >>> a == b
             """
-            return
+            return self.a == other.a
 
         def __ge__(self,other):
             """
@@ -598,45 +713,73 @@
             """
             return
 
-    #inheritance
-        class B(A):
-            def __init__(self,a,*args, **kwargs):
+        def __str__(self):
+            """should return bytes in some encoding,
+            
+            called string for compatibility, changed to __bytes__ in python 3"""
+            return unicode(self).encode('utf-8')
 
-                #modify args
-                args = [ a+1 for a in args]
+        def __unicode__(self):
+            """informal description, return (possibly unicode) chars
+            
+            http://stackoverflow.com/questions/1307014/python-str-versus-unicode
 
-                #modify kwargs
-                    kwargs['override'] = "fixed value"
+            changed to __str__ in python 3
+            """
+            return 'a'
 
-                    self.creator = kwargs.pop('arg_for_derived_only',"default")
+        def __repr__(self):
+            """formal, very precise and verbose
 
-                #call base calss constructor
-                super(B,self).__init__(a,*args,**kwargs)
+            used in interactive section:
+            >>>A()
+            """
+            return 'class A()'
 
-                print "Constructor B was called"
+        def __len__(self):
+            """
+            >>>len(a)
+            """
+            return len(self.a)
 
-        #TODO multiple
+    a=A()
+    
+    print a.__class__.__name__
+    #a.__class__ is the class of instance a: A
 
-    class Reflection
 
-        def __init__(self):
-            self.a = "adsf"
+    #reflection
+        class Reflection
 
-        def print_methods(self):
-            """ print all the methods of this object and their doc string"""
-            print '\n* Methods *'
-            for names in dir(self):
-            attr = getattr(self,names)
-            if callable(attr):
-                print names,':',attr.__doc__
+            def __init__(self):
+                self.a = "adsf"
 
-        def print_attributes(self):
-            """ print all the attributes of this object and their value """
-            print '* Attributes *'
-            for names in dir(self):
-            attr = getattr(self,names)
-            if not callable(attr):
-                print names,':',attr
+            def print_methods(self):
+                """ print all the methods of this object and their doc string"""
+                print '\n* Methods *'
+                for names in dir(self):
+                attr = getattr(self,names)
+                if callable(attr):
+                    print names,':',attr.__doc__
+
+            def print_attributes(self):
+                """ print all the attributes of this object and their value """
+                print '* Attributes *'
+                for names in dir(self):
+                attr = getattr(self,names)
+                if not callable(attr):
+                    print names,':',attr
+
+    #None object
+        
+        a = A()
+        a is None
+        #a == None #bad
+
+        #always compare with is, never ==, because == can be overwriden by __eq__
+            #for example, to always true, while is cannot
+            #http://jaredgrubb.blogspot.com.br/2009/04/python-is-none-vs-none.html
+
 
 #builtin functions
 
@@ -853,6 +996,12 @@
 
 #stdout and err
 
+    if sys.stdout.isatty():
+        print "terminal"
+    else:
+        print "pipe"
+
+
     from __future__ import print_function
     print(*objects, sep=' ', end='\n', file=sys.stdout)
     #this is normally hidden by the print "statement"
@@ -941,26 +1090,48 @@
     for i in random.sample(xrange(2), 2):
         print i;
 
-#sphynx
-def public_fn_with_sphinxy_docstring(name, state=None):
-    """This function does something.
+#sphinx
 
-    A really great idea.  A way you might use me is
+    sudo pip install sphynx
 
-        >>> bar()
-        >>> print 'foo'
-        foo
+    def func(name, state=None):
+        """short summary
 
- 
-    :param name: The name to use.
-    :type name: str.
-    :param state: Current state to be in.
-    :type state: bool.
-    :returns:  int -- the return code.
-    :raises: AttributeError, KeyError
+        longer explanation
+        latex math: :math:`\\alpha`.
+        refers to a function: :func:`function1`
+        refers to a class: TODO
 
-    """
-    return 0
+        **kwargs vs named args**:
+            note that in python, there is no difference for the end user
+            between kwargs and args named on function def: so you document
+            them in the same way
+
+        :param arg1: the first value
+        :param arg2: the first value
+        :param arg3: the first value
+        :type arg1: int
+        :type arg2: int
+        :type arg3: int
+        :returns: arg1/arg2 +arg3
+        :rtype: int
+        :raises: AttributeError, KeyError
+
+        :example:
+
+        >>> import template
+        >>> a = template.MainClass1()
+        >>> a.function1(1,1,1)
+        2
+
+        .. note:: can be useful to emphasize
+            important feature
+        .. seealso:: :class:`MainClass2`
+        .. warning:: arg2 must be non-zero.
+        .. todo:: check that arg2 is non zero.This function does something.
+
+        """
+        return 0
 
 #doctest
 
@@ -1047,4 +1218,12 @@ def public_fn_with_sphinxy_docstring(name, state=None):
     #from __future__ import print_function
     #cprint kwargs are the print_function kwargs
     #color is obsolete, exists only not to break interface, never use it
-    cprint("Attention!", 'red', 'on_green', attrs=['bold','blink'], end='', file=sys.stderr)
+
+    cprint(
+            "Attention!",
+            'red',
+            'on_green',
+            attrs=['bold','blink'],
+            end='',
+            file=sys.stderr,
+        )

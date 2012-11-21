@@ -116,35 +116,51 @@ TODO
         output_separator = u"\n"
 
     #act
+    stdout_isatty = sys.stdout.isatty()
     for path in files.find(
                 u".",
                 min_depth=min_depth,
                 max_depth=max_depth,
             ):
+
+        #initialize
         head, bname = os.path.split(path)
         accept=True
         color_spans = [] #start end pairs span pairs to color in between
+
+        #find those that match
         for reg in res:
-            matches = list(reg.finditer(bname))
-            if matches:
-                color_spans.extend(m.span() for m in matches)
+            if stdout_isatty: #must find all matches to color them
+                matches = list(reg.finditer(bname))
+                if matches:
+                    color_spans.extend(m.span() for m in matches)
+                else:
+                    accept = False
+                    break
             else:
-                accept = False
-                break
+                if not reg.match(bname):
+                    accept = False
+
+        #don't take if a negation matches
         if accept:
             for reg in negated_res:
                 if reg.search(bname):
                     accept = False
                     break
+
+        #print
         if accept:
             sys.stdout.write( head + os.path.sep )
-            for i,c in itertools.izip(itertools.count(),bname): 
-                printed = False
-                for color_span in color_spans:
-                    if i >= color_span[0] and i < color_span[1]:
-                        termcolor.cprint(c,'red',attrs=['bold'],end='')
-                        printed = True
-                        break;
-                if not printed:
-                    sys.stdout.write( c )
-            sys.stdout.write( output_separator)
+            if stdout_isatty: #color
+                for i,c in itertools.izip(itertools.count(),bname): 
+                    printed = False
+                    for color_span in color_spans:
+                        if i >= color_span[0] and i < color_span[1]:
+                            termcolor.cprint(c,'red',attrs=['bold'],end='')
+                            printed = True
+                            break;
+                    if not printed:
+                        sys.stdout.write( c )
+            else: #don't color: may break grep, etc, since terminal color means extra chars
+                sys.stdout.write(bname)
+            sys.stdout.write( output_separator )
