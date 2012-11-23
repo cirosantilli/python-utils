@@ -3,59 +3,27 @@ from django.views.generic import DetailView, ListView
 from django.views.generic.create_update import create_object 
 from django.views.generic.simple import direct_to_template
 
-from views import UserGroupForm
+from settings import THISAPP
 
-#from user_user_groups.models import UserGroup
-
-USERNAME_RE = r'(?P<username>[^/?]+)'
-GROUP_NAME_RE = r'(?P<groupname>[^/?]+)'
+USERNAME_RE = r'(?P<owner_username>[^/?]+)'
+ID2_RE = r'(?P<id2>[^/?]+)'
 
 username_url_re_prefix = r'^' + USERNAME_RE 
-username_groupname_url_re_prefix = username_url_re_prefix + r'/' + GROUP_NAME_RE
+username_id2_url_re_prefix = username_url_re_prefix + r'/' + ID2_RE
 suffix = r'/$'
 
-urlpatterns = patterns('user_user_groups.views',
+urls = [
+    ('index_all',r'^$'),
+    ('index_user', username_url_re_prefix + suffix),
+    ('create', username_url_re_prefix + r'/create' + suffix),
+    ('update_list', username_id2_url_re_prefix + r'/update' + suffix),
+    ('bulk_action', username_url_re_prefix + r'/bulk_action' + suffix),
+    ('detail', username_id2_url_re_prefix + suffix),
+]
 
-    url(
-        username_url_re_prefix + r'/create' + suffix,
-        'create',
-        name='user_user_groups_create',
-    ),
+#dictionnary: short names (without app preffix) to long names (with app preffix)
+url_names = { u[0]:THISAPP+'_'+u[0] for u in urls }
 
-    url(
-        username_groupname_url_re_prefix +  r'/update' + suffix,
-        'update',
-        name='user_user_groups_update',
-    ),
-
-    url(
-        username_url_re_prefix + suffix,
-        'index',
-        name='user_user_groups_index',
-    ),
-
-    url(
-        username_url_re_prefix +  r'/bulk_action' + suffix,
-        'bulk_action',
-        name='user_user_groups_bulk_action',
-    ),
-    
-    url(
-        username_url_re_prefix +  r'/delete' + suffix,
-        'delete',
-        name='user_user_groups_delete',
-    ),
-
-    url(
-        username_url_re_prefix +  r'/copy' + suffix,
-        'copy',
-        name='user_user_groups_copy',
-    ),
-
-    url(
-        username_groupname_url_re_prefix +  suffix,
-        'detail',
-        name='user_user_groups_detail',
-    ),
-
+urlpatterns = patterns(THISAPP+'.views',
+   *[  url(u[1],u[0],name=url_names[u[0]]) for u in urls ]
 )

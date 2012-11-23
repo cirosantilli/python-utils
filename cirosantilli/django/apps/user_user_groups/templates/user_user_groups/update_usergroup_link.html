@@ -1,8 +1,0 @@
-{# include "user_user_groups/create_new_group_link.html" with username=creator.username #}
-
-{% load url from future %}
-{% load i18n %}
-
-{% if user.username == username %}
-<div class="new_item"><a href="{% url 'user_user_groups_update' username groupname %}">{% trans "edit group" %}</a></div> 
-{% endif %}

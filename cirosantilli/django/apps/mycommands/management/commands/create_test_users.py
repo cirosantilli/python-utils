@@ -30,8 +30,7 @@ class Command(BaseCommand):
             users.append(u)
         print users
 
-        for i,user in zip(count(),users):
-            Profile.objects.create(user=user,favourite_snack="snack%d"%i)
-            print i
+        for user in users:
+            Profile.objects.create(user=user)
 
         self.stderr.write("created one superuser and %d regular users" % (nusers))

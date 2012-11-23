@@ -21,36 +21,51 @@ from django_tables2.utils import A  # alias for Accessor
 
 from user_user_groups.models import UserGroup, UserInGroup
 from django_tables2_datatables import settings as dtd_settings, tables as dtd_tables
+from settings import THISAPP
 
 ITEMS_PER_PAGE = 100
 
-def get_group_table(creator,data):
-    """returns an instance of a class named GroupTable derived from tables.Table
+def get_item2_table(
+        data,
+        has_owner=True,
+        has_selection=True,
+        form="",
+    ):
+    """returns an instance of a class derived from tables.Table
 
-    :param creator: user that the table links to
-    :type creator: django.contrib.auth.models.User
+    :param owner: user that the table links to
+    :type owner: django.contrib.auth.models.User
     :param data: data, same as passed to django_tables2.Table constructor
-    :returns: the table that links to creator's user groups
+    :returns: the table that links to owner's user groups
     :rtype: django_tables2.Table instance
     """
 
-    class GroupTable(tables.Table):
+    class T(tables.Table):
 
-        selection = dtd_tables.MasterCheckBoxColumn(
-            "select-group",
-            name="groupnames",
-            form="bulk-action",
-            accessor="groupname",
-        )
+        if has_selection:
+            selection = dtd_tables.MasterCheckBoxColumn(
+                "select-group",
+                name="id2",
+                form=form,
+                accessor="id2",
+            )
 
-        groupname = dtd_tables.LinkColumn(
-            'user_user_groups_detail',
-            args=[creator,A('groupname')],
+        if has_owner:
+            owner = dtd_tables.LinkColumn(
+                'userena_profile_detail',
+                args=[A('owner.username')],
+                #THISAPP+'_index_user',
+                #args=[A('owner.username'),A('id2')],
+            )
+
+        id2 = dtd_tables.LinkColumn(
+            THISAPP+'_detail',
+            args=[A('owner.username'),A('id2')],
         )
 
         usercount = tables.Column(
             accessor="useringroup_set.count",
-            verbose_name="user count",
+            verbose_name="item count",
         )
 
         class Meta(dtd_tables.Meta):
@@ -58,125 +73,197 @@ def get_group_table(creator,data):
             fields = (
                 'creation_date',
             )
-            sequence = (
-                'selection',
-                'groupname',
+
+            sequence = []
+            if has_selection:
+                sequence.append('selection')
+            if has_owner:
+                sequence.append('owner')
+            sequence.extend([
+                'id2',
                 'usercount',
                 'creation_date',
-            )
+            ])
         Meta.attrs["id"] = 'grouptable'
 
-    return GroupTable(data)
+    t = T(data)
+    setattr(t,'bulk_form_id',form)
+    return t
 
-@require_safe
-def index(request, username):
-
-    creator = get_object_or_404(User,username=username)
-    all_items_db = UserGroup.objects.filter(creator=creator).order_by('groupname')
-
-    table = get_group_table(creator,all_items_db)
-
-    table_filter = dtd_tables.get_table_filter(table)
-
-    filters = {
-        'target_table':'grouptable',
-        'filter_global':True,
-        'filter_cols':[
-            'user',
-        ],
-    }
-
+def render_this_app(
+            request,
+            short_template_name
+            context,
+        ):
     return render(
         request,
-        'user_user_groups/index.html',
+        THISAPP+'/index_all.html',
         {
-            'creator': creator,
             'total_items_db': all_items_db.count(),
             'table': table,
             'table_filter': table_filter,
         },
     )
 
-def get_user_table(data):
-    """returns an instance of a class named UserTable derived from tables.Table"""
 
-    class UserTable(tables.Table):
+def index_all(request):
+    """item2 of all owners"""
 
-        selection = dtd_tables.MasterCheckBoxColumn(
-            "select-group",
-            name="groupnames",
-            form="bulk-action",
-            accessor="groupname",
-        )
+    all_items_db = UserGroup.objects.all().order_by('id2')
 
-        username = dtd_tables.LinkColumn(
-            'userena.views.profile_detail',
-            args=[A('username')],
-        )
+    table = get_item2_table(
+        all_items_db,
+        has_owner=True,
+        has_selection=True,
+        form='bulk-action',
+    )
+    table_filter = dtd_tables.get_table_filter(table)
 
-        class Meta(dtd_tables.Meta):
-            model = UserInGroup
-            fields = (
-                'date_added',
-            )
-            sequence = (
-                'selection',
-                'username',
-                'date_added',
-            )
-        Meta.attrs['id'] = 'usertable'
-
-    return UserTable(data)
+    return render_this_app(
+        request,
+        'index_all',
+        {
+            'total_items_db': all_items_db.count(),
+            'table': table,
+            'table_filter': table_filter,
+        },
+    )
 
 @require_safe
-def detail(request, username, groupname):
+def index_user(request, owner_username):
+    """itmes2 of a given owner"""
 
-    creator = get_object_or_404(User, username=username)
-    usergroup = get_object_or_404(UserGroup, creator=creator, groupname=groupname)
-    all_items_db = UserInGroup.objects.filter(group=usergroup).order_by('user__username')
+    owner = get_object_or_404(User,username=owner_username)
+    all_items_db = UserGroup.objects.filter(owner=owner).order_by('id2')
 
-    table = get_user_table(all_items_db)
-
+    table = get_item2_table(
+        all_items_db,
+        has_selection=True,
+        has_owner=False,
+        form='bulk-action',
+    )
     table_filter = dtd_tables.get_table_filter(table)
 
     return render(
-                request,
-                'user_user_groups/detail.html',
-                {
-                    'creator': creator,
-                    'usergroup': usergroup,
-                    'table': table,
-                    'table_filter': table_filter,
-                },
+        request,
+        THISAPP+'/index_user.html',
+        {
+            'owner': owner,
+            'total_items_db': all_items_db.count(),
+            'table': table,
+            'table_filter': table_filter,
+        },
+    )
+
+def get_item3_table(
+        data,
+        id='',
+        form='',
+        has_selection=True,
+    ):
+    """returns an instance of a class derived from tables.Table,
+    containing item3 data
+
+    :param data: table data
+    :type data: data accepted by a django_tables2.Table constructor
+    :param id: <table id="id">
+    :type id: string
+    :param form: <td><input form="form">
+    :type form: string
+    :param has_selection: if True, table gets a master checkbox column at right
+    :type has_selection: boolean
+    """
+
+    class T(tables.Table):
+
+        if has_selection:
+            selection = dtd_tables.MasterCheckBoxColumn(
+                "select-users",
+                name="usernames",
+                form=form,
+                accessor="username",
             )
 
+        username = dtd_tables.LinkColumn(
+            'userena.views.profile_detail',
+            accessor="user.username",
+            args=[A('user.username')],
+        )
+
+        class Meta(dtd_tables.Meta):
+
+            model = UserInGroup
+
+            fields = (
+                'date_added',
+            )
+
+            sequence = []
+            if has_selection:
+                sequence.append('selection')
+            sequence.extend([
+                'username',
+                'date_added',
+            ])
+
+        Meta.attrs['id'] = id
+
+    return T(data)
+
+@require_safe
+def detail(request, owner_username, id2):
+
+    owner = get_object_or_404(User, username=owner_username)
+    item2 = get_object_or_404(UserGroup, owner=owner, id2=id2)
+    all_items_db = UserInGroup.objects.filter(group=item2).order_by('user__username')
+
+    table = get_item3_table(
+        all_items_db,
+        id='items',
+        form='bulk-action',
+        has_selection=False,
+    )
+    table_filter = dtd_tables.get_table_filter(table)
+
+    return render(
+        request,
+        THISAPP+'/detail.html',
+        {
+            'owner': owner,
+            'item2': item2,
+            'total_items_db': all_items_db.count(),
+            'table': table,
+            'table_filter': table_filter,
+        },
+    )
+
 #TODO 0 add help
-class UserGroupForm(ModelForm):
+class Item2Form(ModelForm):
 
     users = forms.ModelMultipleChoiceField(
-            queryset=User.objects.all(),
-            widget=SelectMultiple(
-                    attrs={
-                        'rows':'10',
-                        'class':'jquery-ui-autocomplete',
-                        }
-                )
+        queryset=User.objects.all(),
+        widget=SelectMultiple(
+            attrs={
+                'rows':'10',
+                'class':'jquery-ui-autocomplete',
+            }
         )
+    )
 
     def __init__(self, *args, **kwargs):
         """
         #kwargs
 
-        - creator
+        - owner
             Auth.User object
 
-            if no creator is given, unicity check does nothing:
+            if no owner is given, unicity check does nothing:
             it is probably the initial GET request.
 
-            rationale: without a creator, one cannot know if the
-            groupname/username pair is unique.
+            rationale: without a owner, one cannot know if the
+            id2/owner_username pair is unique.
 
-        - initial_usergroup
+        - initial_item2
             UserGroup object
 
             loads form with given UserGroup object.
@@ -185,256 +272,269 @@ class UserGroupForm(ModelForm):
             just like it is if a ModelForm is given a initial
             kwarg
 
-            if 'initial' is given with initial_usergroup, its values are considered
+            if 'initial' is given with initial_item2, its values are considered
             'initial' dictionnary value pairs have precedence over
-            those extracted in initial_usergroup.
+            those extracted in initial_item2.
 
-        - old_groupname
+        - old_id2
             String
 
-            if given supposes it is an update of old_groupname.
+            if given supposes it is an update of old_id2.
             therefore, in that case, will only raise an unicity check error
-            it then new username/groupname is already taken and if the
+            it then new username/id2 is already taken and if the
             new groupaname is different from the old one, meaning that the
             user is trying to update the name to a new one.
         """
 
-        self.creator = kwargs.pop('creator',None)
-        self.old_groupname = kwargs.pop('old_groupname',None)
+        self.owner = kwargs.pop('owner',None)
+        self.old_id2 = kwargs.pop('old_id2',None)
 
         #update initial values based on model
-        initial_usergroup = kwargs.pop('initial_usergroup',None)
-        if initial_usergroup: 
+        initial_item2 = kwargs.pop('initial_item2',None)
+        if initial_item2: 
             old_initial = kwargs.get('initial',{})
             kwargs['initial'] = {}
-            kwargs['initial'].update(model_to_dict(initial_usergroup,fields=['groupname']))
+            kwargs['initial'].update(model_to_dict(initial_item2,fields=['id2']))
             kwargs['initial']['users'] = [
-                    useringroup.user.pk for useringroup in initial_usergroup.useringroup_set.all()
-                ]
+                useringroup.user.pk for useringroup in initial_item2.useringroup_set.all()
+            ]
             kwargs['initial'].update(old_initial)
 
-        super(UserGroupForm, self).__init__(*args, **kwargs)
+        super(Item2Form, self).__init__(*args, **kwargs)
 
     def clean(self):
         """
-        ensure creator/groupname pair is unique taking into consideration update
+        ensure owner/id2 pair is unique taking into consideration update
         """
-        cleaned_data = super(UserGroupForm, self).clean()
-        if self.creator: #POST
-            new_groupname = cleaned_data.get('groupname',None) #because is_valid calls clean first, before passing it to the model for field validation
-            if new_groupname:
+        cleaned_data = super(Item2Form, self).clean()
+        if self.owner: #POST
+            new_id2 = cleaned_data.get('id2',None) #because is_valid calls clean first, before passing it to the model for field validation
+            if new_id2:
                 if UserGroup.objects.filter(
-                                creator=self.creator,
-                                groupname=new_groupname
-                            ).exists(): #new name exists: might be error
+                            owner=self.owner,
+                            id2=new_id2
+                        ).exists(): #new name exists: might be error
                     error = False
-                    if( (self.old_groupname and self.old_groupname != new_groupname ) #update, and name different from old. error
-                            or not self.old_groupname ): #create and new name exists. error
-                        self._errors['groupname'] = [_(
-                                "groupname \"%s\" already exists for user \"%s\". "
+                    if( (self.old_id2 and self.old_id2 != new_id2 ) #update, and name different from old. error
+                            or not self.old_id2 ): #create and new name exists. error
+                        self._errors['id2'] = [_(
+                                "groupaname \"%s\" already exists for user \"%s\". "
                                 "please choose a different groupname."
-                                %(new_groupname,self.creator.username)
+                                %(new_id2,self.owner.username)
                             )]
         return cleaned_data
 
     class Meta:
         model = UserGroup
         fields = (
-                'groupname',
+                'id2',
             )
 
 #TODO 0 confirm before exiting create!
 #TODO 1 add nice admin search widget
 @require_http_methods(["GET","HEAD","POST"])
 @login_required
-def create(request, username):
+def create(request, owner_username):
 
-    creator = get_object_or_404(User, username=username)
+    owner = get_object_or_404(User, username=owner_username)
 
-    if request.user != creator:
+    if request.user != owner:
         return HttpResponse(_(
-                "you are logged in as \"%s\" "
-                "and cannot create a group for user \"%s\""
-                % (request.user.username, creator.username)
-            ))
+            "you are logged in as \"%s\" "
+            "and cannot create a group for user \"%s\""
+            % (request.user.username, owner.username)
+        ))
 
     if request.method == "POST":
-        form = UserGroupForm(request.POST, creator=creator)
+        form = Item2Form(request.POST, owner=owner)
         if form.is_valid():
-            groupname = form.cleaned_data['groupname']
+            id2 = form.cleaned_data['id2']
             group = UserGroup.objects.create(
-                    groupname=groupname,
-                    creator=creator,
-                )
+                id2=id2,
+                owner=owner,
+            )
             for user in form.cleaned_data['users']:
-                user_in_group = UserInGroup.objects.create(
-                        user=user,
-                        group=group,
-                    )
-            return HttpResponseRedirect(reverse('user_user_groups_index',args=(username,)))
+                item3_in_item2 = UserInGroup.objects.create(
+                    user=user,
+                    group=group,
+                )
+            return HttpResponseRedirect(reverse(THISAPP+'_index_user',args=(owner_username,)))
     else:
-        form = UserGroupForm()
+        form = Item2Form()
 
     return render(
-            request,
-            "user_user_groups/create_usergroup.html",
-            {
-                "form": form,
-                "creator": creator,
-            },
-        )
+        request,
+        THISAPP+"/create_list.html",
+        {
+            "form": form,
+            "owner": owner,
+        },
+    )
 
 @require_http_methods(["GET","POST"])
 @login_required
-def update(request, username, groupname):
+def update_list(request, owner_username, id2):
 
-    creator = get_object_or_404(User, username=username)
-    usergroup = get_object_or_404(UserGroup, creator=creator, groupname=groupname)
+    owner = get_object_or_404(User, username=owner_username)
+    item2 = get_object_or_404(UserGroup, owner=owner, id2=id2)
 
-    if request.user != creator:
+
+    if request.user != owner:
         return HttpResponse(_(
-                "you are logged in as \"%s\" "
-                "and cannot update a group for user \"%s\""
-                % (request.user.username, creator.username)
-            ))
+            "you are logged in as \"%s\" "
+            "and cannot update a group for user \"%s\""
+            % (request.user.username, owner.username)
+        ))
 
     if request.method == "POST":
-        form = UserGroupForm(request.POST, creator=creator, old_groupname=usergroup.groupname)
+        form = Item2Form(request.POST, owner=owner, old_id2=item2.id2)
         if form.is_valid():
 
             #update name
-            old_name = usergroup.groupname
-            new_name = form.cleaned_data['groupname']
+            old_name = item2.id2
+            new_name = form.cleaned_data['id2']
             if new_name != old_name: #validation already guarantees new name is available
-                usergroup.groupname = new_name
-                usergroup.save()
+                item2.id2 = new_name
+                item2.save()
 
             #update users
-            old_users = usergroup.useringroup_set.all()
+            old_users = item2.useringroup_set.all()
             new_users = form.cleaned_data['users']
             for user in new_users: #add new ones
                 if not user in old_users:
-                    user_in_group = UserInGroup.objects.create(
+                    item3_in_item2 = UserInGroup.objects.create(
                             user=user,
-                            group=usergroup,
+                            group=item2,
                         )
             for user in old_users: #delete removed ones
                 if not user in new_users:
                     user.delete()
             return HttpResponseRedirect(
-                    reverse('user_user_groups_detail',
-                    args=(username,usergroup.groupname))
+                    reverse(THISAPP+'_detail',
+                    args=(owner_username,item2.id2))
                 )
     else:
-        form = UserGroupForm(initial_usergroup=usergroup)
+        all_items_db = UserInGroup.objects.filter(group=item2).order_by('user__username')
+        update_form_id = 'update' #<input form=> and <form id=>
+        update_table = get_item3_table(
+            all_items_db,
+            id='update_items',
+            form=update_form_id,
+        )
+        update_table_filter = dtd_tables.get_table_filter(update_table)
+
+        form = Item2Form(initial_item2=item2)
 
     return render(
-            request,
-            "user_user_groups/update_usergroup.html",
-            {
-                "form": form,
-                "creator": creator,
-                "usergroup": usergroup,
-            },
-        )
+        request,
+        THISAPP+"/update_list.html",
+        {
+            'form': form,
+            'owner': owner,
+            'item2': item2,
+            'update_table': update_table,
+            'update_table_filter': update_table_filter,
+            'update_form_id': update_form_id,
+        },
+    )
 
 #TODO are you sure you want to delete?
 @login_required
 @require_http_methods(["POST"])
-def delete(request, username):
+def delete_selected(request, owner_username):
     """
     delete multiple groups given in post request
 
-    username is given on the url
+    owner_username is given on the url
 
-    groupnames to delete for the given username
-    are given in request.POST.getlist['groupnames']
+    id2 to delete for the given owner_username
+    are given in request.POST.getlist['id2']
 
-    if a single username groupname pair does not exist,
+    if a single owner_username groupname pair does not exist,
     no deletion is made, and a 404 is returned
     """
 
-    creator = get_object_or_404(User, username=username)
+    owner = get_object_or_404(User, username=owner_username)
 
-    if request.user != creator:
+    if request.user != owner:
         return HttpResponse(_("you cannot delete a group that belongs to another user")) #TODO decent
 
-    #first check all groupnames exist, then delete them
+    #first check all id2 exist, then delete them
     #if one does not exist, 404
-    groups = [ get_object_or_404(UserGroup, creator=creator, groupname=groupname)
-            for groupname in request.POST.getlist('groupnames') ] 
+    groups = [ get_object_or_404(UserGroup, owner=owner, id2=id2)
+            for id2 in request.POST.getlist('id2') ] 
 
     for group in groups:
         group.delete()
 
-    return HttpResponseRedirect(reverse('user_user_groups_index',args=(username,)))
+    return HttpResponseRedirect(reverse(THISAPP+'_index_user',args=(owner_username,)))
 
-def _get_unique_groupname(user, groupname):
+def _get_unique_id2(user, id2):
     """
-    returns an groupname such that the pair user/groupname is not taken up
+    returns an id2 such that the pair user/id2 is not taken up
 
-    if no conflict exists for groupname, returns the given groupname
+    if no conflict exists for id2, returns the given id2
     
-    else "000_\n+_" preffix is appended to the groupname, where \n+ is
-    the first integer starting from 1 that makes the groupname unique
+    else "000_\n+_" preffix is appended to the id2, where \n+ is
+    the first integer starting from 1 that makes the id2 unique
     """
     PREFIX = '000_'
     SUFFIX = '_'
     if ( UserGroup.objects.filter(
-                    creator=user,
-                    groupname=groupname,
-                ).exists() ):
+                owner=user,
+                id2=id2,
+            ).exists() ):
         i=1
-        old_groupname = groupname
-        groupname = PREFIX + str(i) + SUFFIX + old_groupname
+        old_id2 = id2
+        id2 = PREFIX + str(i) + SUFFIX + old_id2
         while ( UserGroup.objects.filter(
-                    creator=user,
-                    groupname=groupname,
-                    ).exists() ):
+                    owner=user,
+                    id2=id2,
+                ).exists() ):
             i=i+1
-            groupname = PREFIX + str(i) + SUFFIX + old_groupname
-    return groupname
+            id2 = PREFIX + str(i) + SUFFIX + old_id2
+    return id2
 
 @login_required
 @require_http_methods(["POST"])
-def copy(request, username):
+def copy_selected(request, owner_username):
     """
-    same as delete, but copies the groups from the given username,
+    same as delete, but copies the groups from the given owner_username,
     to the authenticated user.
 
-    in case of conflict of existing groupname,
-    it is resolved by _get_unique_groupname
+    in case of conflict of existing id2,
+    it is resolved by _get_unique_id2
     """
 
-    creator = get_object_or_404(User, username=username)
+    owner = get_object_or_404(User, username=owner_username)
 
-    groups = [ get_object_or_404(UserGroup, creator=creator, groupname=groupname)
-            for groupname in request.POST.getlist('groupnames') ] 
+    groups = [ get_object_or_404(UserGroup, owner=owner, id2=id2)
+            for id2 in request.POST.getlist('id2') ] 
+    print request.POST.getlist('id2')
 
     for old_group in groups:
         new_group = UserGroup.objects.create(
-                creator=request.user,
-                groupname=_get_unique_groupname(request.user,old_group.groupname)
-            )
-        for user_in_group in UserInGroup.objects.filter(group=old_group):
-            user_in_group.pk = None
-            user_in_group.group = new_group
-            user_in_group.save()
+            owner=request.user,
+            id2=_get_unique_id2(request.user,old_group.id2)
+        )
+        for item3_in_item2 in UserInGroup.objects.filter(group=old_group):
+            item3_in_item2.pk = None
+            item3_in_item2.group = new_group
+            item3_in_item2.save()
 
-    return HttpResponseRedirect(reverse('user_user_groups_index',args=(username,)))
+    return HttpResponseRedirect(reverse(THISAPP+'_index_user',args=(owner_username,)))
 
 @login_required
 @require_http_methods(["POST"])
-def bulk_action(request, username):
+def bulk_action(request, owner_username):
     """
     decides between bulk actions (actions which may affect several objects at once)
     such as copy or delete.
     """
 
     if request.POST.__contains__('copy'):
-        return copy(request,username)
+        return copy_selected(request,owner_username)
     if request.POST.__contains__('delete'):
-        return delete(request,username)
+        return delete_selected(request,owner_username)
     else:
         return HttpResponseBadRequest("unknown action" % action)
-        

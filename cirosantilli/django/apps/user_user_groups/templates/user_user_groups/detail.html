@@ -2,43 +2,50 @@
 
 {% load url from future %}
 {% load i18n %}
+{% load django_tables2 %}
 
-{% block title %}{{ creator.username }}{% endblock %}
+{% block title %}{{ owner.username }} &gt {{item2.id2}}{% endblock %}
 
-{% block content_title %}{{ creator.username }}{% endblock %}
+{% block content_title %}{{ owner.username }} &gt {{item2.id2}}{% endblock %}
 
 {% block content %}
 
-    <h2>{% trans "filter" %}</h2>
-    {% include "django_tables2_datatables/filters.html" with target_table=filters.target_table filter_global=filters.filter_global %}
+    <h2>{% trans "view" %}</h2>
+    {% render_table table %}
+    <div>{% trans "total items in database" %}: {{ total_items_db }}</div>
 
-    <h2>{{ usergroup.groupname }}</h2>
-    <div>{% trans "user count" %}: {{ usergroup.useringroup_set.count }}</div>
-    {% if usergroup.useringroup_set %}
-        <table id="{{ table.id }}" class="{{ datatable_table_class }}">
-            <thead> 
-                <tr>
-                    <th>{% trans "username" %}</th>
-                    <th>{% trans "date added" %}</th>
-                </tr>
-            </thead> 
-            <tbody> 
-            {% for useringroup in usersingroup %}
-                <tr>
-                    <td>{% include "accounts/user_link.html" with username=useringroup.user.username %}</td>
-                    <td>{{ useringroup.date_added }}</td>
-                </tr>
-            {% endfor %}
-            </tbody> 
-        </table>
-    {% else %}
-        <p>{% trans "this group has no users" %}</p>
+    <h2>{% trans "filter" %}</h2>
+    {% render_table table_filter %}
+
+    <h2>{% trans "edit this" %}</h2>
+
+    <table>
+        <tr>
+            <td>{% trans "copy" %}</td>
+            <td>
+                <form action="{% url "user_user_groups_bulk_action" owner.username %}"
+                        method="post">{% csrf_token %}
+                    <input type="hidden" name="id2" value="{{ item2 }}" />
+                    <input type="submit" name="copy" value="do it" />
+                </form>
+            </td>
+        </tr>
+    {% if user.username == owner.username %}
+        <tr>
+            <td>{% trans "delete" %}</td>
+            <td>
+                <form action="{% url "user_user_groups_bulk_action" owner.username %}"
+                        method="post">{% csrf_token %}
+                    <input type="hidden" name="id2" value="{{ item2 }}" />
+                    <input type="submit" name="delete" value="do it" />
+                </form>
+            </td>
+        </tr>
+        <tr>
+            <td>{% trans "update" %}</td>
+            <td><a href="{% url 'user_user_groups_update_list' owner.username item2.id2 %}">{% trans "do it" %}</a></td>
+        </tr>
     {% endif %}
-    <h2>{% trans "edit" %}</h2>
-    <form action="{% url 'user_user_groups_copy' creator.username %}" method="post">{% csrf_token %}
-        <input type="hidden" name="groupnames" value="{{ usergroup.groupname }}">
-        {% trans "copy group" %} <input type="submit" value="{% trans "copy group" %}" />
-    </form>
-    {% include "user_user_groups/delete_usergroup_link.html" with username=creator.username groupname=usergroup.groupname %}
-    {% include "user_user_groups/update_usergroup_link.html" with username=creator.username groupname=usergroup.groupname %}
+    </table>
+
 {% endblock %}

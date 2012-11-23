@@ -130,16 +130,17 @@ TODO
 
         #find those that match
         for reg in res:
-            if stdout_isatty: #must find all matches to color them
+            if stdout_isatty: #must find all matches to color them later
                 matches = list(reg.finditer(bname))
                 if matches:
                     color_spans.extend(m.span() for m in matches)
                 else:
                     accept = False
                     break
-            else:
-                if not reg.match(bname):
+            else: #pipe: no coloring, so only find one match
+                if not reg.search(bname):
                     accept = False
+                    break
 
         #don't take if a negation matches
         if accept:
@@ -156,11 +157,17 @@ TODO
                     printed = False
                     for color_span in color_spans:
                         if i >= color_span[0] and i < color_span[1]:
-                            termcolor.cprint(c,'red',attrs=['bold'],end='')
+                            termcolor.cprint(
+                                c,
+                                'red',
+                                'on_blue',
+                                attrs=['bold'],
+                                end=''
+                            )
                             printed = True
                             break;
                     if not printed:
                         sys.stdout.write( c )
-            else: #don't color: may break grep, etc, since terminal color means extra chars
+            else: #don't color: may break grep, etc, since terminal color means extra control chars
                 sys.stdout.write(bname)
             sys.stdout.write( output_separator )

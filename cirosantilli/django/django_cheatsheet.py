@@ -325,31 +325,126 @@ firefox http://127.0.0.1:8000/
 
 #south
 
+    #info
+
+        #http://south.readthedocs.org/en/latest/tutorial/part3.html
+
+        #there are two parts to south:
+            #south db: stores when migration were applied
+            #migration files: say what migrations whould do
+
+        #schema migrations
+            #layout of columns
+            #renaming, creating
+
+        #travel in time
+            ./manage.py migrate #go to latest migration
+            ./manage.py migrate "$APP" 0002
+            ./manage.py migrate "$APP" zero #initial state, removes from south db
+        #data migrations
+            #the data in the columns
+
     #installation
-        #1 add to INSTALLED_APPS
-        #2 syncdb
+        #add to INSTALLED_APPS
+        ./manage.py syncdb
 
-    APP=
-    #tracking a table
+    #migrate
+
+        ./manage.py migrate --list
+        #see a list of available migrations
+            #simply lists files in migration folders
+            #* means applied
+
+        #travel in time
+            ./manage.py migrate #go to latest migration
+            ./manage.py migrate "$APP" 0002
+            #go back to migration 2
+                #called *rollback*
+
+            ./manage.py migrate "$APP" zero
+            #initial state, removes from south db
+
+    #add a table to tracking *before* a syncdb
         
-        ./manage.py schemamigration --initial $APP
-        ./migrate
-        #add new table
+        ./manage.py schemamigration --initial "$APP"
+        #creates migration files
+        ./manage.py migrate "$APP"
+        #applies migration, changing south db and creating app db
+            #only migration file is considered for this:
+            #if you change your model after the shcemamigration,
+            #migrating directly will do nothing! you must do another
+            #schemamigration
 
-        ./manage.py convert_to_south $APP
-        #convert existing table to django
+            #./manage.py syncdb does nothing to an app that is tracked by south
 
-    #add new field to tracked table
+    #add a table to tracking *after* syncdb
+        ./manage.py convert_to_south "$APP"
+        #convert existing table to south:
+            #makes migration file
+            #applies migration on south db
+            #table data is untouched
 
-        ./manage.py schemamigration $APP --auto
+    #simple migrations: auto can recognize changes
+        #add new field to tracked table
+
+        ./manage.py schemamigration "$APP" --auto
         #new fields must have default
+        ./manage.py migrate
 
-    #rename a model
-        #http://stackoverflow.com/questions/2862979/easiest-way-to-rename-a-model-using-django-south
+    #more complex migrations
+        #you must edit the migration files yourself
 
-        ./manage.py schemamigration $APP rename_foo_to_bar --auto
+        #rename model field
+            ./manage.py datamigration "$APP" "NAME" --auto
 
-    #more complicated stuff
-        http://south.readthedocs.org/en/latest/tutorial/part3.html
+            ### generated file ###
+            from .. import settings.THISAPP as app
 
+            class Migration(DataMigration):
+
+                def __init__(self):
+                    self.table = app + '_' + ''
+                    #learn how django calculates table names
+                        #app + '_' + class.lower()
+                        #_id is appended if foreign key
+                        #always have a peek at db before migration
+                    self.old = ''
+                    self.new = ''
+                    #self.unique_with = ['',] #unique together, except for changing key
+
+                def forwards(self, orm):
+                    db.rename_column(self.table, self.old, self.new)
+                    #db.create_unique(self.table, unique_with + self.new)
+
+                def backwards(self, orm):
+                    db.rename_column(self.table, self.new, self.old)
+                    #db.create_unique(self.table, unique_with + self.old)
+
+        #rename model
+            #http://stackoverflow.com/questions/2862979/easiest-way-to-rename-a-model-using-django-south
+            ./manage.py schemamigration "$APP" "NAME" --auto
+
+            ### generated file ###
+            from .. import settings.THISAPP as app
+
+            class Migration(SchemaMigration):
+
+                def __init__():
+                    self.old_model = ''
+                    self.new_model = ''
+                    self.old_db = self.model_to_db(self.old_model)
+                    self.new_db = self.model_to_db(self.new_model)
+
+                def model_to_db(self,model):
+                    return app + '_' + model.lower().strip('_')
+
+                def forwards(self, orm):
+                    db.rename_table(self.old, self.new) 
+                    #deal with foreign keys
+                    db.send_create_signal(app, [self.new_model])
+
+                def backwards(self, orm):
+                    db.rename_table(self.new, self.old)
+                    #deal with foreign keys
+                    db.send_create_signal(app, [self.old_model])
 

@@ -19,9 +19,10 @@ urlpatterns = patterns('',
     url(r'^users/', include('userena.urls')),
     #>userena
 
-    url(r'^user-groups/', include('user_user_groups.urls')),
-
     url(r'^django_tables2_datatables/', include('django_tables2_datatables.urls')),
+
+    url(r'^user-lists/', include('user_user_groups.urls')),
+    url(r'^uri-lists/', include('user_list_uri.urls')),
     
 )
 

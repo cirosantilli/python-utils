@@ -6,57 +6,57 @@ from django.contrib.auth.models import User
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 
-MAX_GROUPNAME_LENGTH = 256
-VALID_GROUPNAME_RE = r'^[a-z0-9_]+$'
+MAX_ID2_LENGTH = 255
+VALID_ID2_RE = r'^[a-z0-9_]+$'
 
-def validate_groupname_chars(groupname):
-    if not re.match(VALID_GROUPNAME_RE,groupname):
+def validate_id2_chars(id2):
+    if not re.match(VALID_ID2_RE,id2):
         raise forms.ValidationError(
-                _("groupname \"%s\" contains invalid characters. valid characters are: 'a' to 'z' (lowercase) and underscore '_'."%(groupname))
-            )
-
+            _("groupname \"%s\" contains invalid characters."\
+            " valid characters are: 'a' to 'z' (lowercase) and underscore '_'."%(id2))
+        )
 
 class UserGroup(models.Model):
 
-    creator = models.ForeignKey(
-                User,
-            )
+    owner = models.ForeignKey(
+        User,
+    )
 
-    groupname = models.CharField(
-                'group name',
-                max_length=MAX_GROUPNAME_LENGTH,
-                validators=[
-                        validate_groupname_chars,
-                    ],
-            )
+    id2 = models.CharField(
+        'id',
+        max_length=MAX_ID2_LENGTH,
+        validators=[
+            validate_id2_chars,
+        ],
+    )
 
     creation_date = models.DateTimeField(
-                'creation date',
-                default=lambda:datetime.now(),
-            )
+        'created',
+        default=lambda:datetime.now(),
+    )
 
     def __unicode__(self):
-        return self.groupname
+        return self.id2
 
     class Meta:
-        unique_together = ("creator", "groupname")
+        unique_together = ("owner", "id2")
 
 class UserInGroup(models.Model):
 
     user = models.ForeignKey(
-                User,
-                #related_name='users'
-            )
+        User,
+        #related_name='users'
+    )
 
     date_added = models.DateTimeField(
-                'date added',
-                default=lambda:datetime.now(),
-            )
+        'added',
+        default=lambda:datetime.now(),
+    )
 
     group = models.ForeignKey(
-                UserGroup,
-                #related_name='group',
-            )
+        UserGroup,
+        #related_name='group',
+    )
 
     def __unicode__(self):
         return self.user.username

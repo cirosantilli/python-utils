@@ -108,8 +108,6 @@
         pip freeze > stable-req.pip
         #to create a requirements file, then remove what is not needed
 
-
-
 #environment
 
     python -m site
@@ -147,36 +145,58 @@
     #note that there is no difference between that and importing a function or class from a file
 
 #import
+    #a *module* is either:
+        #- file.py
+        #- dir with __init__py in it
+
+    import a
+    a.f()
 
     import a.b
     a.b.f()
 
+    #ERROR
+        #import a
+        #a.b.f()
+        ##b was not imported!
+
+    import a
+    a.Class.f()
+    #fine: Class is a member of a, not a module
+
     from a import b
     b.f()
 
-    #rename
+    from a import *
+    b.f()
+    c.f()
+
+    #alias
         from a import b as c
         c.f()
 
         #ERROR:
+            #from a import b as c
             #import c.d
-            #must use import b.d
+            ##must use import b.d
 
-    #a in same module
-    import .a
-    a.f()
+    #realtive imports up
 
-    #a in up a module
-    import ..a
-    a.f()
+        #a in same module
+        a
+        a.f()
 
-    #a in up two modules
-    import ...a
-    a.f()
+        #a in up a module
+        from .. import a
+        a.f()
 
-    #a in up three modules
-    import ....a
-    a.f()
+        #a in up two modules
+        from ... import a
+        a.f()
+
+        #a in up three modules
+        from .... import a
+        a.f()
 
     #multiline
     from django_tables2.utils import (a, b, c,
@@ -186,17 +206,16 @@
 
     #arithmetic operators
 
-        a=1
-        af=1.
-        b=2
-        bf=2.
-
-        print a+b
-
-        print a*b
-        print a/b #0
-        print af/bf #0.5
-        print a%b
+        >>> print 2*3
+        6
+        >>> print 1/2
+        0
+        >>> print 1./2.
+        0.5
+        >>> print 5%3 #mod
+        2
+        >>> print 2**3 #pow
+        8
 
     #boolean operator
         a=True
@@ -372,9 +391,8 @@
         d1.update(1=2,3=4)
         #update d1 to add/update values of dict d2 and d3 and as key
 
-
-
-
+        #dictionnary comprehentions
+        print {key: value for (key, value) in [(1,2),(3,4)] } 
 
 #flow control
 
@@ -617,11 +635,26 @@
 
     a = A(1)
     b = A(2)
+
     print a.member
+    a.member = 3
+    print a.member
+
     print a._private
+    a._private = 4
+    print a._private
+
     print A.static
+    A.static = 5
+    print A.static
+
     print a.__class__.static
     print b.__class__.static
+    #ERROR
+        #print a.non_existent
+    #ERROR
+        #a.non_existent = 6
+        #must use setattr()
 
     #inheritance
         class B(A):
@@ -743,58 +776,82 @@
             return len(self.a)
 
     a=A()
-    
-    print a.__class__.__name__
-    #a.__class__ is the class of instance a: A
-
-
-    #reflection
-        class Reflection
-
-            def __init__(self):
-                self.a = "adsf"
-
-            def print_methods(self):
-                """ print all the methods of this object and their doc string"""
-                print '\n* Methods *'
-                for names in dir(self):
-                attr = getattr(self,names)
-                if callable(attr):
-                    print names,':',attr.__doc__
-
-            def print_attributes(self):
-                """ print all the attributes of this object and their value """
-                print '* Attributes *'
-                for names in dir(self):
-                attr = getattr(self,names)
-                if not callable(attr):
-                    print names,':',attr
+    >>> print a.__class__.__name__
+    A
 
     #None object
         
         a = A()
         a is None
         #a == None #bad
-
         #always compare with is, never ==, because == can be overwriden by __eq__
             #for example, to always true, while is cannot
             #http://jaredgrubb.blogspot.com.br/2009/04/python-is-none-vs-none.html
 
 
-#builtin functions
+    #python classes/modules are really soft
 
-    #geattr
-        value = obj.attribute
-        value = getattr(obj, "attribute")
+        #hasattr
+            class A:
+                a = 10
+            if hasattr(A, 'a'): 
+                print True
 
-        ### settings.py ###
-        PARAM = True
+        #geattr
+            value = obj.attribute
+            value = getattr(obj, "attribute")
 
-        ### otherfile.py
-        param = getattr(settings, "PARAM", False) #default to False
+            #of a module
+                ### settings.py ###
+                PARAM = True
 
-    hasattr(a, 'property'): 
-        a.property
+                ### otherfile.py
+                param = getattr(settings, "PARAM", False) #default to False
+
+        #setattr
+            class A:
+                pass #empty class
+            setattr(A, 'name', 'value')
+
+        #any expression goes
+            hasa = True
+            class A:
+                if hasa:
+                    a = 10
+            print A.a
+            #10
+
+
+        #classes can be made in functions
+            def func(val):
+                class A:
+                    a = val
+                return A
+            a = func(1)
+            print a.a
+            b = func(2)
+            print b.a
+            print a.a #unaltered
+
+    #@classmethod and @staticmethod
+        class A():
+            def m(self,x):
+                print "m(%s,%s)"%(self,x)
+
+            @classmethod
+            def c(cls,x):
+                print "c(%s,%s)"%(cls,x)
+
+            @staticmethod
+            def s(x):
+                print "s(%s)"%(x)
+
+        a=A()
+        a.m(1)
+        a.c(2)
+        A.c(3)
+        a.s(4)
+
 
 #iterators
 
@@ -826,7 +883,6 @@
         for i in it:
             print "second"
             print i
-
 
     #there is no has_next method, you must catch an exception:
     StopIteration
@@ -1062,10 +1118,27 @@
         #same as sub(), but return a tuple (new_string, number_of_subs_made).
 
     #match
+        #MUST MATCH FROM BEGINNING OF STRING!!!!!!
         re.match(r"a.c","abc")
 
         r = re.compile(r"a.c")
         r.match("abc")
+        #matches
+        r.match("0abc")
+        #DOES NOT MATCH!!!! MUST MATCH FROM BEGINNING OF STRING!!! use search for that
+
+    #search
+
+        r.search("0abc")
+        #works
+
+        r.search("abcaBc")
+        #. == b, stops at first match. to find all matches, use finditer
+
+    #finditer
+
+        matches = list(r.finditer("abcaBc"))
+        #a list of all matches
 
 #curses : python command line interfaces. see curses_cheatsheet.py
 

@@ -198,6 +198,7 @@ def get_stdin_items(sep, encoding):
         if items_str:
             stdin_items = items_str.split(sep)
             stdin_items = filter(lambda p: p, stdin_items) #only get non-empty items. last path is probably empty, since the items="path1\npath2\n" and split gives [path1, path2, ""]
+            print stdin_items
             return stdin_items
     else:
         return []

@@ -87,6 +87,7 @@ INSTALLED_APPS = [
     'polls',
     'mycommands',
     'user_user_groups',
+    'user_list_uri',
 ]
 
 # Language code for this installation. All choices can be found here:

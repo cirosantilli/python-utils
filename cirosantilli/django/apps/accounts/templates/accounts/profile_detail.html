@@ -7,6 +7,9 @@
 {% block content_title %}{{ profile.user.username }} {% if profile.user.get_full_name %}({{ profile.user.get_full_name }}){% endif %}{% endblock %}
 
 {% block content %}
+<h1>THIS IS A SAMPLE PROFILE ONLY! OVERWRIDE IT BY PUTTING AN
+  accounts/profile_detail.html FILE IN YOUR proj/templates dir</h1>
+
     <h2>{% trans "toc" %}</h2>
     <ul>
       <li><a href="{% url 'user_user_groups_index' profile.user.username %}">{% trans "user groups" %}</a></li>

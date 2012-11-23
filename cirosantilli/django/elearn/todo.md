@@ -1,12 +1,11 @@
 # datatable
 
+- sort only if click *outside* master checkbox
+- make global regex/smart work straighaway
+
 ## has workaround:
 
 - sort anchors without searching link
-
-# datatable
-
-sort only if click *outside* master checkbox
 
 # django_tables2
 
