@@ -9,7 +9,7 @@ import subprocess
 import argparse
 from argparse import RawTextHelpFormatter
 
-import files
+from cirosantilli import files
 
 AUDIO_EXTS = ['ape', 'flac']
 
@@ -121,3 +121,7 @@ shnsplit_recursive.py -o flac -t '%n - %p - %t' -R
         print "ERRORS OCCURRED:"
         print
         print "\n\n".join(errors)
+
+
+
+

@@ -6,7 +6,7 @@ from argparse import RawTextHelpFormatter
 import re
 import os.path
 
-import files
+from cirosantilli import files
 
 if __name__ == '__main__':
 
@@ -125,7 +125,11 @@ SAMPLE CALLS
             new += (new_line) + "\n"
             i=i+1
         if had_match:
-            output = "==================================================\n%s\n\n%s" % (path, output)
+            output = "%s\n%s\n\n%s" % ("="*70,path, output)
             sys.stderr.write( output )
         if not_dry_run:
             files.write(path, new)
+
+
+
+

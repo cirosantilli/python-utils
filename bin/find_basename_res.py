@@ -7,8 +7,8 @@ import itertools
 
 import termcolor
 
-import files
-import argparse_extras
+from cirosantilli import files
+from cirosantilli import argparse_extras
 
 if __name__ == '__main__':
 
@@ -115,6 +115,8 @@ TODO
     else:
         output_separator = u"\n"
 
+    encoding = 'utf-8' #TODO make encoding option
+
     #act
     stdout_isatty = sys.stdout.isatty()
     for path in files.find(
@@ -167,7 +169,11 @@ TODO
                             printed = True
                             break;
                     if not printed:
-                        sys.stdout.write( c )
+                        sys.stdout.write( c.encode(encoding) )
             else: #don't color: may break grep, etc, since terminal color means extra control chars
-                sys.stdout.write(bname)
+                sys.stdout.write( bname.encode(encoding) )
             sys.stdout.write( output_separator )
+
+
+
+

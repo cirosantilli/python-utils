@@ -282,9 +282,3 @@ INSTALLED_APPS.extend([
     'master_checkbox',
 ])
 #>datatable
-
-#</cirosantilli
-INSTALLED_APPS.extend([
-    'cirosantilli',
-])
-#>cirosantilli

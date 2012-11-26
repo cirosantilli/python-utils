@@ -13,8 +13,8 @@ import sys
 if __name__ == '__main__':
     
     parser = argparse.ArgumentParser(
-            description="", #one line summary of program
-            epilog=r"""
+        description="", #one line summary of program
+        epilog=r"""
 INSTALLATION
 
 EXAMPLES
@@ -23,7 +23,7 @@ EXAMPLES
 
   %(f)s
 """ % {'f':os.path.basename(__file__)},
-    formatter_class=RawTextHelpFormatter, #keep newlines
+        formatter_class=RawTextHelpFormatter, #keep newlines
     )
 
     parser.add_argument('a',
@@ -44,7 +44,7 @@ EXAMPLES
     parser.add_argument('-a', '--a-long',
         help="provides long name. Must destination is 'along', not 'a'.",
         default="")
-    a = args.a_long
+    a = parser.parse_args().a_long
     #hyphens are converted to underscores
 
     parser.add_argument('-a', '--a-long',
@@ -77,9 +77,6 @@ EXAMPLES
         nargs=3,
         help="optional. takes 3 args exatcly. stores a list, even if nargs=1!",
         default=[])
-
-    args = parser.parse_args()
-    a = args.a
 
     parser.add_argument('-b', '--blong', 
         action="store", 
@@ -135,6 +132,16 @@ EXAMPLES
         dest='const_collection',
         const='value-2-to-append',
         help='Add different values to list')
+
+    #choices
+        #select from a set
+        parser.add_argument('foo', choices='abc') #a, b or c only
+        parser.add_argument('foo', type=complex, choices=[1, 1j])
+        parser.add_argument(
+            '-a', 
+            nargs=1,
+            choices='abc'
+        )
 
     args = parser.parse_args()
     a = args.a

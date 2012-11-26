@@ -15,7 +15,7 @@ urlpatterns = patterns('',
             'template': thisapp+'/media/js/jquery.dataTables.config.js',
             'extra_context': settings.CONTEXT,
         },
-        name="django_tables2_usertables_config_js",
+        name="django_tables2_datatables_config_js",
     ),
 
 )

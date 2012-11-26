@@ -21,7 +21,7 @@
     #http://docs.python.org/2/howto/logging.html#logging-basic-tutorial
         #don't ever use sys.stderr.write for serious scripts! log instead
 
-    import process
+    import subprocess
     #calling external process
 
     #user interfaces
@@ -242,80 +242,163 @@
         print a+b
         print a * 20
 
+        print int("1234")
+        print float("12.34e56")
+
+        print "0ba1aba2".split("ab")
+        #['0','1','2']
+
+        string.whitespace
+        print "0 1\t \n2".split()
+        #['0','1','2'] #splits at whitespaces
+
+        print "0\n1\r2\r\n3".splitlines()
+        #['0','1','2','3']
+
+        "0a1cba2".strip("abc")
+        #"012"
+
+        "0 1\t \n2".strip()
+        #"012"
+        #at whitespace
+
+    #unicode
+        # -*- coding: utf-8 -*-
+        #this must be the second line to be able to use ut8 8 in python source!!
+        s = "åäö"
+        print s
+        #BAD
+        #this works for for the terminal, where python recognizes the terminla encoding
+        #ALWAYS, I MEAN, ALWAYS encode unicdoe stuff that may be piped out and unicode!
+
         d=u"utf-8: 中文"
         print d
         #unicode strings
         #to put unicode inside the .py file, must put the "# -*- coding: utf-8 -*-" as second line
-
-        i = int("1234")
-        f = float("12.34e56")
-
-    #unicode
-        # -*- coding: utf-8 -*-
-        s = "åäö"
-        print s
-        #BAD
-        #this works for for the terminal, where python recognizes the
-
-        #ALWAYS, I MEAN, ALWAYS encode unicdoe stuff that may be piped out!
         print s.encode('utf-8')
 
 #data structures
     #http://docs.python.org/2/tutorial/datastructures.html
 
-    #list
-        l = [1,2,"a","b"] 
-        l2 = list((1,2,"a","b")) #from tuple
+    #lists
 
-        print l
-        print l[0]
-        print l[1]
-        print l[-1]
-        print l[-2]
+        #create
 
-        print l[1:]
-        print l[:1]
-        print l[:-1]
-        print l[-2:]
+            [1,2,"a","b"] 
+            list((1,2)) #from tuple
 
-        l2[0] = "new"
-        print l2
+            #range
+                #xrange for the interator version
 
-        del l2[0]
-        print l2
+                range(3)
+                #[0,1,2,3]
 
-        print l+"c"
-        #print l+="c" #error
-        print l.append("c")
-        print l.extend(["c","d"])
+                range(1,3)
+                #[1,2,3]
 
-        print os.path.join(*sys.argv[1:])
-        #pass list to function that takes n params: add '*' before list
+                range(1,5,2)
+                #[1,3,5]
 
-        l.sort()
-        print l
-        #modifies original list. more efficient than sorted()
+            #list comprehentions
+                print [ i for i in xrange(3) if i!= 2]
+                #[0,1,3]
+                #creates list
 
-        l2 = l.sorted()
-        #creates new list
+            print map( lambda i:i+1, xrange(10) )
 
-        #range
-            l = range(10) #0 to 9
-            l = range(1,10) #0 to 9
-            l = range(1,10,2) #1, 3, ...
-            
-        #xrange
-            #iterator version.
-            #more efficient if loop only
-            for i in xrange(1,10,2):
-                print i
+        #access
+            l=range(3)
+            l[0]
+            #0
+            l[1]
+            #1
+            l[-1]
+            #3
+            l[-2]
+            #2
 
-        #list comprehentions
-            print [i for i in xrange(10) ]
-            #creates list
+            #slices
+                l[1:]
+                #[1,2,3]
+                l[:1]
+                #[0]
+                l[:-1]
+                #[3]
+                l[-1:]
+                #[0,1,2]
 
-        print map(lambda i:i+1,xrange(10))
-        #creates a list
+        #modify
+            l=range(2)
+            l[0] = 10
+            l
+            #[10,1,2]
+
+            #remove
+            l=range(2)
+            del l[1]
+            l
+            #[0,2]
+
+            l=range(2)
+            l+3
+            #[0,1,2,3]
+            #creates new list
+
+            l=range(2)
+            l.append(3)
+            #None
+            l
+            #[0,1,2,3]
+            #in place edit
+
+            l=range(2)
+            l.extend([3,4])
+            #None
+            l
+            #[0,1,2,3,4]
+            #in place?
+
+            l=range(2)
+            l.insert(2,3)
+            #[0,3,1,2]
+
+        #sort
+
+            l = [2,1,3]
+            print l.sort()
+            #None
+            print l
+            #[1,2,3]
+            print l.sort(inverse=True)
+            #None
+            print l
+            #[3,2,1]
+            #modifies l1
+                #returns NONE!!!
+
+            print sorted([2,1])
+            print l
+            #[1,2]
+            #creates new list and returns it
+                #l is untouched
+
+        #find item
+
+            #first match for criteria with generator expression
+            next(pair for pair in [(1,1),(2,1),(2,1)] if pair[0]==2)
+            #(2,1)
+
+            next(pair for pair in [(1,1),(2,1),(2,1)] if pair[0]==3)
+            #(2,1)
+            #StopIteration exception
+
+            next(pair for pair in [(1,1),(2,1),(2,1)] if pair[0]==3, None)
+            #None
+            #uses the default
+
+        #remove dupes
+            print list(set([1,2,1]))
+            #[1,2]
 
     #tuple
         t=(1,2,3)
@@ -463,26 +546,6 @@
             if i==3:
                 continue
 
-    #excetions
-
-        def e():
-            """
-            There are many standard exceptions to choose from!
-            """
-            raise Exception()
-
-        try:
-            print "exception trying here"
-            e()
-        except Exception:
-            print "exception behaviour here"
-        else:
-            print "normal behaviour here"
-            print "only gets here if there were no exceptions"
-        finally:
-            print "this is ALWAYS executed"
-            print "cannot see exception from here"
-
 #functions
     
     #multiple return values
@@ -606,7 +669,45 @@
         f.c = 1
         print f.c
 
-    
+#global
+
+    #do
+        a = 1
+
+        def printA():
+            print a
+
+        def setA_wrong(val):
+            a = val
+
+        def setA_right(val):
+            global a
+            a = val
+
+        print a
+        printA()
+        setA_wrong(2)
+        printA()
+        setA_right(2)
+        printA()
+
+    #dont
+
+        if __name__=='__main__':
+        global a
+        #error: must be inside a def:!
+
+
+    #nested functions
+        #this is the way to go
+        def ex8():
+            ex8.var = 'foo'
+            def inner():
+                ex8.var = 'bar'
+                print 'inside inner, ex8.var is ', ex8.var
+            inner()
+            print 'inside outer function, ex8.var is ', ex8.var
+        ex8()
 
 #classes and objects
 
@@ -627,6 +728,7 @@
             A.static = a
             self.__class__.static = a
             #set the static variable
+            print self.static
 
             self._private = b
             #by convention, '_' indicates private varibales and methods.
@@ -639,6 +741,10 @@
     print a.member
     a.member = 3
     print a.member
+
+    print a.static
+    a.static = 3
+    print a.static
 
     print a._private
     a._private = 4
@@ -852,10 +958,186 @@
         A.c(3)
         a.s(4)
 
+#exceptions
+    #depends on: classes
+
+    #they go up until somthing catches them
+        def e():
+            raise Exception
+
+        def d():
+            e()
+
+        try:
+            d()
+        except:
+            print "exception!"
+
+    #if nothing catches them, they explode on stdX and stop program excecution!
+        #pretty drastic no?
+        #what is printed:
+            #1) traceback: where the exception came from (modules, functions, lines)
+                #this is userful for debug, so you can find where the problem comes from
+            #2) <Exception class>: <exception.__repr__>
+        raise Exception("repr")
+        print "cant reach here"
+
+    #raise and catch
+        try:
+            print "try"
+        except:
+            print "any exception"
+        else:
+            print "no exceptions happened"
+        finally:
+            print "this is *always* executed, with or without exception"
+
+    #except catches derived classes only
+        try:
+            raise Exception()
+        except ZeroDivisionError:
+            print "ZeroDivisionErrorOnly or derived classes"
+        except Exception:
+            print "Exception, or its derived classes, therefore all exceptions"
+        except:
+            print "same as above"
+
+    #passing args to exceptions
+        try:
+            raise Exception(1,2)
+            #raise Exception, (1, 2) #same as above, but more verbose and implicit. NEVER user this
+        except Exception, e:
+            print "e is an instance of Exception"
+            print Exception, e
+            print e.args[0], e.args[1]
+            print e
+
+    #reraise
+        #to add/modify info
+        try:
+            raise Exception("msg")
+
+        except Exception, e:
+
+            raise Exception("updated msg")
+            #YOU LOSE THE TRACEBACK!!
+
+            #to print you traceback
+            import traceback
+            traceback.print_exc(
+                #file=sys.stdout #stderr is the default
+            )
+
+            #for more info
+            print sys.exc_info()
+            print sys.exc_type
+            print sys.exc_value
+            print sys.exc_traceback
+
+            raise e
+            raise
+            #same thing
+
+    #standard exceptions
+        #http://docs.python.org/2/library/exceptions.html
+
+        try:
+            print 1/0
+        except ZeroDivisionError:
+            print "division by zero"
+        else:
+            print "no exception"
+
+        try:
+            int("a")
+        except ValueError:
+            print "not a number"
+
+        try:
+            f = open("NONEXISTENT")
+        except IOError, (err, msg):
+            if err == 2:
+                print "does not exist", msg
+            else:
+                print "no exception"
+
+    #custom exception
+        class CustomException(Exception):
+            def __init__(self, value):
+                self.parameter = value
+            def __str__(self):
+                return repr(self.parameter)
+
+        try:
+            raise CustomException("msg")
+        except CustomException, (instance):
+            print instance.parameter
 
 #iterators
+    #are more memory effiicent for iterations than lists
+        #no need to store the entire sequence!
+        #but you must calculate each new item, so more time expensive if
+            #you are going to use it more than once
+        #classic space/time tradeoff
+
+    #create
+
+        def count():
+            """this is already builtin"""
+            i=0
+            yield i
+            i=i+1
+
+        #no need to store all items
+            #here there are infinitelly many anyways so it would be impossible
+        for i in count():
+            print i
+
+        #must calculate again each sum, so uses more time
+        for i in count():
+            print i
+
+        #raise exception to stop
+        
+            def xrange(n):
+                """this is already builtin
+                
+                count to n
+                """
+                i=0
+                yield i
+                i=i+1
+                if i>n:
+                    raise StopIteration
+
+        #generator expressions
+            #shorthand way to create iterators
+            for i in (i for i in xrange(10) ):
+                print i
+
+            #parenthesis can be ommited for single argument func call
+            def f(i):
+                return i+1
+            for i in f(i for i in xrange(10) ):
+                print i
+
+    #next
+        i = xrange(0)
+        next(i)
+        #i.next() #same as above
+        #0
+        next(i)
+        #StopIteration exception
+
+        i = xrange(0)
+        next(i)
+        #0
+        next(i,3)
+        #3
+        #default value if over
 
     #iterators can't be rewinded!
+
         #either store on memory or recalculate
         it = iter("asdf")
         for i in it:
@@ -884,26 +1166,12 @@
             print "second"
             print i
 
-    #there is no has_next method, you must catch an exception:
-    StopIteration
-    try:
-        iter.next()
-        print 'has next'
-    except StopIteration:
-        print 'does not have next'
-
-    #iterators next()
-
-    #generator expressions
-        #create an iterator on the fly!
-        for i in (i for i in xrange(10) ):
-            print i
-
-        #parenthesis can be ommited for single argument func call
-        def f(i):
-            return i+1
-        for i in f(i for i in xrange(10) ):
-            print i
+    #there is no has_next method, you must catch an exception StopIteration:
+        try:
+            iter.next()
+            print 'has next'
+        except StopIteration:
+            print 'does not have next'
 
     #itertools
         #hardcore iterator patterns
@@ -918,7 +1186,6 @@
 
         for i,j in itertools.product(xrange(3),xrange(3)):
             print i,j
-
 
 #decorators
 
@@ -959,7 +1226,15 @@
         s = sys.stder.read()
 
     #open
-        fo = open("path/to/txt.txt",'r')
+        try:
+            f = open("path/to/txt.txt",'r')
+            try:
+                f.seek(-128, 2)
+                print f.read(128)
+            finally:
+                fsock.close()
+        except IOError:
+            pass
         #open path for reading
         #r is like c file reading options
 
@@ -998,26 +1273,25 @@
     ### subprocess_test.py ###
     import subprocess
     commands = [
-                'python',
-                'test1.py'
-            ]
+        'python',
+        'test1.py'
+    ]
     try:
         process = subprocess.Popen(
-                    commands,
-                    shell=False,
-                    stdin=subprocess.PIPE,
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.PIPE
-                )
+            commands,
+            shell=False,
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE
+        )
     except OSError: #gets here if command not found
         sys.stderr.write(' '.join(commands) + '\nfailed. are all dependencies installed?'
 
-    stdout, stderr = process.communicate("this is the input")
-    #get stdout and stderr.
-    #if you don't collect them by setting stdin/out=subprocess.PIPE,
+    stdout, stderr = process.communicate("this is the stdin")
+    #get stdout and stderr, must use stdin/err=process.PIPE
+    # if you don't collect them by setting stdin/out=subprocess.PIPE,
     # they go to the usual stdout and stderr,
     # and therefore appear on the console or shell
-    #in order to write to the stdin of a process you must use stdin=process.PIPE
 
     return_code = process.poll() #does not wait for process to end, None if process not yet terminated
     return_code = process.wait() #waits for process to end
@@ -1105,6 +1379,15 @@
         #end() 	Return the ending position of the match
         #span() 	Return a tuple containing the (start, end) positions of the match
 
+
+    #predefined classes
+        #\d [0-9]
+        #\D [^0-9]
+        #\s [ \t\n\r\f\v]
+        #\S
+        #\w [a-zA-Z0-9_].
+        #\W
+
     p = re.compile(r"find(\d)",re.IGNORECASE | re.DOTALL)
 
     #sub
@@ -1139,6 +1422,9 @@
 
         matches = list(r.finditer("abcaBc"))
         #a list of all matches
+
+    re.split(r'[ab]+','0abba1aaaaa2')
+    #[0,1,2]
 
 #curses : python command line interfaces. see curses_cheatsheet.py
 
@@ -1252,6 +1538,7 @@
             raise RuntimeError('here is the error')
 
 #tempfile
+    #http://www.doughellmann.com/PyMOTW/tempfile/
 
     import os
     import tempfile
@@ -1259,9 +1546,9 @@
     #suffix and preffix
         #dir + prefix + random + suffix
         temp = tempfile.NamedTemporaryFile(
-                    suffix='_suffix', 
-                    prefix='prefix_', 
                     dir='/tmp',
+                    prefix='prefix_', 
+                    suffix='_suffix', 
                 )
         try:
             print 'temp:', temp
@@ -1274,17 +1561,107 @@
 
         print 'gettempdir():', tempfile.gettempdir()
         print 'gettempprefix():', tempfile.gettempprefix()
-
         #gettempdir() returns the default directory that will hold all of the temporary files
         #gettempprefix() returns the string prefix for new file and directory names.
 
-#os
+
+    #make a temporary dir in temp location
+        directory_name = tempfile.mkdtemp(
+            dir='/tmp',
+            prefix='prefix_', 
+            suffix='_suffix', 
+        )
+        print directory_name
+        os.removedirs(directory_name)
+
+#os shutil
     #http://www.quora.com/Python-programming-language-1/Whats-the-difference-between-os-path-abspath-and-os-path-realpath-in-Python
 
-    print os.sep
+    #if you are going to get paths from a command (like os.list), give UNICODE STRINGS!!!!!
+        #this way the function will also return unicode string
 
-    os.path.join(p1,p2)
-    #join paths
+    import os
+    import os.path
+    import shutil
+
+    os.sep
+
+    os.path.join('a//','/b')
+
+    os.path.exists('/a')
+    os.path.isfile('/a')
+    os.path.isdir('/a')
+    os.path.islink('/a')
+
+    os.path.abspath(u'/a')
+    os.path.relpath(u'/a')
+
+    os.listdir(u'/')
+
+    os.makedirs('/a/b/c/d/e') #makes e, and if inexistent, d, c, b, and a
+
+    os.removedirs('/a/b/c') #rm -rf : remove c, and everything inside it IF there are no files?
+    shutil.rmtree('/a/') #rm everything under a
+
+#logging
+    #http://docs.python.org/2/howto/logging.html
+    #TODO log all at once
+
+    #defult logger
+
+        import logging
+
+        logging.basicConfig(
+            #filename='example.log', #default stderr
+            #filemode='w'
+
+            level=logging.DEBUG,
+            #level=logging.INFO,
+            #level=logging.WARNING,
+            #level=logging.ERROR,
+            #level=logging.CRITICAL,
+
+            format='%(levelname)s %(name)s %(asctime)s %(message)s',
+
+            datefmt='%m/%d/%Y %I:%M:%S %p', #format for asctime
+
+        )
+
+        logging.debug('very detailed, debugging only')
+        logging.info('confirm everything is fine')
+        logging.warning('unexpected, maybe problem in future')
+        logging.error('could not perform some function')
+        logging.critical('serious error. program cant run anymore')
+        try:
+            raise Exception:
+        except:
+            logging.exception('inside exception. also prints exception stack')
+
+    #custom loggers
+
+        # create logger
+        logger = logging.getLogger('simple_example')
+        logger.setLevel(logging.DEBUG)
+
+        # create console handler and set level to debug
+        ch = logging.StreamHandler()
+        ch.setLevel(logging.DEBUG)
+
+        # create formatter
+        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+
+        # add formatter to ch
+        ch.setFormatter(formatter)
+
+        # add ch to logger
+        logger.addHandler(ch)
+
+        # 'application' code
+        logger.debug('debug message')
+        logger.info('info message')
+        logger.warn('warn message')
+        logger.error('error message')
+        logger.critical('critical message')
 
 #termcolor
 
@@ -1300,3 +1677,53 @@
             end='',
             file=sys.stderr,
         )
+
+#unittest
+    #http://docs.python.org/2/library/unittest.html
+    #http://www.diveintopython.net/unit_testing/index.html
+
+    import unittest 
+
+    import files
+
+    class test(unittest.TestCase):
+
+        def setUp(self):
+
+        def test(self):
+            self.assertEqual(,)
+            #assertEqual(a, b) 	a == b 	 
+            #assertNotEqual(a, b) 	a != b 	 
+            #assertTrue(x) 	bool(x) is True 	 
+            #assertFalse(x) 	bool(x) is False 	 
+            #assertIs(a, b) 	a is b 	2.7
+            #assertIsNot(a, b) 	a is not b 	2.7
+            #assertIsNone(x) 	x is None 	2.7
+            #assertIsNotNone(x) 	x is not None 	2.7
+            #assertIn(a, b) 	a in b 	2.7
+            #assertNotIn(a, b) 	a not in b 	2.7
+            #assertIsInstance(a, b) 	isinstance(a, b) 	2.7
+            #assertNotIsInstance(a, b) 	not isinstance(a, b) 	2.7
+            #assertAlmostEqual(a, b) 	round(a-b, 7) == 0 	 
+            #assertNotAlmostEqual(a, b) 	round(a-b, 7) != 0 	 
+            #assertGreater(a, b) 	a > b 	2.7
+            #assertGreaterEqual(a, b) 	a >= b 	2.7
+            #assertLess(a, b) 	a < b 	2.7
+            #assertLessEqual(a, b) 	a <= b 	2.7
+            #assertRegexpMatches(s, re) 	regex.search(s) 	2.7
+            #assertNotRegexpMatches(s, re) 	not regex.search(s) 	2.7
+            #assertItemsEqual(a, b) 	sorted(a) == sorted(b) and works with unhashable objs 	2.7
+            #assertDictContainsSubset(a, b)
+            #assertMultiLineEqual(a, b) 	strings 	2.7
+            #assertSequenceEqual(a, b) 	sequences 	2.7
+            #assertListEqual(a, b) 	lists 	2.7
+            #assertTupleEqual(a, b) 	tuples 	2.7
+            #assertSetEqual(a, b) 	sets or frozensets 	2.7
+            #assertDictEqual(a, b) 	dicts 	2.7
+            #assertRaises(exc, fun, *args, **kwds) 	fun(*args, **kwds) raises exc 	 
+            #assertRaisesRegexp(exc, re, fun, *args, **kwds) 	fun(*args, **kwds) raises exc and the message matches re 	2.7
+
+        def tearDown(self):
+
+    if __name__ == '__main__':
+        unittest.main()

@@ -21,3 +21,6 @@ print result[1]
 file = open(output,'w')
 file.write(result[1])
 file.close()
+
+
+

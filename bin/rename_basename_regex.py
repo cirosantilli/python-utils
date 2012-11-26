@@ -2,9 +2,9 @@
 
 import re
 
-from rename_argparse import rename_argparse
+from cirosantilli.move_argparse import move_argparse
 import utils
-import files
+from cirosantilli import files
 
 def add_find(parser):
     """add find arg to given argument parser"""
@@ -31,7 +31,6 @@ def controller(args):
             }
         )
     
-@files.act_basename_only
 def rename_func(path,*args,**kwargs):
 
     find_str = args[0]
@@ -79,3 +78,7 @@ EXAMPLES
     find . | %(f)s -E a b
     #don't act on Extension
 """)
+
+
+
+

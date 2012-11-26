@@ -9,7 +9,7 @@
 #------------------------------------------------------------
 
 import os.path
-import files
+from cirosantilli import files
 
 MAX_BNAME_LENGTH = 255
 
@@ -30,5 +30,9 @@ if __name__ == '__main__':
             print path
             print "Basename without extension ends in a dot '.'"
             print
+
+
+
+
 
 

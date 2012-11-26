@@ -80,3 +80,4 @@ def nice_basename_stripped(bname):
 
 if __name__ == '__main__':
     print 'TEST'
+

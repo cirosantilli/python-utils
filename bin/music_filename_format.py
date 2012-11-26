@@ -1,5 +1,5 @@
 import os.path
-import files
+from cirosantilli import files
 import re
 
 reload(files)
@@ -107,3 +107,7 @@ if(exists):
     print '\nnew names:\n' + '\n'.join( [rename_func(os.path.splitext(os.path.basename(path))[0]) for path in paths] )
     
 #    files.rename( paths, rename_func )
+
+
+
+

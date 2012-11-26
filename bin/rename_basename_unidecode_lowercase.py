@@ -3,8 +3,8 @@
 
 import unidecode
 
-from rename_argparse import rename_argparse
-import files
+from cirosantilli.move_argparse import move_argparse
+from cirosantilli import files
 
 @files.act_basename_only
 def rename_func(bname):
@@ -24,3 +24,7 @@ EXAMPLES
     find . | %(f)s
     #renames paths found
 """)
+
+
+
+

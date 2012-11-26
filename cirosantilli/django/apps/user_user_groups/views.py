@@ -90,22 +90,6 @@ def get_item2_table(
     setattr(t,'bulk_form_id',form)
     return t
 
-def render_this_app(
-            request,
-            short_template_name
-            context,
-        ):
-    return render(
-        request,
-        THISAPP+'/index_all.html',
-        {
-            'total_items_db': all_items_db.count(),
-            'table': table,
-            'table_filter': table_filter,
-        },
-    )
-
-
 def index_all(request):
     """item2 of all owners"""
 
@@ -119,9 +103,9 @@ def index_all(request):
     )
     table_filter = dtd_tables.get_table_filter(table)
 
-    return render_this_app(
+    return render(
         request,
-        'index_all',
+        THISAPP+'/index_all.html',
         {
             'total_items_db': all_items_db.count(),
             'table': table,
@@ -245,7 +229,6 @@ class Item2Form(ModelForm):
         widget=SelectMultiple(
             attrs={
                 'rows':'10',
-                'class':'jquery-ui-autocomplete',
             }
         )
     )
@@ -295,8 +278,8 @@ class Item2Form(ModelForm):
             old_initial = kwargs.get('initial',{})
             kwargs['initial'] = {}
             kwargs['initial'].update(model_to_dict(initial_item2,fields=['id2']))
-            kwargs['initial']['users'] = [
-                useringroup.user.pk for useringroup in initial_item2.useringroup_set.all()
+            kwargs['initial']['uris'] = [
+                item3.user.pk for useringroup in initial_item2.useringroup_set.all()
             ]
             kwargs['initial'].update(old_initial)
 
@@ -334,27 +317,26 @@ class Item2Form(ModelForm):
 #TODO 1 add nice admin search widget
 @require_http_methods(["GET","HEAD","POST"])
 @login_required
-def create(request, owner_username):
+def create_list(request, owner_username):
 
     owner = get_object_or_404(User, username=owner_username)
 
     if request.user != owner:
         return HttpResponse(_(
             "you are logged in as \"%s\" "
-            "and cannot create a group for user \"%s\""
+            "and cannot edit data for user \"%s\""
             % (request.user.username, owner.username)
         ))
 
     if request.method == "POST":
         form = Item2Form(request.POST, owner=owner)
         if form.is_valid():
-            id2 = form.cleaned_data['id2']
             group = UserGroup.objects.create(
-                id2=id2,
+                id2=form.cleaned_data['id2'],
                 owner=owner,
             )
             for user in form.cleaned_data['users']:
-                item3_in_item2 = UserInGroup.objects.create(
+                UserInGroup.objects.create(
                     user=user,
                     group=group,
                 )

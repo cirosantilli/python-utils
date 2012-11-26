@@ -11,6 +11,7 @@
 import os
 import sys
 import argparse
+import logging
 
 SECTION_TITLES = {
     'examples':'EXAMPLES',
@@ -28,6 +29,48 @@ class ArgumentParser(argparse.ArgumentParser):
         kwargs['epilog'] = kwargs.get('epilog',"") % {'f':os.path.basename(sys.argv[0])}
         kwargs['formatter_class'] = kwargs.get('formatter_class',argparse.RawTextHelpFormatter)
         super(ArgumentParser,self).__init__(*args,**kwargs)
+
+CHAR_LOG_LEVELS = {
+    'd':logging.DEBUG,
+    'i':logging.INFO,
+    'w':logging.WARNING,
+    'e':logging.ERROR,
+    'c':logging.CRITICAL,
+}
+
+LOG_LEVELS_CHAR = {v:k for (k,v) in CHAR_LOG_LEVELS.items()}
+
+def add_log_level(
+            parser,
+            shortname='-L',
+            longname='--log-level',
+            **kwargs
+        ):
+
+    kwargs = dict(
+                [
+                    ('nargs',1),
+                    (
+                        'help',
+                        "the level of user information to be output\n"+
+                        "possibilities:\n"+
+                        " %s: debug\n"%LOG_LEVELS_CHAR[logging.DEBUG]+
+                        " %s: information\n"%LOG_LEVELS_CHAR[logging.INFO]+
+                        " %s: warnings\n"%LOG_LEVELS_CHAR[logging.WARNING]+
+                        " %s: error\n"%LOG_LEVELS_CHAR[logging.ERROR]+
+                        " %s: critical\n"%LOG_LEVELS_CHAR[logging.CRITICAL]
+                    ),
+                    ('default',[LOG_LEVELS_CHAR[logging.INFO]]),
+                    ('choices',CHAR_LOG_LEVELS.keys()),
+                ]
+                + kwargs.items()
+            )
+
+    parser.add_argument(shortname,longname,**kwargs)
+
+def get_log_level(args):
+    #TODO broken get method
+    return CHAR_LOG_LEVELS[args.log_level[0]]
 
 def add_not_dry_run(
             parser,
@@ -185,7 +228,6 @@ def add_silent(
             **kwargs
         )
 
-
 def add_paths_from_stdin_and_argv(parser,before_paths_arg_adders=[]):
     add_null_separated_input(parser)
     for arg_adder in before_paths_arg_adders:
@@ -198,7 +240,6 @@ def get_stdin_items(sep, encoding):
         if items_str:
             stdin_items = items_str.split(sep)
             stdin_items = filter(lambda p: p, stdin_items) #only get non-empty items. last path is probably empty, since the items="path1\npath2\n" and split gives [path1, path2, ""]
-            print stdin_items
             return stdin_items
     else:
         return []
@@ -219,3 +260,4 @@ def get_paths_from_stdin_and_argv(
     paths.extend(get_stdin_items(sep,encoding))
 
     return map(lambda s: s.decode(encoding), paths)
+

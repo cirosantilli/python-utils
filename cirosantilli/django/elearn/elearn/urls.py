@@ -11,8 +11,6 @@ urlpatterns = patterns('',
 
     url(r'^admin/', include(admin.site.urls)),
 
-    url(r'^', include('cirosantilli.urls')),
-
     url(r'^master-checkbox/', include('master_checkbox.urls')),
 
     #<userena

@@ -4,8 +4,8 @@ import re
 import os.path
 
 import utils
-from rename_argparse import rename_argparse
-import files
+from cirosantilli.move_argparse import move_argparse
+from cirosantilli import files
 
 remove_track_resub = [re.compile(r"\d+ - "),""]
 
@@ -31,3 +31,7 @@ if __name__ == '__main__':
     %(f)s -D "01 - title.mp3" "1 - title.mp3"
     #not Dry run
 """)
+
+
+
+

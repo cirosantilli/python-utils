@@ -3,7 +3,7 @@
 if __name__ == '__main__':
     import os
     import sys
-    import files
+    from cirosantilli import files
     import subprocess
     import platform
     
@@ -37,3 +37,7 @@ if __name__ == '__main__':
     
     if exists:
       subprocess.Popen([player]+the_files, stdout=FNUL, stderr=FNUL)
+
+
+
+

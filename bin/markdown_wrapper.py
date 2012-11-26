@@ -56,7 +56,7 @@ if __name__ == '__main__':
     import argparse
     import shutil
     
-    import files
+    from cirosantilli import files
     import ui
     
     parser = argparse.ArgumentParser(description="Wrapper for markdown that improves its command-line interface",)
@@ -137,3 +137,7 @@ if __name__ == '__main__':
         sys.exit(1)
     else:
         sys.exit(0)
+
+
+
+

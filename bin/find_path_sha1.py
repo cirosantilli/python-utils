@@ -89,3 +89,7 @@ find_path_sha1.py -n 100000
         print path
         print str(sha1_hex_file(path,sha1_max_bytes_read))
         print
+
+
+
+

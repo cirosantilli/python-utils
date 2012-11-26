@@ -4,8 +4,8 @@ import re
 import os.path
 
 import utils
-from rename_argparse import rename_argparse
-import files
+from cirosantilli.move_argparse import move_argparse
+from cirosantilli import files
 
 track_double_digit_resub = [re.compile(r"^(\d) - "),r"0\1 - "]
 track_correct_resub = [re.compile(r"^(\d+)(\. | - | )"),r"\1 - "]
@@ -35,3 +35,7 @@ if __name__ == '__main__':
     find . -iname '*mp3' | %(f)s
     #act on multiple files
 """)
+
+
+
+

@@ -5,8 +5,8 @@ import os
 
 import unidecode
 
-import files
-from rename_argparse import rename_argparse
+from cirosantilli import files
+from cirosantilli.move_argparse import move_argparse
 
 if __name__ == '__main__':
 
@@ -23,3 +23,7 @@ EXAMPLES
     find . | %(f)s
     #renames paths found
 """)
+
+
+
+

@@ -4,8 +4,8 @@ import re
 import os.path
 
 import utils
-from rename_argparse import rename_argparse
-import files
+from cirosantilli.move_argparse import move_argparse
+from cirosantilli import files
 
 @files.act_basename_only
 def rename_func(path):
@@ -14,3 +14,7 @@ def rename_func(path):
 if __name__ == '__main__':
 
     rename_argparse(rename_func)
+
+
+
+

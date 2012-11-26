@@ -14,3 +14,7 @@ if __name__ == '__main__':
     encoding='utf-8'
     print unidecode(u" ".join(map(unicode(sys.argv[1:],encoding)))).encode(encoding)
     sys.exit(0)
+
+
+
+

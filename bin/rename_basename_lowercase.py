@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
-import files
-from rename_argparse import rename_argparse
+from cirosantilli import files
+from cirosantilli.move_argparse import move_argparse
 
 if __name__ == '__main__':
 
@@ -9,3 +9,7 @@ if __name__ == '__main__':
                 files.act_basename_only(lambda s:s.lower()),
                 add_act_noext_only=True,
             )
+
+
+
+

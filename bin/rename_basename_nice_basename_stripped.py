@@ -2,9 +2,9 @@
 
 import os
 
-from rename_argparse import rename_argparse
+from cirosantilli.move_argparse import move_argparse
 import utils
-import files
+from cirosantilli import files
 
 if __name__ == '__main__':
 
@@ -24,3 +24,7 @@ if __name__ == '__main__':
     find . | %(f)s
     #acts on found files
 """)
+
+
+
+

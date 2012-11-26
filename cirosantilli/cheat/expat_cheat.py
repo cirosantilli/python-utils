@@ -1,11 +1,6 @@
 import os.path
 from xml.parsers import expat
 
-home_dir = os.path.dirname(os.path.dirname(__file__))
-
-input_path = os.path.join(home_dir,'toc.xml')
-output_path = os.path.join(home_dir,'toc.html')
-
 class Parser:
 
     def __init__(self):
@@ -38,15 +33,24 @@ class Parser:
     def result(self):
 	return self._result
 
+home_dir = os.path.dirname(os.path.dirname(__file__))
+
+input_path = os.path.join(home_dir,'toc.xml')
+output_path = os.path.join(home_dir,'toc.html')
+
+#get input from file
 file = open(input_path,'r')
 input = file.read()
 file.close()
 
+#transform xml
 p = Parser()
 p.feed(xml_data)
 p.close()
 output = p.result()
 
+#do something with output
 print result
 #file = open(output_path,'w')
 #file.write(output)
+#file.close()

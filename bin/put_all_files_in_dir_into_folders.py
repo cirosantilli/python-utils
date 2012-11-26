@@ -29,3 +29,7 @@ def put_all_files_in_dir_into_folders(dir_path,exts):
                 print "Given path is not a directory."
                  
                         
+
+
+
+

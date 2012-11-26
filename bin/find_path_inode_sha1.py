@@ -89,3 +89,7 @@ Useful to make a backup of filepaths before renaming them, for example before a 
         print str(os.stat(path)[stat.ST_INO])
         print str(sha1_hex_file(path,sha1_max_bytes_read))
         print
+
+
+
+

@@ -1,10 +1,10 @@
 #!/usr/bin/env python
-
 import os
 import sys
 import stat
 import shutil
 import ctypes
+import logging
 
 import utils
 
@@ -50,8 +50,8 @@ def act_basename_only(func):
 
     return wrapper
 
-def rename_basenames(paths, rename_func, do_rename=False, **kwargs):
-    """convenient interface for renaming multiple paths.
+def move(paths, rename_func, do_rename=False, **kwargs):
+    """convenient interface for moving multiple paths
 
     rename func can takes the entire path, not only the basename,
     but it can only alter the basename only, and not the containing directory.
@@ -69,44 +69,140 @@ def rename_basenames(paths, rename_func, do_rename=False, **kwargs):
         to do a function that uses only basename information, use the act_basename_only
         decorator
 
-    :type name: list of strigs
+    :type paths: list of strigs
     :param rename_func: rename function of  that returns the *basename* from the given *full path*
-    :type name: function with signature (string,*args,**kwargs)
+    :type rename_func: function with signature (string,*args,**kwargs)
     :param do_rename: if True, really renames, else, only outputs changes that would be done
-    :type name: boolean
+    :type do_rename: boolean
+    :param mv_func: if given, uses this function to rename files from old to new name. default: os.rename
 
-    Sample usage
-    ============
+        this function can suppose that:
 
-    >>> import os, sys, tempfile
-    >>> def f(p,a1,**kwargs):
-    ...     return p + a1 + kwargs['kwarg']
-    >>> tdir = tempfile.gettempdir()
-    >>> bnames = ["as DF",".qewr"]
-    >>> paths = [ os.path.join(tdir,bname) for bname in bnames ]
-    >>> for p in paths:
-    ...   fi = open(p,'w')
-    ...   fi.close()
-    >>> rename_basenames(paths,f,func_args=["b1"],func_kwargs={'kwarg':"brg"})
-    >>> new_bnames = ["as DFb1brg",".qewrb1brg"]
-    >>> new_paths = [ os.path.join(tdir,bname) for bname in new_bnames ]
-    >>> for p in paths:
-    ...   print os.path.exists(p)
-    False
-    False
-    >>> for p in new_paths:
-    ...   print os.path.exists(p)
-    ...   os.remove(p)
-    True
-    True
+        - the target parent directory exists
+        - the target file does not exist
+
+        it should throw any exception if the rename fails.
+
+    :type mv_func: func(stringn,string). side effect: move old_path to new_path
+
+    :param can_change_dirs: default: False
+    
+        if True, new path can be in a new dir from old one.
+    
+        else, if this is tried a warning is logged, and move is skipped
+
+        example:
+
+            old path:
+
+                /usr/file.py
+
+            new path:
+
+                /home/file.py
+
+            if True, the move works
+
+    :type can_change_dirs: boolean
+    :param make_missing_dirs: default: False
+    
+        if True, automatically makes any non existant directories that
+        would be necessary for the new path.
+        
+        else, loggs a warning and skips current move
+
+        this option implies can_change_dirs
+
+        if a file is going to be moved to a different parent dir,
+        and the parent dir is an existing file, only moves if overwrite == True
+        and make_missing_dirs == True
+
+        example:
+
+            existing dirs:
+
+                /usr/
+
+            old path:
+
+                /usr/file.py
+
+            new path:
+
+                /usr/non/existant/dirs/file.py
+
+            if True, creates:
+
+                /usr/non/
+                /usr/non/existant/
+                /usr/non/existant/dir/
+
+            and then moves the old path there:
+
+                /usr/non/existant/dir/file.py
+                
+    :type make_missing_dirs: boolean
+    :param overwrite: default: False
+    
+        if True overwrites existing files without asking.
+
+        else, logs a warning, and skips move
+
+        if a file is going to be moved to a different parent dir,
+        and the parent dir is an existing file, only moves if overwrite == True
+        and make_missing_dirs == True
+
+    :type overwrite: boolean.
+
+    :param sort_func: default: sorted(reverse=True)
+
+        function used to sort paths, and therefore decide order in which paths are renamed
+
+        clearly, this function can have an impact on the rename results.
+
+        example:
+
+            existing files:
+
+                /a
+                /b
+
+            rename func: lambda p: 'c'
+
+            in this case, either a or b will be renamed,
+            depending on which goes first.
+
+            if overwrite is True, loss of data would occur
+
+        rationale hehind default:
+
+            with sorted(reverse=True), when renameing basenames, which is the major use case,
+            one always renames parent dirs before files inside them.
+
+    :type sort_func: function([string, ...])
+
+    TODO
+    ====
+
+        - THE MOVE DIRS IS BUGGED DON'T USE IT!!!!!!
+
+        - rename do_rename to do_mv
+
+        - add act on abspath/act on relpath option
+
     """
 
-    func_args = kwargs.get("func_args", [])
-    func_kwargs = kwargs.get("func_kwargs", {})
-    silent = kwargs.get("silent", False)
+    sort_func = kwargs.pop("sort_func", sorted)
+    func_args = kwargs.pop("func_args", [])
+    func_kwargs = kwargs.pop("func_kwargs", {})
+    make_missing_dirs = kwargs.pop("make_missing_dirs", True)
+    can_change_dirs = kwargs.pop("can_change_dirs", True) or make_missing_dirs
+    mv_func = kwargs.pop("mv_func", os.rename)
+    overwrite = kwargs.pop("overwrite", True)
 
     paths = map(os.path.abspath,paths)
-    paths.sort(reverse=True) # so that dirs get renamed after the paths they contain
+    paths = sort_func(paths,reverse=True)
+    warnings = []
     errors = []
     for path in paths:
 
@@ -115,21 +211,105 @@ def rename_basenames(paths, rename_func, do_rename=False, **kwargs):
         new_path = os.path.join(head, new_bname)
 
         if new_path != path:
-            if not silent:
-                sys.stderr.write(path + "\n")
-                sys.stderr.write(new_path + "\n")
-                sys.stderr.write("\n")
-            if os.path.exists(new_path):
-                errors.append("new path already exists. rename skipped\nold path:  %s\nnew path:  %s" % (path, new_path) )
-            elif os.path.split(path)[0] != os.path.split(new_path)[0]:
-                errors.append("new path is in a different directory from old one. rename skipped\nold path:  %s\nnew path:  %s" % (path, new_path) )
-            elif do_rename:
-                os.rename(path, new_path)
 
-    if errors and not silent:
-        sys.stderr.write("START errors occurred\n\n")
-        sys.stderr.write("\n".join(errors))
-        sys.stderr.write("\n\nEND errors occurred\n")
+            logging.info( "%s\n%s\n" % (path,new_path) )
+
+            #make sure new path is clear
+            if os.path.exists(new_path):
+                if overwrite and do_rename:
+                    if not os.path.isdir(new_dir): #its a file
+                        if new_dir != old_path:
+                            if overwrite:
+                                shutil.rmtree(new_path)
+                                os.mkdir(new_path)
+                            else:
+                                print overwrite_error
+                        elif overwrite: #must move old path to temp path!
+                            try:
+                                os.move(path,tmppath)
+                            except Exception,e:
+                                errors.append( "TODO" % (path,new_path,e) )
+                                continue
+                            path = temppath
+                    try:
+                        shutil.rmtree(new_path)
+                    except Exception,e:
+                        errors.append(
+                            "os error: could not remove existing path"
+                            "\n%s\n%s\n\n%s" % (path,new_path,e) 
+                        )
+                        continue
+                else:
+                    warnings.append(
+                            "new path already exists."
+                            "rename skipped\nold path:"
+                            "%s\nnew path:  %s" % (path, new_path) 
+                    )
+                    continue
+
+            #make sure new dir exists
+            old_dir = os.path.split(path)[0]
+            new_dir = os.path.split(new_path)[0]
+            if old_dir != new_dir:
+                makedirs = False
+                continue #TODO this is for security before I get the tests done!!!!!!
+                if can_change_dirs:
+                    if os.path.exists(new_dir):
+                        if not os.path.isdir(new_dir): #its a file
+                            if make_missing_dirs:
+                                makedirs = True
+                                if new_dir != old_path:
+                                    if overwrite:
+                                        try:
+                                            shutil.rmtree(new_path)
+                                        except Exception,e:
+                                            print e, "TODO"
+                                            continue
+                                    else:
+                                        print overwrite_error #TODO
+                                elif overwrite: #new_dir == old_path: must move old path to temp path!
+                                    #TODO get temppath
+                                    try:
+                                        os.move(path,tmppath)
+                                    except Exception,e:
+                                        errors.append( "TODO" % (path,new_path,e) )
+                                        continue
+                                    path = temppath
+                            else:
+                                print 'missing dirs warn TODO'
+                    elif make_missing_dirs:
+                        makedirs = True
+                    else:
+                        print 'missing dirs warn TODO'
+
+                    #now that the are is clear, make the missing dirs if needed
+                    if makedirs and do_rename:
+                        try:
+                            os.makedirs(new_dir) #ensure dir exists
+                        except Exception,e:
+                            errors.append( "os error: could not create non-existant dirs for new path. \n%s\n%s\n\n%s" % (path,new_path,e) )
+                            continue
+                    else:
+                        warnings.append("new dir does not exist\n%s\n%s\n" % (path, new_path) )
+                        continue
+                else:
+                    warnings.append("new path is in a different directory from old one. rename skipped\nold path:  %s\nnew path:  %s" % (path, new_path) )
+                    continue
+
+            if do_rename:
+                try:
+                    mv_func(path, new_path)
+                except Exception,e:
+                    errors.append( "os error: could not rename \n%s\n%s\n\n%s" % (path,new_path,e) )
+
+    if warnings:
+        logging.warning("WARNINGS")
+        logging.warning("\n".join(warnings))
+        logging.warning("END WARNINGS\n")
+    if errors:
+        logging.error("ERRORS")
+        logging.error("\n".join(errors))
+        logging.error("END ERRORS\n")
 
 def find(root, **kwargs):
     """
@@ -256,33 +436,11 @@ def find_music(roots, **kwargs):
             if ( os.path.isfile(path)
                     and extension(path) in exts ):
                 yield path
-
-def parent_dir(path):
-    """ Returns full path of parent directory. """
-    return os.path.dirname(path)
-
-def basename(path):
-    """ Returns basename. """
-    return os.path.splitext(path)[1]
-
-def basename_no_ext(path):
-    """ Returns basename wihout extension (no dot '.' either) """
-    (shortname, ext) = os.path.splitext(os.path.basename(path))
-    return shortname;
-
 def split3(path):
     """ Returns a triplet parent_dir, basename wihout extension and extension with dot """
     parent_dir, bname = os.path.split(path)
     bname_noext, dotext = os.path.splitext(bname)
     return parent_dir, bname_noext, dotext
-
-def path_no_ext(path):
-    """ Returns path without file extension (no dot '.' either) """
-    return os.path.join(parent_dir(path), basename_no_ext(path))
-
-def extension_no_dot(path):
-    """ Returns file extension without dot of a given path. """
-    return os.path.splitext(path)[1][1:]
 
 def inode(path):
     """ Returns inode of a given path. """
@@ -361,7 +519,7 @@ def read(path,**kwargs):
     except Exception, exc:
         had_exception = True
         if print_error:
-            sys.stderr.write("could not read from\n%s\n" % (output_path) )
+            sys.stderr.write("could not read from\n%s\n" % (path) )
             if not raise_exception:
                 sys.stderr.write(str(err))
         if raise_exception:
@@ -485,3 +643,4 @@ def has_hidden_attribute(filepath):
 if __name__ == "__main__":
     import doctest
     doctest.testmod()
+
