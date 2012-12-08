@@ -63,7 +63,7 @@ def get_list_table(
     }
     custom_selection_args.update(selection_args)
 
-    class T(tables.Table):
+    class T(dtd_tables.Datatable):
 
         if has_selection:
             selection = dtd_tables.MasterCheckBoxColumn(
@@ -119,7 +119,6 @@ def index_all(request):
         has_selection=True,
         form='bulk',
     )
-    table_filter = dtd_tables.get_table_filter(table)
 
     return render_thisapp(
         request,
@@ -127,7 +126,6 @@ def index_all(request):
         {
             'total_items_db': all_items_db.count(),
             'table': table,
-            'table_filter': table_filter,
         },
     )
 
@@ -144,7 +142,6 @@ def index_user(request, owner_username):
         has_owner=False,
         form='bulk',
     )
-    table_filter = dtd_tables.get_table_filter(table)
 
     return render_thisapp(
         request,
@@ -153,7 +150,6 @@ def index_user(request, owner_username):
             'owner': owner,
             'total_items_db': all_items_db.count(),
             'table': table,
-            'table_filter': table_filter,
         },
     )
 
@@ -175,7 +171,7 @@ def get_item_table(
     :type has_selection: boolean
     """
 
-    class T(tables.Table):
+    class T(dtd_tables.Datatable):
 
         if has_selection:
             selection = dtd_tables.MasterCheckBoxColumn(
@@ -219,7 +215,6 @@ def detail(request, owner_username, id2):
         form='bulk',
         has_selection=False,
     )
-    table_filter = dtd_tables.get_table_filter(table)
 
     return render_thisapp(
         request,
@@ -229,7 +224,6 @@ def detail(request, owner_username, id2):
             'list': list,
             'total_items_db': all_items_db.count(),
             'table': table,
-            'table_filter': table_filter,
         },
     )
 

@@ -3,19 +3,25 @@
 
 import os
 
-if __name__ == "__main__":
+def f(i):
+    class C:
+        class D:
+            j=i
+        D.k=i
+    C.D.l=i
+    return C()
 
-    i=0
-    for i in range(1000000):
-        i=i+1
-    print i
+c1 = f(1)
+print c1.D.j
+print c1.D.k
+print c1.D.l
+print f(2).D.j
+print f(2).D.k
+print f(2).D.l
+print c1.D.j
+print c1.D.k
+print c1.D.l
 
 
-
-
-
-
-
-
-
+#if __name__ == "__main__":
 

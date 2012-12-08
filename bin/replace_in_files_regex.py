@@ -146,9 +146,9 @@ EXAMPLES
                     i = 0
                     for old_line in f.xreadlines():
                         old_line = _chomp(old_line)
-                        new_line = p.sub(replace, line)
+                        new_line = p.sub(replace, old_line)
                         if old_line != new_line:
-                            output += "%i%s%s" % (i,sep,old_line)
+                            output += "%i%s%s\n" % (i,sep,old_line)
                             output += "%i%s%s\n" % (i,sep,new_line)
                             had_change = True
                         new += (new_line) + "\n"
@@ -159,7 +159,7 @@ EXAMPLES
             continue
 
         if had_change:
-            output = "="*70 + "\n" + path + "\n\n" + output
+            output = "\n"+"="*70 + "\n" + path + "\n\n" + output
             sys.stderr.write( output )
             if not_dry_run:
                 files.write(path, new)

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 #find files that I want to keep track of for a django project,
-#output to stdout newline separated
+#and adds them to django
 
 set -e #stop execution if one command goes wrong
 

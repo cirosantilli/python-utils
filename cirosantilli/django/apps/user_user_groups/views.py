@@ -62,7 +62,7 @@ def get_user_list_table(
     }
     custom_selection_args.update(selection_args)
 
-    class T(tables.Table):
+    class T(dtd_tables.Datatable):
 
         if has_selection:
             selection = dtd_tables.MasterCheckBoxColumn(
@@ -121,7 +121,6 @@ def index_all(request):
         has_selection=True,
         form='bulk-action',
     )
-    table_filter = dtd_tables.get_table_filter(table)
 
     return render(
         request,
@@ -129,7 +128,6 @@ def index_all(request):
         {
             'total_items_db': all_items_db.count(),
             'table': table,
-            'table_filter': table_filter,
         },
     )
 
@@ -155,7 +153,6 @@ def index_user(request, owner_username):
             'owner': owner,
             'total_items_db': all_items_db.count(),
             'table': table,
-            'table_filter': table_filter,
         },
     )
 
@@ -178,7 +175,7 @@ def get_item3_table(
     :type has_selection: boolean
     """
 
-    class T(tables.Table):
+    class T(dtd_tables.Datatable):
 
         if has_selection:
             selection = dtd_tables.MasterCheckBoxColumn(
@@ -227,7 +224,6 @@ def detail(request, owner_username, id2):
         form='bulk-action',
         has_selection=False,
     )
-    table_filter = dtd_tables.get_table_filter(table)
 
     return render(
         request,
@@ -237,7 +233,6 @@ def detail(request, owner_username, id2):
             'item2': item2,
             'total_items_db': all_items_db.count(),
             'table': table,
-            'table_filter': table_filter,
         },
     )
 
@@ -423,7 +418,6 @@ def update_list(request, owner_username, id2):
             id='update_items',
             form=update_form_id,
         )
-        update_table_filter = dtd_tables.get_table_filter(update_table)
 
         form = Item2Form(initial_item2=item2)
 
@@ -435,7 +429,6 @@ def update_list(request, owner_username, id2):
             'owner': owner,
             'item2': item2,
             'update_table': update_table,
-            'update_table_filter': update_table_filter,
             'update_form_id': update_form_id,
         },
     )

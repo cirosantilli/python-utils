@@ -21,7 +21,6 @@ from django_tables2.utils import A  # alias for Accessor
 
 from django_tables2_datatables import tables as dtd_tables
 from helpers import url_add_app, render_thisapp
-
 import user_list_uri.views
 from user_list_uri.models import List
 import user_user_groups.views
@@ -37,10 +36,12 @@ FILTER_SERVER_FORM_ID = 'filter-server' #in the form that gets server data: <for
 
 def get_issue_table(
         data,
-        id='issue-table',
+        table_attrs={}
     ):
+    custom_table_attrs={'id':'issue-table'}
+    custom_table_attrs.update(custom_table_attrs)
 
-    class T(tables.Table):
+    class T(dtd_tables.Datatable):
 
         id = dtd_tables.LinkColumn(
             url_add_app('detail'),
@@ -70,7 +71,7 @@ def get_issue_table(
                 'creation_date',
             ]
 
-    T.Meta.attrs["id"] = id
+        Meta.attrs['id'] = custom_table_attrs['id']
 
     return T(data)
 
@@ -137,7 +138,6 @@ def index_all(request):
             'accessor':'pk',
         },
     )
-    user_list_table_filter = dtd_tables.get_table_filter(user_list_table)
 
     #filter by uri lists
     filter_uri_lists_pk = request.GET.getlist(FILTER_URI_LIST_NAME)
@@ -158,7 +158,6 @@ def index_all(request):
             'accessor':'pk',
         },
     )
-    uri_list_table_filter = dtd_tables.get_table_filter(uri_list_table)
 
     #get issues table
     selected_issues = Issue.objects.all()
@@ -166,8 +165,9 @@ def index_all(request):
         selected_issues = selected_issues.filter(creator__username__in=filter_usernames)
     if filter_uris:
         selected_issues = selected_issues.filter(uri__in=filter_uris)
-    table = get_issue_table(selected_issues)
-    table_filter = dtd_tables.get_table_filter(table)
+    table = get_issue_table(
+        selected_issues
+    )
 
     return render_thisapp(
         request,
@@ -176,11 +176,8 @@ def index_all(request):
             'n_items_db': all_items_db.count(),
             #'get_items_form': get_items_form,
             'table': table,
-            'table_filter': table_filter,
             'uri_list_table': uri_list_table,
-            'uri_list_table_filter': uri_list_table_filter,
             'user_list_table': user_list_table,
-            'user_list_table_filter': user_list_table_filter,
         },
     )
 

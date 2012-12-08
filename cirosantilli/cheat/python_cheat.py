@@ -807,8 +807,6 @@
 
                 print "Constructor B was called"
 
-        #TODO multiple
-
     #special methods
     class A():
         """

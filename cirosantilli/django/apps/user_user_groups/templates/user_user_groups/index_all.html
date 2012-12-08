@@ -12,12 +12,12 @@
 
     <h2>{% trans "view" %}</h2>
 
-    <h3>{% trans "filter" %}</h3>
-    {% render_table table_filter %}
+      <h3>{% trans "filter" %}</h3>
+        {% render_table table.filter %}
 
-    <h3>{% trans "data" %}</h3>
-    {% render_table table %}
-    <div>{% trans "total items in database" %}: {{ total_items_db }}</div>
+      <h3>{% trans "data" %}</h3>
+        {% render_table table %}
+        <div>{% trans "total items in database" %}: {{ total_items_db }}</div>
 
     {% if user.is_authenticated %}
         <h2>{% trans "edit data" %}</h2>

@@ -16,6 +16,56 @@ class Meta():
         "class":settings.TABLE_CLASS,
     }
 
+class Datatable(tables.Table):
+
+    def _get_table_filter(self):
+        """a datatables based filter for the given table
+        
+        the filter is itself a table
+        """
+
+        id = self.__class__.Meta.attrs['id']
+
+        class TableFilter(tables.Table):
+
+            target = tables.Column()
+
+            find = TextColumn(
+                attrs={
+                    'td__input':{settings.FILTER_TABLE_FIND_ATTR:id},
+                }
+            )
+            
+            regex = MasterCheckBoxColumn(
+                "regex",
+                th__before_input='regex',
+                attrs={
+                    'td__input':{settings.FILTER_TABLE_REGEX_ATTR:id},
+                }
+            )
+
+            smart = MasterCheckBoxColumn(
+                "smart",
+                th__before_input='smart',
+                attrs={
+                    'td__input':{settings.FILTER_TABLE_SMART_ATTR:id},
+                }
+            )
+
+            class Meta():
+                orderable=False
+
+        data = [
+            {'target':'global', },
+        ]
+
+        return TableFilter(data)
+
+
+    def __init__(self,*args,**kwargs):
+        super(Datatable,self).__init__(*args,**kwargs)
+        self.filter = self._get_table_filter()
+
 class MasterCheckBoxColumn(tables.CheckBoxColumn):
     """sortable checkbox column with a box to select/deselect all at once
 
@@ -125,42 +175,3 @@ class TextColumn(Column):
         specific = self.attrs.get('td__input')
         attrs = AttributeDict(default, **(specific or general or {}))
         return mark_safe('<input %s/>' % attrs.as_html())
-
-def get_table_filter(table):
-
-    id = table.__class__.Meta.attrs['id']
-
-    class TableFilter(tables.Table):
-
-        target = tables.Column()
-
-        find = TextColumn(
-            attrs={
-                'td__input':{settings.FILTER_TABLE_FIND_ATTR:id},
-            }
-        )
-        
-        regex = MasterCheckBoxColumn(
-            "regex",
-            th__before_input='regex',
-            attrs={
-                'td__input':{settings.FILTER_TABLE_REGEX_ATTR:id},
-            }
-        )
-
-        smart = MasterCheckBoxColumn(
-            "smart",
-            th__before_input='smart',
-            attrs={
-                'td__input':{settings.FILTER_TABLE_SMART_ATTR:id},
-            }
-        )
-
-        class Meta():
-            orderable=False
-
-    data = [
-        {'target':'global', },
-    ]
-
-    return TableFilter(data)

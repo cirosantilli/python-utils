@@ -13,7 +13,7 @@
     <div>{% trans "total items in database" %}: {{ total_items_db }}</div>
 
     <h3>{% trans "filter" %}</h3>
-    {% render_table table_filter %}
+    {% render_table table.filter %}
 
     <h4>{% trans "data" %}</h4>
     {% render_table table %}
