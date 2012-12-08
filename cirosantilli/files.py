@@ -6,7 +6,7 @@ import shutil
 import ctypes
 import logging
 
-import utils
+from cirosantilli import utils
 
 MBYTE = float(2**20)
 def size_mb_str(path, decimals=2):
@@ -36,21 +36,50 @@ def act_noext_only(func):
 
     return wrapper
 
-def act_basename_only(func):
+def act_basename_only(f):
     """decorator
     
-    if f(path,*args,**kwargs) would act on the entire given path,
-    to find a new name for it for example, it acts only on the basename
+    if f(path,*args,**kwargs) would recieve and return full paths,
+    it may recieve and return only the basename when decorated
+
+    :example:
+
+    >>> @act_basename_only
+    ... def rename_func(bname):
+    ...     return "c"
+    >>> print rename_func("a/b")
+    a/c
     """
 
     def wrapper(path,*args,**kwargs):
         head,bname = os.path.split(path)
-        new_bname = func(bname,*args,**kwargs)
+        new_bname = f(bname,*args,**kwargs)
         return os.path.join(head,new_bname)
 
     return wrapper
 
-def move(paths, rename_func, do_rename=False, **kwargs):
+def output_basename_only(f):
+    """decorator
+    
+    if f(path,*args,**kwargs) would recieve and return full paths,
+    it may return only the basename when decorated
+
+    :example:
+
+    >>> @output_basename_only
+    ... def rename_func(path):
+    ...     return path
+    >>> print rename_func("a/b/c")
+    a/b/a/b/c
+    """
+
+    def wrapper(path,*args,**kwargs):
+        head,bname = os.path.split(path)
+        return os.path.join(head,f(path,*args,**kwargs))
+
+    return wrapper
+
+def move(paths, rename_func, do_move=False, **kwargs):
     """convenient interface for moving multiple paths
 
     rename func can takes the entire path, not only the basename,
@@ -70,10 +99,10 @@ def move(paths, rename_func, do_rename=False, **kwargs):
         decorator
 
     :type paths: list of strigs
-    :param rename_func: rename function of  that returns the *basename* from the given *full path*
+    :param rename_func: rename function of that returns the *full path* from a given *full path*
     :type rename_func: function with signature (string,*args,**kwargs)
-    :param do_rename: if True, really renames, else, only outputs changes that would be done
-    :type do_rename: boolean
+    :param do_move: if True, really renames, else, only outputs changes that would be done
+    :type do_move: boolean
     :param mv_func: if given, uses this function to rename files from old to new name. default: os.rename
 
         this function can suppose that:
@@ -186,7 +215,7 @@ def move(paths, rename_func, do_rename=False, **kwargs):
 
         - THE MOVE DIRS IS BUGGED DON'T USE IT!!!!!!
 
-        - rename do_rename to do_mv
+        - rename do_move to do_mv
 
         - add act on abspath/act on relpath option
 
@@ -198,7 +227,7 @@ def move(paths, rename_func, do_rename=False, **kwargs):
     make_missing_dirs = kwargs.pop("make_missing_dirs", True)
     can_change_dirs = kwargs.pop("can_change_dirs", True) or make_missing_dirs
     mv_func = kwargs.pop("mv_func", os.rename)
-    overwrite = kwargs.pop("overwrite", True)
+    overwrite = kwargs.pop("overwrite", False)
 
     paths = map(os.path.abspath,paths)
     paths = sort_func(paths,reverse=True)
@@ -216,23 +245,9 @@ def move(paths, rename_func, do_rename=False, **kwargs):
 
             #make sure new path is clear
             if os.path.exists(new_path):
-                if overwrite and do_rename:
-                    if not os.path.isdir(new_dir): #its a file
-                        if new_dir != old_path:
-                            if overwrite:
-                                shutil.rmtree(new_path)
-                                os.mkdir(new_path)
-                            else:
-                                print overwrite_error
-                        elif overwrite: #must move old path to temp path!
-                            try:
-                                os.move(path,tmppath)
-                            except Exception,e:
-                                errors.append( "TODO" % (path,new_path,e) )
-                                continue
-                            path = temppath
+                if overwrite and do_move:
                     try:
-                        shutil.rmtree(new_path)
+                        remove_recursive(new_path)
                     except Exception,e:
                         errors.append(
                             "os error: could not remove existing path"
@@ -258,7 +273,7 @@ def move(paths, rename_func, do_rename=False, **kwargs):
                         if not os.path.isdir(new_dir): #its a file
                             if make_missing_dirs:
                                 makedirs = True
-                                if new_dir != old_path:
+                                if not os.path.commonprefix([old_path, new_dir]) == old_path: #old_path is an ancestor for new path
                                     if overwrite:
                                         try:
                                             shutil.rmtree(new_path)
@@ -282,8 +297,8 @@ def move(paths, rename_func, do_rename=False, **kwargs):
                     else:
                         print 'missing dirs warn TODO'
 
-                    #now that the are is clear, make the missing dirs if needed
-                    if makedirs and do_rename:
+                    #now that the area is clear, make the missing dirs if needed
+                    if makedirs and do_move:
                         try:
                             os.makedirs(new_dir) #ensure dir exists
                         except Exception,e:
@@ -296,7 +311,8 @@ def move(paths, rename_func, do_rename=False, **kwargs):
                     warnings.append("new path is in a different directory from old one. rename skipped\nold path:  %s\nnew path:  %s" % (path, new_path) )
                     continue
 
-            if do_rename:
+            #move
+            if do_move:
                 try:
                     mv_func(path, new_path)
                 except Exception,e:
@@ -413,14 +429,7 @@ def find_rec(root, curdepth, **kwargs ):
                 yield path
 
 def find_books(roots, **kwargs):
-
-    for kwargs_key_def in kwargs_key_defs:
-        key = kwargs_key_def[0]
-        default = kwargs_key_def[1]
-        kwargs[key] = kwargs.get(key, default)
-    """
-    Helper method to find books.
-    """
+    """helper method to find books"""
     exts = ['pdf','djvu','djv','chm']
     for root in roots:
         for path in find(root, **kwargs):
@@ -429,7 +438,7 @@ def find_books(roots, **kwargs):
                 yield path
 
 def find_music(roots, **kwargs):
-    """Helper method to find books."""
+    """helper method to find music"""
     exts = ['mp3','ogg','wma','flac']
     for root in roots:
         for path in find(root, **kwargs):
@@ -437,98 +446,25 @@ def find_music(roots, **kwargs):
                     and extension(path) in exts ):
                 yield path
 def split3(path):
-    """ Returns a triplet parent_dir, basename wihout extension and extension with dot """
+    """returns a tuple (parent_dir, basename wihout extension, extension with dot) """
     parent_dir, bname = os.path.split(path)
     bname_noext, dotext = os.path.splitext(bname)
     return parent_dir, bname_noext, dotext
 
 def inode(path):
-    """ Returns inode of a given path. """
+    """returns inode of a given path"""
     return os.stat(path)[stat.ST_INO]
 
 def write(path,input,**kwargs):
-    """
-    Saves input string to a given path.
-    If the path already exists, it is overwritten.
-
-    Examples:
-
-    write("~/.asdf", "written to file")
-    write("~/.asdf", "written to file", print_error=True)
-    write("~/.asdf", "written to file", raise_exception=False, print_error=True)
-
-    @print_error: boolean. If True, prints errors to stderr in case of exception.
-        Exception itself is only printed if raise_exception is False.
-        If it is True, it is left to the caller to print it if the wants.
-
-    @raise_exception: boolean. If True, this function may raise an
-    """
-
-    print_error = kwargs.get('print_error', True)
-    raise_exception = kwargs.get('raise_exception', True)
-
-    had_exception = False
-    try:
-        f = open(path,'w')
-        f.write(input)
-        f.close()
-    except Exception, exc:
-        had_exception = True
-        if print_error:
-            sys.stderr.write( "could not write to path \n%s" % (output_path) )
-            if not raise_exception:
-                sys.stderr.write(str(err))
-        if raise_exception:
-            raise exc
-
-    if had_exception:
-        return False
-    else:
-        return True
+    f = open(path,'w')
+    f.write(input)
+    f.close()
 
 def read(path,**kwargs):
-    """
-    Convenient wrapper that reads content from a path and returns it.
-
-    Speed of the operation may be slightly compromised by a constant factor.
-    It is the price to pay for the convenience, and ease of refactoring of using this method.
-
-    Useful for one hit read of files that wont clutter the RAM memory.
-    If its too big and you can do operations part by part, use a buffered reader instead.
-    If it is too big, and you can't do operations part by part, ... there exists no solution for you!
-
-    **kwargs:
-
-    @print_error
-    boolean
-    true
-    If true, will print a standardized error message on stderr in case of exception.
-
-    @: boolean. If true, will print de
-
-    """
-
-    print_error = kwargs.get('print_error', True)
-    raise_exception = kwargs.get('raise_exception', True)
-
-    had_exception = False
-    try:
-        f = open(path,'r')
-        output = f.read()
-        f.close()
-    except Exception, exc:
-        had_exception = True
-        if print_error:
-            sys.stderr.write("could not read from\n%s\n" % (path) )
-            if not raise_exception:
-                sys.stderr.write(str(err))
-        if raise_exception:
-            raise exc
-
-    if had_exception:
-        return None
-    else:
-        return output
+    f = open(path,'r')
+    output = f.read()
+    f.close()
+    return output
 
 def remove_recursive(path):
     """
@@ -643,4 +579,3 @@ def has_hidden_attribute(filepath):
 if __name__ == "__main__":
     import doctest
     doctest.testmod()
-

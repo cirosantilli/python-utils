@@ -10,3 +10,5 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         for poll in Poll.objects.all():
             poll.delete() #also call delete on choices, default of foreign key!
+
+

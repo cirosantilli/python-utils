@@ -18,3 +18,5 @@ setup(
         "unidecode >= 0.04.9",
     ],
 )
+
+

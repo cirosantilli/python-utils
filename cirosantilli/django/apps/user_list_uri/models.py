@@ -36,6 +36,7 @@ class List(models.Model):
         validators=[
             validate_id2_chars,
         ],
+        help_text='allowed chars: "[a-z][0-9]_". max length: 255 chars',
     )
 
     creation_date = models.DateTimeField(
@@ -47,6 +48,7 @@ class List(models.Model):
         'description',
         max_length=MAX_DESCRIPTION_LENGTH,
         blank=True,
+        help_text='max length: %d chars'%MAX_DESCRIPTION_LENGTH,
     )
 
     def item_count(self):
@@ -77,3 +79,5 @@ class Item(models.Model):
 
     def __unicode__(self):
         return self.user.username
+
+

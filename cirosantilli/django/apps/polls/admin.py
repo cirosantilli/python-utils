@@ -37,3 +37,5 @@ class PollAdmin(admin.ModelAdmin):
     date_hierarchy = 'pub_date' #navigation by date
 
 admin.site.register(Poll, PollAdmin)
+
+

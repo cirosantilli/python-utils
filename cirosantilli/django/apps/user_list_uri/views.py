@@ -30,7 +30,9 @@ def get_list_table(
         data,
         has_owner=True,
         has_selection=True,
-        form="",
+        selection_args={},
+        form='issue-lists-bulk-action',
+        id='list-table',
     ):
     """returns an instance of a class derived from tables.Table
 
@@ -38,17 +40,35 @@ def get_list_table(
     :type owner: django.contrib.auth.models.User
     :param data: data, same as passed to django_tables2.Table constructor
     :returns: the table that links to owner's user groups
+    :param selection_args: custom arguments be passedto dtd_tables.MasterCheckBoxColumn
+
+        default:
+
+        custom_selection_args = {
+            'master_group':'select-group',
+            'name':'id2',
+            'accessor':'id2',
+        }
+
+        form=form is also passed
+
+    :type selection_args: dict
     :rtype: django_tables2.Table instance
     """
+
+    custom_selection_args = {
+        'master_group':'select-group',
+        'name':'id2',
+        'accessor':'id2',
+    }
+    custom_selection_args.update(selection_args)
 
     class T(tables.Table):
 
         if has_selection:
             selection = dtd_tables.MasterCheckBoxColumn(
-                "select-group",
-                name="id2",
                 form=form,
-                accessor="id2",
+                **custom_selection_args
             )
 
         if has_owner:
@@ -81,7 +101,7 @@ def get_list_table(
                 'item_count',
                 'creation_date',
             ])
-        Meta.attrs["id"] = 'listtable'
+        Meta.attrs["id"] = id
 
     t = T(data)
     setattr(t,'bulk_form_id',form)
@@ -100,14 +120,6 @@ def index_all(request):
         form='bulk',
     )
     table_filter = dtd_tables.get_table_filter(table)
-
-    filters = {
-        'target_table':'grouptable',
-        'filter_global':True,
-        'filter_cols':[
-            'user',
-        ],
-    }
 
     return render_thisapp(
         request,
@@ -567,7 +579,9 @@ def bulk_action(request, owner_username):
     else:
         return HttpResponseBadRequest("unknown action" % action)
 
-if __name__ == "__main__":
+#if __name__ == "__main__":
     #quick and dirty tests
     #import doctest
     #doctest.testmod()
+
+

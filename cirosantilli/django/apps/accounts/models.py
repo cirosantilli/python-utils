@@ -17,3 +17,5 @@ class Profile(UserenaBaseProfile):
             permissions = (
                 ("is_member", "is member"),
             )
+
+

@@ -88,6 +88,8 @@ INSTALLED_APPS = [
     'mycommands',
     'user_user_groups',
     'user_list_uri',
+    'issue_tracker',
+    'project_specific',
 ]
 
 # Language code for this installation. All choices can be found here:
@@ -263,7 +265,8 @@ EMAIL_HOST_PASSWORD = 'thpaofmyte'
 
 ANONYMOUS_USER_ID = -1
 
-LOGIN_REDIRECT_URL = '/users/%(username)s/'
+#LOGIN_REDIRECT_URL = '/users/%(username)s/'
+USERENA_SIGNIN_REDIRECT_URL = '/users/%(username)s/'
 LOGIN_URL = '/users/signin/'
 LOGOUT_URL = '/users/signout/'
 

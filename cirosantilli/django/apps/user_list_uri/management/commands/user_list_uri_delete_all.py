@@ -4,11 +4,10 @@ from django.core.management.base import BaseCommand, CommandError
 
 from django.contrib.auth.models import User
 
-from user_list_uri.models import List
+from ...tests import delete_all_uri_lists
 
 class Command(BaseCommand):
     help = 'deletes all Users'
 
     def handle(self, *args, **options):
-        for user in List.objects.all():
-            user.delete() #also call delete on choices, default of foreign key!
+        delete_all_uri_lists()

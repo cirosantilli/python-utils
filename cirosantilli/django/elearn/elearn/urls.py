@@ -21,6 +21,7 @@ urlpatterns = patterns('',
 
     url(r'^user-lists/', include('user_user_groups.urls')),
     url(r'^uri-lists/', include('user_list_uri.urls')),
+    url(r'^issue-tracker/', include('issue_tracker.urls')),
     
 )
 

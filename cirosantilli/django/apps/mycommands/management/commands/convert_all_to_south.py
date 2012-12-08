@@ -18,3 +18,4 @@ class Command(BaseCommand):
             print 'All applications converted to south'
         except:
             pass
+

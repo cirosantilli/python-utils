@@ -34,3 +34,5 @@ class Command(BaseCommand):
             Choice.objects.create(poll=polls[i], choice_text="choice%d" % j, votes=0)
 
         self.stderr.write("created %d polls, with %d choices per poll" % (npolls, choices_per_poll))
+
+

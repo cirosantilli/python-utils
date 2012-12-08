@@ -28,3 +28,5 @@ URLS_THISAPP = { u[0]:THISAPP+'_'+u[0] for u in urls }
 urlpatterns = patterns(THISAPP+'.views',
    *[  url(u[1],u[0],name=URLS_THISAPP[u[0]]) for u in urls ]
 )
+
+

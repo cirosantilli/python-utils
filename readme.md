@@ -20,3 +20,5 @@ Is a script is not here, it may be total trash (due lack of tests, or pure noobi
 ## bin/find_basename_res.py
 
 simplified ack -g -all with multiple regexes
+
+

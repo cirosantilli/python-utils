@@ -18,3 +18,5 @@ CONTEXT = {
     'master_checkbox_group_attr':MASTER_GROUP_ATTR,
     'slave_checkbox_group_attr':SLAVE_GROUP_ATTR,
 }
+
+

@@ -44,3 +44,5 @@ class Table():
         output.append('</tr></table>')
 
         return '\n'.join(output)
+
+

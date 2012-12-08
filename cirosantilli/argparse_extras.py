@@ -30,6 +30,62 @@ class ArgumentParser(argparse.ArgumentParser):
         kwargs['formatter_class'] = kwargs.get('formatter_class',argparse.RawTextHelpFormatter)
         super(ArgumentParser,self).__init__(*args,**kwargs)
 
+def add_single_argument(
+            parser,
+            shortname,
+            longname,
+            default_kwargs,
+            **custom_kwargs
+        ):
+    """adds a single argument to an argument parser
+    
+    custom_kwargs overwride default ones
+    """
+    add_argument_kwargs = default_kwargs.copy()
+    add_argument_kwargs.update(custom_kwargs)
+    parser.add_argument(shortname,longname,**add_argument_kwargs)
+
+def add_act_full_path(
+        parser,
+        shortname='-F',
+        longname='--act-full-path',
+        **custom_kwargs
+    ):
+
+    add_single_argument(
+        parser,
+        shortname,
+        longname,
+        default_kwargs =
+        {
+            'action':'store_true',
+            'default':False,
+            'help':"if given, rename function acts on entire path. default: act on basename only",
+        },
+        **custom_kwargs
+    )
+
+def add_input_full_path(
+        parser,
+        shortname='-f',
+        longname='--input-full-path',
+        **custom_kwargs
+    ):
+
+    add_single_argument(
+        parser,
+        shortname,
+        longname,
+        default_kwargs =
+        {
+            'action':'store_true',
+            'default':False,
+            'help':"if given, rename function takes the full path as input,"
+                "and returns only the basename. default: false",
+        },
+        **custom_kwargs
+    )
+
 CHAR_LOG_LEVELS = {
     'd':logging.DEBUG,
     'i':logging.INFO,
@@ -40,37 +96,58 @@ CHAR_LOG_LEVELS = {
 
 LOG_LEVELS_CHAR = {v:k for (k,v) in CHAR_LOG_LEVELS.items()}
 
+class LogLevelAction(argparse.Action):
+    def __call__(self, parser, namespace, values, option_string=None):
+        setattr(namespace, self.dest, CHAR_LOG_LEVELS[values[0]])
+
 def add_log_level(
-            parser,
-            shortname='-L',
-            longname='--log-level',
-            **kwargs
-        ):
+        parser,
+        shortname='-L',
+        longname='--log-level',
+        **custom_kwargs
+    ):
+    """
+    :param kwargs: are all passed to the parser.add_argument function.
+            they overwride defaults set by this function
 
-    kwargs = dict(
-                [
-                    ('nargs',1),
-                    (
-                        'help',
-                        "the level of user information to be output\n"+
-                        "possibilities:\n"+
-                        " %s: debug\n"%LOG_LEVELS_CHAR[logging.DEBUG]+
-                        " %s: information\n"%LOG_LEVELS_CHAR[logging.INFO]+
-                        " %s: warnings\n"%LOG_LEVELS_CHAR[logging.WARNING]+
-                        " %s: error\n"%LOG_LEVELS_CHAR[logging.ERROR]+
-                        " %s: critical\n"%LOG_LEVELS_CHAR[logging.CRITICAL]
-                    ),
-                    ('default',[LOG_LEVELS_CHAR[logging.INFO]]),
-                    ('choices',CHAR_LOG_LEVELS.keys()),
-                ]
-                + kwargs.items()
-            )
+    :examples:
+    >>> parser = argparse.ArgumentParser()
+    >>> add_log_level(parser)
+    >>> args = parser.parse_args([''])
+    >>> args.log_level == logging.INFO
+    True
+    >>> args = parser.parse_args('-L w'.split())
+    >>> args.log_level == logging.WARNING
+    True
+    >>> args = parser.parse_args('--log-level w'.split())
+    >>> args.log_level == logging.WARNING
+    True
+    >>> add_log_level(parser,'-l','--new-long-name')
+    >>> args = parser.parse_args('-lw'.split)
+    >>> args.new_long_name == logging.WARNING
+    True
+    >>> add_log_level(parser,help='this is the new help, which overwrites the old one')
+    """
 
-    parser.add_argument(shortname,longname,**kwargs)
-
-def get_log_level(args):
-    #TODO broken get method
-    return CHAR_LOG_LEVELS[args.log_level[0]]
+    add_single_argument(
+        parser,
+        shortname,
+        longname,
+        default_kwargs={
+            'help':
+                "the level of user information to be output\n"+
+                "possibilities:\n"+
+                " %s: debug\n"%LOG_LEVELS_CHAR[logging.DEBUG]+
+                " %s: information\n"%LOG_LEVELS_CHAR[logging.INFO]+
+                " %s: warnings\n"%LOG_LEVELS_CHAR[logging.WARNING]+
+                " %s: error\n"%LOG_LEVELS_CHAR[logging.ERROR]+
+                " %s: critical\n"%LOG_LEVELS_CHAR[logging.CRITICAL],
+                'default':logging.INFO,
+            'choices':CHAR_LOG_LEVELS.keys(),
+            'action':LogLevelAction
+        },
+        **custom_kwargs
+    )
 
 def add_not_dry_run(
             parser,
@@ -83,7 +160,8 @@ def add_not_dry_run(
                 [
                     ('action','store_true'),
                     ('default',False),
-                    ('help',"if given, makes modifications, otherwise only shows modifications that would have been made"),
+                    ('help',"if given, makes modifications, otherwise only"
+                        "shows modifications that would have been made"),
                 ]
                 + kwargs.items()
             )
@@ -186,25 +264,6 @@ def add_null_separated_output(
             **kwargs
         )
 
-def add_paths(
-            parser,
-            name="paths",
-            **kwargs
-        ):
-
-    kwargs = dict(
-                [
-                    ('nargs','*'),
-                    ('help',"paths to rename. Also takes paths nul separated from stdin and adds to those"),
-                ]
-                + kwargs.items()
-            )
-    
-    parser.add_argument(
-            name,
-            **kwargs
-        )
-
 def add_silent(
 
             parser,
@@ -228,11 +287,9 @@ def add_silent(
             **kwargs
         )
 
-def add_paths_from_stdin_and_argv(parser,before_paths_arg_adders=[]):
-    add_null_separated_input(parser)
-    for arg_adder in before_paths_arg_adders:
-        arg_adder(parser)
-    add_paths(parser)
+class StdinArgvPathsAction(argparse.Action):
+    def __call__(self, parser, namespace, values, option_string=None):
+        setattr(namespace, self.dest, CHAR_LOG_LEVELS[values[0]])
 
 def get_stdin_items(sep, encoding):
     if not sys.stdin.isatty():
@@ -261,3 +318,27 @@ def get_paths_from_stdin_and_argv(
 
     return map(lambda s: s.decode(encoding), paths)
 
+def add_paths(
+            parser,
+            name="paths",
+            **kwargs
+        ):
+
+    kwargs = dict(
+                [
+                    ('nargs','*'),
+                    ('help',"paths to rename. Also takes paths nul separated from stdin and adds to those"),
+                ]
+                + kwargs.items()
+            )
+    
+    parser.add_argument(
+            name,
+            **kwargs
+        )
+
+def add_paths_from_stdin_and_argv(parser,before_paths_arg_adders=[]):
+    add_null_separated_input(parser)
+    for arg_adder in before_paths_arg_adders:
+        arg_adder(parser)
+    add_paths(parser)

@@ -4,18 +4,19 @@
 {% load i18n %}
 {% load django_tables2 %}
 
-{% block title %}{% trans "user groups" %}{% endblock %}
-
-{% block content_title %}{% trans "user groups" %}{% endblock %}
+{% block title %}{% trans "uri-lists" %}{% endblock %}
 
 {% block content %}
 
     <h2>{% trans "view" %}</h2>
-    {% render_table table %}
+
     <div>{% trans "total items in database" %}: {{ total_items_db }}</div>
 
-    <h2>{% trans "filter" %}</h2>
+    <h3>{% trans "filter" %}</h3>
     {% render_table table_filter %}
+
+    <h4>{% trans "data" %}</h4>
+    {% render_table table %}
 
     {% if user.is_authenticated %}
         <h2>{% trans "edit data" %}</h2>

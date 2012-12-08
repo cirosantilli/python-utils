@@ -4,6 +4,7 @@ from datetime import datetime
 from django.db import models
 from django.contrib.auth.models import User
 from django import forms
+from django.utils.timezone import utc
 from django.utils.translation import ugettext_lazy as _
 
 MAX_ID2_LENGTH = 255
@@ -32,7 +33,7 @@ class UserGroup(models.Model):
 
     creation_date = models.DateTimeField(
         'created',
-        default=lambda:datetime.now(),
+        default=lambda:datetime.utcnow().replace(tzinfo=utc),
     )
 
     def __unicode__(self):
@@ -60,3 +61,5 @@ class UserInGroup(models.Model):
 
     def __unicode__(self):
         return self.user.username
+
+

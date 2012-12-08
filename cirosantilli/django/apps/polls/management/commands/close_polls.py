@@ -19,3 +19,5 @@ class Command(BaseCommand):
             poll.save()
             self.stderr.write('Successfully closed poll "%s"' % poll_id)
 
+
+

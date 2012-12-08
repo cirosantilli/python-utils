@@ -126,3 +126,5 @@ def vote(request, poll_id):
                 return HttpResponse('you dont have permission to vote for polls')
         else:
             return HttpResponse('you must be logged in to vote')
+
+

@@ -15,3 +15,5 @@ def processor(request):
             'datatable_filter_html_class' : FILTER_HTML_CLASS,
             'datatable_filter_checkbox_class' : FILTER_CHECKBOX_CLASS,
         }
+
+

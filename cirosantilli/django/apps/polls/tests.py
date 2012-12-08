@@ -8,6 +8,11 @@ from django.test.client import Client
 from models import Poll, Choice
 from django.contrib.auth.models import User
 
+#to give permissions
+    #u = User...
+    #u.user_permissions.add(Permission.objects.get(codename='can_vote'))
+    #u.save
+
 class PollTest(TestCase):
 
     def setUp(self):
@@ -36,3 +41,5 @@ class PollTest(TestCase):
 
         # Check that the response is 200 OK.
         self.assertEqual(response.status_code, 200)
+
+

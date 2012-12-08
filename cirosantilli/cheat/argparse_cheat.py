@@ -29,7 +29,9 @@ EXAMPLES
     parser.add_argument('a',
         help="positional (obligatory) argument because no hyphen before a.",
         default="")
+    parser.parse_args('1')
     a = args.a
+    #1
 
     parser.add_argument('0',
         help="positional (obligatory) argument because no hyphen before a.",
@@ -39,7 +41,9 @@ EXAMPLES
     parser.add_argument('-a',
         help="optional argument because there is hyphen before a. Takes a single value.",
         default="")
-    a = args.a
+    parser.parse_args('--foo 1'.split())
+    args.a
+    #1
 
     parser.add_argument('-a', '--a-long',
         help="provides long name. Must destination is 'along', not 'a'.",
@@ -147,15 +151,32 @@ EXAMPLES
     a = args.a
 
     #inheritnace can be done via arguments
-        #>>> parent_parser = argparse.ArgumentParser(add_help=False)
-        #>>> parent_parser.add_argument('--parent', type=int)
+        >>> parent_parser = argparse.ArgumentParser(add_help=False)
+        >>> parent_parser.add_argument('--parent', type=int)
 
-        #>>> foo_parser = argparse.ArgumentParser(parents=[parent_parser])
-        #>>> foo_parser.add_argument('foo')
-        #>>> foo_parser.parse_args(['--parent', '2', 'XXX'])
-        #Namespace(foo='XXX', parent=2)
+        >>> foo_parser = argparse.ArgumentParser(parents=[parent_parser])
+        >>> foo_parser.add_argument('foo')
+        >>> foo_parser.parse_args(['--parent', '2', 'XXX'])
+        Namespace(foo='XXX', parent=2)
 
-        #>>> bar_parser = argparse.ArgumentParser(parents=[parent_parser])
-        #>>> bar_parser.add_argument('--bar')
-        #>>> bar_parser.parse_args(['--bar', 'YYY'])
-        #Namespace(bar='YYY', parent=None)
+        >>> bar_parser = argparse.ArgumentParser(parents=[parent_parser])
+        >>> bar_parser.add_argument('--bar')
+        >>> bar_parser.parse_args(['--bar', 'YYY'])
+        Namespace(bar='YYY', parent=None)
+
+
+    #custom actions!
+        >>> class FooAction(argparse.Action):
+        ...     def __call__(self, parser, namespace, values, option_string=None):
+                    """only called if not default value"""
+        ...         print('%r %r %r' % (namespace, values, option_string))
+        ...         setattr(namespace, self.dest, values)
+        ...
+        >>> parser = argparse.ArgumentParser()
+        >>> parser.add_argument('--foo', action=FooAction)
+        >>> parser.add_argument('bar', action=FooAction)
+        >>> args = parser.parse_args('1 --foo 2'.split())
+        Namespace(bar=None, foo=None) '1' None
+        Namespace(bar='1', foo=None) '2' '--foo'
+        >>> args
+        Namespace(bar='1', foo='2')

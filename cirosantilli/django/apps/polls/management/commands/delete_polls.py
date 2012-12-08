@@ -17,3 +17,5 @@ class Command(BaseCommand):
 
             poll.delete() #also deletes choices because of foreign key magic!
             self.stderr.write('Successfully deleted poll "%s"' % poll_id)
+
+

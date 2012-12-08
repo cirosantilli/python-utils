@@ -87,15 +87,14 @@ def move_argparse(rename_func, **kwargs):
         all kwargs accepted by argpase.ArgumentParser are passed to it
         but some of them are modified as follows specified by argparse_extras.ArgumentParser
 
-
     todo
     ====
         - add kwarg that adds both ext only and bname only
     """
 
-    can_cut_path = kwargs.pop("can_cut_path", False)
-    add_act_noext_only = kwargs.pop("add_act_noext_only", can_cut_path)
+    add_act_noext_only = kwargs.pop("add_act_noext_only", False)
     add_act_full_path = kwargs.pop("add_act_full_path", False)
+    add_input_full_path = kwargs.pop("add_input_full_path", False)
 
     encoding = kwargs.pop("encoding", 'UTF-8')
     func_arg_adders = kwargs.pop("func_arg_adders", [])
@@ -103,22 +102,22 @@ def move_argparse(rename_func, **kwargs):
 
     parser = argparse_extras.ArgumentParser(**kwargs)
 
+    argparse_extras.add_log_level(parser)
     argparse_extras.add_not_dry_run(parser)
     argparse_extras.add_not_ignorecase(parser)
+
     if add_act_noext_only:
         argparse_extras.add_not_act_on_extension(parser)
     if add_act_full_path:
-        parser.add_argument(
-            shortname='-f',
-            longname='--act-full-path',
-            action='store_true',
-            default=False,
-            help="if given, rename function acts on entire path. default: act on basename only",
-        )
+        argparse_extras.add_act_full_path(parser)
+    if add_input_full_path:
+        argparse_extras.add_act_full_path(parser)
+
     argparse_extras.add_paths_from_stdin_and_argv(
         parser,
         before_paths_arg_adders=func_arg_adders
     )
+
     parser.add_argument(
         '-g',
         '--git-mv',
@@ -126,23 +125,23 @@ def move_argparse(rename_func, **kwargs):
         default=False,
         help='if given does a git mv rename instead of normal rename',
     )
-    argparse_extras.add_log_level(parser)
 
     args = parser.parse_args()
 
     paths = argparse_extras.get_paths_from_stdin_and_argv(args)
+
     if add_act_noext_only and not args.act_on_extension:
         rename_func = files.act_noext_only(rename_func)
-    if add_full_path and not args.act_on_extension:
+    if add_act_full_path and not args.act_full_path:
         rename_func = files.act_basename_only(rename_func)
 
     logging.basicConfig(
         format='%(message)s',
-        level=args.log_level
+        level=args.log_level,
     )
 
     move_kwargs = {}
-    move_kwargs['do_rename'] = args.not_dry_run
+    move_kwargs['do_move'] = args.not_dry_run
     move_kwargs['func_args'], move_kwargs['func_kwargs'] = func_arg_controller(args)
     if args.git_mv:
         move_kwargs['mv_func'] = git_mv
