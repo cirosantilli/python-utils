@@ -9,7 +9,6 @@ from django.core.urlresolvers import reverse
 from django import forms
 from django.forms import ModelForm
 from django.forms.models import inlineformset_factory, model_to_dict
-from django.forms.widgets import SelectMultiple
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseBadRequest, HttpResponseNotAllowed
 from django.shortcuts import get_object_or_404, render_to_response, render
 from django.template import RequestContext
@@ -57,7 +56,7 @@ def get_list_table(
     """
 
     custom_selection_args = {
-        'master_group':'select-group',
+        'master_group':'uri-list-select',
         'name':'id2',
         'accessor':'id2',
     }
@@ -366,8 +365,6 @@ def create_list(request, owner_username):
     if request.method == "POST":
         form = ListForm(request.POST, owner=owner)
         if form.is_valid():
-            print 'create'
-            print form.cleaned_data
             uri_list = List.objects.create(
                 owner=owner,
                 id2=form.cleaned_data['id2'],

@@ -40,6 +40,8 @@
 #  https://docs.djangoproject.com/en/dev/ref/forms/fields/
 #  https://docs.djangoproject.com/en/dev/ref/forms/api/
 #  https://docs.djangoproject.com/en/dev/ref/forms/widgets/
+#  http://tothinkornottothink.com/post/10815277049/django-forms-i-custom-fields-and-widgets-in-detail
+#    custom widgets
 #  https://docs.djangoproject.com/en/dev/ref/forms/validation/
 #
 #  http://mikepk.com/2010/08/python-django-forms-errors-fieldsets/

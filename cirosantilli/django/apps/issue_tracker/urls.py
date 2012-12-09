@@ -6,7 +6,6 @@ from django.views.generic.simple import direct_to_template
 from settings import THISAPP
 
 PK_RE = r'(?P<pk>\d+)'
-
 suffix = r'/$'
 
 #all urls names are of the type: THISAPP+'_'+view_name
@@ -22,3 +21,5 @@ URLS_THISAPP = { u[0]:THISAPP+'_'+u[0] for u in urls }
 urlpatterns = patterns(THISAPP+'.views',
    *[  url(u[1],u[0],name=URLS_THISAPP[u[0]]) for u in urls ]
 )
+
+print URLS_THISAPP

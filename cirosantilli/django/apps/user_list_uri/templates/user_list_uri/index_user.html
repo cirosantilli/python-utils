@@ -10,15 +10,22 @@
 
 {% block content %}
 
-    <h2>{% trans "view" %}</h2>
-    {% render_table table %}
-
-    <h2>{% trans "info" %}</h2>
-    <div><a href="{% url 'userena_profile_detail' owner.username %}">{% trans "owner profile" %}</a></div>
-    <div>{% trans "total items in database" %}: {{ total_items_db }}</div>
+    <table>
+        <tr>
+            <td>{% trans "owner" %}</td>
+            <td>{% include "accounts/user_link.html" with username=owner.username %}</td>
+        </tr>
+        <tr>
+            <td>{% trans "total items in database" %}</td>
+            <td>{{ total_items_db }}</td>
+        </tr>
+    </table>
 
     <h2>{% trans "filter" %}</h2>
     {% render_table table.filter %}
+
+    <h2>{% trans "items" %}</h2>
+    {% render_table table %}
 
     <h2>{% trans "edit data" %}</h2>
 

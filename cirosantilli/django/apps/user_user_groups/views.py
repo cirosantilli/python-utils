@@ -1,4 +1,3 @@
-from django.contrib.admin.widgets import FilteredSelectMultiple
 from django.contrib import admin
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.decorators import permission_required
@@ -9,7 +8,7 @@ from django.core.urlresolvers import reverse
 from django import forms
 from django.forms import ModelForm
 from django.forms.models import inlineformset_factory, model_to_dict
-from django.forms.widgets import SelectMultiple
+from django.forms.widgets import CheckboxSelectMultiple
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseBadRequest, HttpResponseNotAllowed
 from django.shortcuts import get_object_or_404, render_to_response, render
 from django.template import RequestContext
@@ -144,7 +143,6 @@ def index_user(request, owner_username):
         has_owner=False,
         form='bulk-action',
     )
-    table_filter = dtd_tables.get_table_filter(table)
 
     return render(
         request,
@@ -241,7 +239,7 @@ class Item2Form(ModelForm):
 
     users = forms.ModelMultipleChoiceField(
         queryset=User.objects.all(),
-        widget=SelectMultiple(
+        widget=CheckboxSelectMultiple(
             attrs={
                 'rows':'10',
             }

@@ -4,23 +4,20 @@
 {% load i18n %}
 {% load django_tables2 %}
 
-{% block title %}{{ owner.username }} &gt {{list.id2}}{% endblock %}
-
-{% block content_title %}{{ owner.username }} &gt {{list.id2}}{% endblock %}
-
 {% block content %}
 
+    <h2>{% trans "owner" %}</h2>
+    {% include "accounts/user_link.html" with username=owner.username %}
+    
     <h2>{% trans "description" %}</h2>
-    {{ list.description }}
-
-    <h2>{% trans "items" %}</h2>
-    {% render_table table %}
-
-    <h2>{% trans "info" %}</h2>
-    <div>{% trans "total items in database" %}: {{ total_items_db }}</div>
+      {{ list.description }}
 
     <h2>{% trans "filter" %}</h2>
-    {% render_table table.filter %}
+      {% render_table table.filter %}
+
+    <h2>{% trans "items" %}</h2>
+      <div>{% trans "total items in database" %}: {{ total_items_db }}</div>
+      {% render_table table %}
 
     <h2>{% trans "edit data" %}</h2>
 

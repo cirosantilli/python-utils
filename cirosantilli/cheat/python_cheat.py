@@ -118,23 +118,7 @@
         pip freeze > stable-req.pip
         #to create a requirements file, then remove what is not needed
 
-#environment
-
-    python -m site
-    #prints list of where python searches for packages
-    #under Ubuntu 12.04 the typical place for things that I installed myself is /usr/local/lib/python2.7/dist-packages
-    #things that came with Ubuntu 12.04 tend to be under /usr/lib/python2.7/dist-packages
-
-    python -c "import django
-    print(django.__path__)"
-    #check where a module is located
-
-    #get environment variables
-    import os
-    print os.environ
-    print os.environ['PATH']
-
-#where python finds modules
+#python module path
 
     echo "$PYTHONPATH"
     #env variable that tells where python searches for modules (python also looks under current dir)
@@ -154,10 +138,24 @@
     #AND if there is a (empty) file named __init__.py in it
     #note that there is no difference between that and importing a function or class from a file
 
+    M=
+    python -c "import django
+print($M.__path__)"
+    #check where a module is located
+
 #import
+
     #a *module* is either:
-        #- file.py
-        #- dir with __init__py in it
+        #a file
+        #dir with ``__init__.py``
+            #__init__.py code is executed when the module is loaded,
+            #just like code in a module is executed when it is loaded
+
+            ### __init__.py ###
+
+            print 'here'
+
+            ###
 
     import a
     a.f()
@@ -174,8 +172,16 @@
     a.Class.f()
     #fine: Class is a member of a, not a module
 
+    #ERROR
+        #import a.Class
+        ##can only import modules, not their attributes
+
     from a import b
     b.f()
+
+    from a import Class
+    Class.f()
+    #fine with from
 
     from a import *
     b.f()
@@ -216,6 +222,11 @@
 
     #arithmetic operators
 
+        >>> a=b=1
+        >>> a
+        1
+        >>> b
+        1
         >>> 2*3
         6
         >>> 1j*1j #complex
@@ -237,6 +248,8 @@
         print a or b
 
     #strings
+        #2 classes: *str* and *unicode*
+        #*basestring* is their common ancestor 
 
         a="asdf"
         b="asdf\tqwer\nzcxz"
@@ -886,15 +899,35 @@
             """formal, very precise and verbose
 
             used in interactive section:
-            >>>A()
+            >>> A()
             """
             return 'class A()'
 
         def __len__(self):
             """
-            >>>len(a)
+            >>> len(a)
             """
             return len(self.a)
+
+        d={}
+
+        def __setitem__(self,k,v):
+            """
+            >>> self[k] = v
+            """
+            d[k]=v
+
+        def __getitem__(self,k):
+            """
+            >>> self[k]
+            """
+            return self.d[k]
+
+        def __contains__(self,v):
+            """
+            >>> v in self
+            """
+            return v in d
 
     a=A()
     >>> print a.__class__.__name__
@@ -953,6 +986,18 @@
             b = func(2)
             print b.a
             print a.a #unaltered
+
+        #type
+            #make classes dynamically
+
+            class C(B):
+                a = 1
+            print C.a
+            
+            #same as
+
+            C = type('C', (B,), dict(a=1))
+            print C.a
 
     #@classmethod and @staticmethod
         class A():
@@ -1205,29 +1250,87 @@
 #decorators
 
     #http://stackoverflow.com/questions/739654/understanding-python-decorators
-    def decorator(func):
 
-        def wrapper(a,*args,**kwargs):
-            print "before"
-            a = a + " modified"
-            func(a,*args,**kwargs)
-            print "after"
+    #creating
 
-        return wrapper
+        def decorator(func):
 
-    @decorator
-    def func1(a,*args,**kwargs):
-        print a
+            def wrapper(a,*args,**kwargs):
+                print "before"
+                a = a + " modified"
+                func(a,*args,**kwargs)
+                print "after"
 
-    func1("inside")
+            return wrapper
 
-    #same as:
+        @decorator
+        def func1(a,*args,**kwargs):
+            print a
 
-    def func0(a):
-        print a
+        func1("inside")
 
-    decorated = decorator(func0)
-    decorated("inside")
+        #same as:
+
+        def func0(a):
+            print a
+
+        decorated = decorator(func0)
+        decorated("inside")
+
+    #builtin
+
+        #property
+        
+            #read only properties
+                class C(object):
+                    @property
+                    def p(self):
+                        return 'val'
+                
+                c = C()
+                print c.p
+                #val
+
+    
+            #read write property
+                class C(object):
+                    def __init__(self):
+                        self._x = None
+
+                    def getx(self):
+                        return self._x
+                    def setx(self, value):
+                        self._x = value
+                    def delx(self):
+                        del self._x
+                    x = property(getx, setx, delx, "I'm the 'x' property.")
+
+                c=C()
+                c.x='0'
+                print c.x
+                del c.x
+                #ERROR
+                    #print c
+
+                #same
+
+                    class C(object):
+                        def __init__(self):
+                            self._x = None
+
+                        @property
+                        def x(self):
+                            """I'm the 'x' property."""
+                            return self._x
+
+                        @x.setter
+                        def x(self, value):
+                            self._x = value
+
+                        @x.deleter
+                        def x(self):
+                            del self._x
+
 
 #file io operations
 
@@ -2133,3 +2236,10 @@
 
     if __name__ == '__main__':
         unittest.main()
+
+#environ
+
+    #get environment variables
+    import os
+    print os.environ
+    print os.environ['PATH']

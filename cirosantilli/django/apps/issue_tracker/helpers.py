@@ -1,5 +1,5 @@
 from settings import THISAPP
-from urls import URLS_THISAPP
+from .urls import URLS_THISAPP
 
 from django.shortcuts import render
 

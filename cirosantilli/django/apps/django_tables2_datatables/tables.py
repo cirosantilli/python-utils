@@ -96,7 +96,7 @@ class MasterCheckBoxColumn(tables.CheckBoxColumn):
 
     def __init__(
                 self,
-                master_group,
+                master_group='select-group',
                 *args,
                 **kwargs
             ):
