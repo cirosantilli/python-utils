@@ -20,6 +20,19 @@ class Issue(models.Model):
         help_text='max length: %d chars'%MAX_URI_LENGTH,
     )
 
+    #TODO make this more powerfull, factor it out on application
+    def get_url():
+        """
+        calculates a url to link from a uri, depending on the content of the uri
+        >>> get_url('http://asdf')
+        'http://asdf'
+        >>> get_url('isbn:asdf')
+        """
+        if uri.startswith('http://'):
+            return uri
+        elif uri.startswith('isbn:'):
+            return uri + 'asdf'
+
     title = models.CharField(
         'title',
         max_length=MAX_TITLE_LENGTH,

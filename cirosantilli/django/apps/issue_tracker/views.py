@@ -49,6 +49,12 @@ def get_issue_table(
             args=[A('pk')],
         )
 
+        #TODO: must hack LinkColumn to accept external links...
+        #uri = dtd_tables.LinkColumn(
+            #url_add_app('detail'),
+            #args=[A('pk')],
+        #)
+
         creator = dtd_tables.LinkColumn(
             'userena_profile_detail',
             args=[A('creator.username')],
@@ -193,7 +199,6 @@ class IssueForm(ModelForm):
             'uri',
             'description',
         )
-
 
 @require_http_methods(["GET","HEAD","POST"])
 @login_required

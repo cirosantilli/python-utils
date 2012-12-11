@@ -1,7 +1,10 @@
+- make a good function that links from uris
+    let user choose that too
+    if empty, guess url
+
 # datatable
 
-- sort only if click *outside* master checkbox
-- make global regex/smart work straighaway
+- make global regex/smart work
 
 ## has workaround:
 
@@ -9,6 +12,9 @@
 
 # django_tables2
 
+- make LinkColumn accept external links
+    1
+    1
 - stop capitalizing headers
 - stop adding class to checkbox
-- create text input element and factor out with checkbox inpute element
+- create text input element and factor out with checkbox input element

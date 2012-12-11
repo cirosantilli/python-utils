@@ -260,8 +260,13 @@ print($M.__path__)"
                 {'v1':"asdf", "#":2} # oh yes
         #format strings: %s recieves strings, %d integegers (decimal), %f floats
 
+        print "abc".startswith("ab")
+        #True
+        print "abc".startswith("bc")
+        #False
+
         print a
-        print b
+        print bc
         print c
 
         a+b
