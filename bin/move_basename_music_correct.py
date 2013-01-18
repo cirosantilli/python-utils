@@ -7,20 +7,22 @@ from cirosantilli import utils
 from cirosantilli.move_argparse import move_argparse
 from cirosantilli import files
 
+track_correct_resub = [re.compile(r"(^| - )(\d+)( - |[._\-]( |)| )"),r"\1\2 - "]
 track_double_digit_resub = [re.compile(r"^(\d) - "),r"0\1 - "]
-track_correct_resub = [re.compile(r"^(\d+)(\. | - | )"),r"\1 - "]
 
+@files.act_noext_only
 @files.act_basename_only
-def remove_track(path):
+def track_correct(path):
     path = utils.resub(track_correct_resub, path)
     path = utils.resub(track_double_digit_resub, path)
-    return bname
+    path = path.replace('_',' ')
+    return path
 
 if __name__ == '__main__':
 
     move_argparse(
-            remove_track,
-            description="corrects many common track formats into my standard r\"\d\d - title.mpr\"",
+            track_correct,
+            description="converts many common track formats into my standard r\"\d\d - title.mpr\"",
             epilog="""EXAMPLES
 
     %(f)s '1. title.mp3' '11 title.mp3'
@@ -35,13 +37,3 @@ if __name__ == '__main__':
     find . -iname '*mp3' | %(f)s
     #act on multiple files
 """)
-
-
-
-
-
-
-
-
-
-

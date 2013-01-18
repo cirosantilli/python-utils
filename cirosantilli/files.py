@@ -1,12 +1,19 @@
 #!/usr/bin/env python
-import os
-import sys
-import stat
-import shutil
 import ctypes
 import logging
+import os
+import re
+import shutil
+import stat
+import sys
 
-from cirosantilli import utils
+from utils import CONTROL_CHARS_STR
+
+#FORBIDDEN_PRINTABLE_BASENAME_CHARS_STR = '|\\?*<":>+[]/'
+MAX_BNAME_LENGTH = 255
+FORBIDDEN_PRINTABLE_BASENAME_CHARS_STR = ur"/:\\|*<>\""
+FORBIDDEN_BASENAME_CHARS = CONTROL_CHARS_STR + FORBIDDEN_PRINTABLE_BASENAME_CHARS_STR
+FORBIDDEN_BASENAME_CHARS_RE = re.compile(ur"[%s]" % re.escape(FORBIDDEN_BASENAME_CHARS), re.UNICODE)
 
 MBYTE = float(2**20)
 def size_mb_str(path, decimals=2):
@@ -327,7 +334,7 @@ def move(paths, rename_func, do_move=False, **kwargs):
         logging.error("\n".join(errors))
         logging.error("END ERRORS\n")
 
-def find(root, **kwargs):
+def find(root='./', **kwargs):
     """
     Recurses under the given root, and returns paths that match desired criteria.
 
@@ -575,6 +582,109 @@ def has_hidden_attribute(filepath):
     except (AttributeError, AssertionError):
         result = False
     return result
+
+def strip_basename_forbidden_chars(s):
+    return FORBIDDEN_BASENAME_CHARS_RE.sub(ur"", s)
+
+remove_heading_hyphen_whitespace = [re.compile(ur"^[-\s]+", re.UNICODE),""]
+remove_trailling_dot_whitespace = [re.compile(ur"[\.\s]+$", re.UNICODE),""]
+def nice_basename_stripped(bname):
+    """
+    Creates a nice and portable basename by simply stripping away bad things.
+
+    If stripped things contain important data and you still need the portability,
+    consider TODO
+    """
+    bname = strip_basename_forbidden_chars(bname)
+
+    bname_noext, dotext = os.path.splitext(bname)
+    
+    bname_noext = resub(remove_heading_hyphen_whitespace,bname_noext)
+
+    #bname_noext = resub(remove_trailling_dot_whitespace,bname_noext)
+    bname_noext = remove_trailling_whitespace(bname_noext)
+
+    bname_noext = whitespaces_to_single_space(bname_noext)
+
+    return bname_noext + dotext
+
+class File:
+    """
+    Represents a file or directory.
+    
+    Usefull for testing file functions.
+
+    :param path:
+    :param isfile:
+    :param content:
+    """
+    def __init__(self,attr_vals={}):
+        """
+        :param attr_vals: attribute value dictionnary for this object
+        :type attr_vals: dict
+
+        >>> f = File({'a':1, 'b':2})
+        >>> f.a
+        1
+        >>> f.b
+        2
+        """
+        for k in attr_vals.keys():
+            setattr(self,k,attr_vals[k])
+
+    def __eq__(self,other):
+        """if True, this file can be equal to another file
+        
+        this is only False when an noncalleable, attribute is present in both
+        Files, and is different between them.
+
+        :param other: other File object to compare to
+
+        >>> f = File()
+        >>> f.a = 1
+        >>> f2 = File()
+        >>> f == f2
+        True
+        >>> f2.b = 1
+        >>> f == f2
+        True
+        >>> f2.a = 1
+        >>> f == f2
+        True
+        >>> f2.a = 2
+        >>> f == f2
+        False
+        """
+        for name in dir(self):
+            if not name.startswith('__'):
+                attr = getattr(self,name)
+                if not callable(attr):
+                    if hasattr(other,name):
+                        attro = getattr(other,name)
+                        if attr != attro:
+                            return False
+        return True
+
+    @staticmethod
+    def find(root=u'./', content=False):
+        """
+        finds files and returns a set 
+        """
+        files = set()
+        for f in find(root):
+            isfile = os.path.isfile(f)
+            file = File({
+                'path':os.path.abspath(f),
+                'isfile':isfile,
+            })
+            if content and isfile:
+                try:
+                    with open(f) as fo:
+                        file.content = fo.read()
+                except IOError,e:
+                    logging.error(e)
+            set.add(file)
+            
 
 if __name__ == "__main__":
     import doctest

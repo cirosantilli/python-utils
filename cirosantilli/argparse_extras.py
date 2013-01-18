@@ -65,6 +65,26 @@ def add_act_full_path(
         **custom_kwargs
     )
 
+def add_literal(
+        parser,
+        shortname='-l',
+        longname='--literal',
+        **custom_kwargs
+    ):
+
+    add_single_argument(
+        parser,
+        shortname,
+        longname,
+        default_kwargs =
+        {
+            'action':'store_true',
+            'default':False,
+            'help':"if given, uses literal expression instead of a regex. default: use regex",
+        },
+        **custom_kwargs
+    )
+
 def add_input_full_path(
         parser,
         shortname='-f',

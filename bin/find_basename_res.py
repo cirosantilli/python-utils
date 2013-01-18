@@ -68,24 +68,31 @@ TODO
 
     argparse_extras.add_not_ignorecase(parser)
 
-    parser.add_argument('-m','--min-depth' ,
-            default=0,
-            action='store',
-            type=int,
-            help="min search depth. 1 makes search start from current dir"
-        )
+    parser.add_argument('-m','--min-depth',
+        default=0,
+        action='store',
+        type=int,
+        help="min search depth. 1 makes search start from current dir",
+    )
 
-    parser.add_argument('-M','--max-depth' ,
-            default=float('inf'),
-            action='store',
-            type=int,
-            help="max search depth. 1 limits search to current dir"
-        )
+    parser.add_argument('-M','--max-depth',
+        default=float('inf'),
+        action='store',
+        type=int,
+        help="max search depth. 1 limits search to current dir",
+    )
 
-    parser.add_argument('-n','--negated' ,
+    parser.add_argument('-n','--negated',
         default=[],
         action='append',
-        help="if the following regex matches, exclude from output")
+        help="if the following regex matches, exclude from output",
+    )
+
+    parser.add_argument('-t','--type',
+        default='a',
+        choices='adf',
+        help="type of files to select. a: all, d: dirs only, f: files only",
+    )
 
     argparse_extras.add_null_separated_output(parser)
 
@@ -93,7 +100,8 @@ TODO
 
     parser.add_argument('find', 
         nargs='*',
-        help="regexes to use to filter, prints output iff given strings match all regexes")
+        help="regexes to use to filter, prints output iff given strings match all regexes"
+    )
 
 
     args = parser.parse_args()
@@ -115,6 +123,13 @@ TODO
     else:
         output_separator = u"\n"
 
+    select_files = True
+    select_dirs = True
+    if args.type == 'f':
+        select_dirs = False
+    elif args.type == 'd':
+        select_files = False
+
     encoding = 'utf-8' #TODO make encoding option
 
     #act
@@ -125,61 +140,54 @@ TODO
                 max_depth=max_depth,
             ):
 
-        #initialize
-        head, bname = os.path.split(path)
-        accept=True
-        color_spans = [] #start end pairs span pairs to color in between
+        isfile = os.path.isfile(path)
+        if ( isfile and select_files ) or ( not isfile and select_dirs ):
 
-        #find those that match
-        for reg in res:
-            if stdout_isatty: #must find all matches to color them later
-                matches = list(reg.finditer(bname))
-                if matches:
-                    color_spans.extend(m.span() for m in matches)
-                else:
-                    accept = False
-                    break
-            else: #pipe: no coloring, so only find one match
-                if not reg.search(bname):
-                    accept = False
-                    break
+            #initialize
+            head, bname = os.path.split(path)
+            accept=True
+            color_spans = [] #start end pairs span pairs to color in between
 
-        #don't take if a negation matches
-        if accept:
-            for reg in negated_res:
-                if reg.search(bname):
-                    accept = False
-                    break
+            #find those that match
+            for reg in res:
+                if stdout_isatty: #must find all matches to color them later
+                    matches = list(reg.finditer(bname))
+                    if matches:
+                        color_spans.extend(m.span() for m in matches)
+                    else:
+                        accept = False
+                        break
+                else: #pipe: no coloring, so only find one match
+                    if not reg.search(bname):
+                        accept = False
+                        break
 
-        #print
-        if accept:
-            sys.stdout.write( head + os.path.sep )
-            if stdout_isatty: #color
-                for i,c in itertools.izip(itertools.count(),bname): 
-                    printed = False
-                    for color_span in color_spans:
-                        if i >= color_span[0] and i < color_span[1]:
-                            termcolor.cprint(
-                                c,
-                                'red',
-                                'on_blue',
-                                attrs=['bold'],
-                                end=''
-                            )
-                            printed = True
-                            break;
-                    if not printed:
-                        sys.stdout.write( c.encode(encoding) )
-            else: #don't color: may break grep, etc, since terminal color means extra control chars
-                sys.stdout.write( bname.encode(encoding) )
-            sys.stdout.write( output_separator )
+            #don't take if a negation matches
+            if accept:
+                for reg in negated_res:
+                    if reg.search(bname):
+                        accept = False
+                        break
 
-
-
-
-
-
-
-
-
-
+            #print
+            if accept:
+                sys.stdout.write( (head + os.path.sep).encode(encoding) )
+                if stdout_isatty: #color
+                    for i,c in itertools.izip(itertools.count(),bname): 
+                        printed = False
+                        for color_span in color_spans:
+                            if i >= color_span[0] and i < color_span[1]:
+                                termcolor.cprint(
+                                    c,
+                                    'red',
+                                    'on_blue',
+                                    attrs=['bold'],
+                                    end=''
+                                )
+                                printed = True
+                                break;
+                        if not printed:
+                            sys.stdout.write( c.encode(encoding) )
+                else: #don't color: may break grep, etc, since terminal color means extra control chars
+                    sys.stdout.write( bname.encode(encoding) )
+                sys.stdout.write( output_separator )

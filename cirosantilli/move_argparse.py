@@ -92,9 +92,9 @@ def move_argparse(rename_func, **kwargs):
         - add kwarg that adds both ext only and bname only
     """
 
-    add_act_noext_only = kwargs.pop("add_act_noext_only", False)
-    add_act_full_path = kwargs.pop("add_act_full_path", False)
-    add_input_full_path = kwargs.pop("add_input_full_path", False)
+    add_act_noext_only = kwargs.pop("add_act_noext_only", None)
+    add_act_full_path = kwargs.pop("add_act_full_path", None)
+    add_input_full_path = kwargs.pop("add_input_full_path", None)
 
     encoding = kwargs.pop("encoding", 'UTF-8')
     func_arg_adders = kwargs.pop("func_arg_adders", [])

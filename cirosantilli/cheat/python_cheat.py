@@ -239,6 +239,12 @@ print($M.__path__)"
         2
         >>> 2**3 #pow
         8
+        >>> 9//2 #floor division
+        4
+        >>> 1.1//1 #floor
+        1.0
+        >>> (1.1+1)//1 #floor
+        1.0
 
     #boolean operator
         a=True
@@ -251,46 +257,62 @@ print($M.__path__)"
         #2 classes: *str* and *unicode*
         #*basestring* is their common ancestor 
 
-        a="asdf"
-        b="asdf\tqwer\nzcxz"
-        #special chars
+        #create
 
-        print "asdf %s qwer %d zxcv %f" % ("fdsa",1,1.1)
-        print "%(v1)s\n%(#)03d\n%(v1)s\n%(#)03d\n" % \
-                {'v1':"asdf", "#":2} # oh yes
-        #format strings: %s recieves strings, %d integegers (decimal), %f floats
+            "asdf"
+            "asdf\tqwer\nzcxz"
+            #special chars
 
-        print "abc".startswith("ab")
-        #True
-        print "abc".startswith("bc")
-        #False
+            "%s %d %f" % ("fdsa",1,1.1)
+            "%(v1)s %(#)03d %(v1)s %(#)03d" % \
+                    {'v1':"asdf", "#":2} # oh yes
+            #format strings: %s recieves strings, %d integegers (decimal), %f floats
 
-        print a
-        print bc
-        print c
+            "ab"+"cd"
+            #abcd
+            "a"*4
+            #aaaa
 
-        a+b
-        a * 20
+            #replace
 
-        int("1234")
-        float("12.34e56")
+                "aabbcc".replace("bb","0")
+                #"aa0cc"
 
-        print "0ba1aba2".split("ab")
-        #['0','1','2']
+                "aabbcc".replace("b","0",1) #1 replace max
+                #"aa0bcc"
 
-        string.whitespace
-        print "0 1\t \n2".split()
-        #['0','1','2'] #splits at whitespaces
+            "0ba1aba2".split("ab")
+            #['0','1','2']
 
-        print "0\n1\r2\r\n3".splitlines()
-        #['0','1','2','3']
+            string.whitespace
+            "0 1\t \n2".split()
+            #['0','1','2'] #splits at whitespaces
 
-        "0a1cba2".strip("abc")
-        #"012"
+            "0\n1\r2\r\n3".splitlines()
+            #['0','1','2','3']
 
-        "0 1\t \n2".strip()
-        #"012"
-        #at whitespace
+            "0a1cba2".strip("abc")
+            #"012"
+
+            "0 1\t \n2".strip()
+            #"012"
+            #at whitespace
+
+        #query
+
+            "abc".startswith("ab")
+            #True
+            "abc".startswith("bc")
+            #False
+
+        #types
+
+            int("1234")
+            float("12.34e56")
+
+            #char to int
+                ord('a')
+                #97
 
     #unicode
         # -*- coding: utf-8 -*-
@@ -360,8 +382,8 @@ print($M.__path__)"
             #default value
                 l[i] if len(l) > i else default
 
-
         #modify
+
             l=range(2)
             l[0] = 10
             l
@@ -433,6 +455,42 @@ print($M.__path__)"
         #remove dupes
             print list(set([1,2,1]))
             #[1,2]
+
+    #set
+
+        #list without order of unique elements
+
+        #len(s) 	  	cardinality of set s
+        #x in s 	  	test x for membership in s
+        #x not in s 	  	test x for non-membership in s
+        #s.issubset(t) 	s <= t 	test whether every element in s is in t
+        #s.issuperset(t) 	s >= t 	test whether every element in t is in s
+        #s.union(t) 	s | t 	new set with elements from both s and t
+        #s.intersection(t) 	s & t 	new set with elements common to s and t
+        #s.difference(t) 	s - t 	new set with elements in s but not in t
+        #s.symmetric_difference(t) 	s ^ t 	new set with elements in either s or t but not both
+        #s.copy() 	  	new set with a shallow copy of s 
+        #s.update(t) 	s |= t 	return set s with elements added from t
+        #s.intersection_update(t) 	s &= t 	return set s keeping only elements also found in t
+        #s.difference_update(t) 	s -= t 	return set s after removing elements found in t
+        #s.symmetric_difference_update(t) 	s ^= t 	return set s with elements from s or t but not both
+        #s.add(x) 	  	add element x to set s
+        #s.remove(x) 	  	remove x from set s; raises KeyError if not present
+        #s.discard(x) 	  	removes x from set s if present
+        #s.pop() 	  	remove and return an arbitrary element from s; raises KeyError if empty
+        #s.clear() 	  	remove all elements from set s
+
+        set([1,2])
+        #set([1, 2])
+
+        set([1,2]).add(3)
+        #set([1, 2, 3])
+
+        set([1,2]).add(2)
+        #set([1, 2])
+
+        set([1,2]).remove(2)
+        #set([1])
 
     #tuple
         t=(1,2,3)
@@ -1022,8 +1080,39 @@ print($M.__path__)"
         a.c(2)
         A.c(3)
         a.s(4)
+        A.s(5)
+
+    #reflection
+
+        #you can get info about objects easily
+
+        class C:
+            """doc"""
+
+            def __init__(self,name):
+                """initdoc"""
+                self.name = name
+
+            def print_attrs(self):
+                """print_attrs_doc"""
+                for name in dir(self):
+                    attr = getattr(self,name)
+                    if not callable(attr):
+                        print name,':',attr
+
+
+            def print_method_docs(self):
+                """print_method_docs.doc"""
+                for name in dir(self):
+                    attr = getattr(self,name)
+                    if callable(attr):
+                        print name,':',attr.__doc__
+
+        c = C('the my object')
+        c.print_all()
 
 #exceptions
+
     #depends on: classes
 
     #they go up until somthing catches them
@@ -1041,9 +1130,9 @@ print($M.__path__)"
     #if nothing catches them, they explode on stdX and stop program excecution!
         #pretty drastic no?
         #what is printed:
-            #1) traceback: where the exception came from (modules, functions, lines)
-                #this is userful for debug, so you can find where the problem comes from
-            #2) <Exception class>: <exception.__repr__>
+        #1) traceback: where the exception came from (modules, functions, lines)
+            #this is userful for debug, so you can find where the problem comes from
+        #2) <Exception class>: <exception.__repr__>
         raise Exception("repr")
         print "cant reach here"
 
@@ -1139,10 +1228,11 @@ print($M.__path__)"
             print instance.parameter
 
 #iterators
+
     #are more memory effiicent for iterations than lists
         #no need to store the entire sequence!
         #but you must calculate each new item, so more time expensive if
-            #you are going to use it more than once
+        #you are going to use it more than once
         #classic space/time tradeoff
 
     #create
@@ -1337,7 +1427,7 @@ print($M.__path__)"
                             del self._x
 
 
-#file io operations
+#file io
 
     #EOF
     #piped EOF comes when pipe closes (end of echo for exapmle)
@@ -1350,7 +1440,7 @@ print($M.__path__)"
 
     #open and close
         try:
-            with open("x.txt") as f:
+            with open("a.txt") as f:
                 #the close is guaranteed by with
                 data = f.read()
         except IOError,e:
@@ -1379,6 +1469,48 @@ print($M.__path__)"
 
     #close!
         f.close()
+
+#stdin err out
+
+    #check if stdin has a pipe comming in or if its the user who is typing
+
+        #test.py
+        if sys.stdin.isatty():
+            print True
+        else:
+            print False
+        in = sys.stdin.read()
+        print in
+
+        echo asdf | test.py
+        #prints False (is a pipe, not a terminal) and asdf (read from sdtin)
+
+        test.py
+        #prints True is a user input terminal (no pipes) and waits for user input
+        #after ^D, prints what was input by keyboard.
+
+    s = unicode(sys.argv[1],'utf-8')
+    #reads stdin as if it were utf-8, which should be the case for any sany stdin input
+
+    s = unicode(sys.argv[1],sys.stdin.encoding)
+    #autodetects the encoding of the stdin
+    #does not work for pipes, since they don't have a default encoding like a terminal!
+    #do this *EVERYTIME* you take command line arguments which *MIGHT* in some case be unicode!!
+    #  meaning: whenever the command line args are not programming switches: filenames, natural language, etc.
+
+#stdout and err
+
+    if sys.stdout.isatty():
+        print "terminal"
+    else:
+        print "pipe"
+
+
+    from __future__ import print_function
+    print(*objects, sep=' ', end='\n', file=sys.stdout)
+    #this is normally hidden by the print "statement"
+        #in python 3.x will be a regular function and not reserved anymore
+
 
 #with TODO
     #http://preshing.com/20110920/the-python-with-statement-by-example
@@ -1419,47 +1551,6 @@ print($M.__path__)"
 
     return_code = process.poll() #does not wait for process to end, None if process not yet terminated
     return_code = process.wait() #waits for process to end
-
-#stdin
-
-    #check if stdin has a pipe comming in or if its the user who is typing
-
-        #test.py
-        if sys.stdin.isatty():
-            print True
-        else:
-            print False
-        in = sys.stdin.read()
-        print in
-
-        echo asdf | test.py
-        #prints False (is a pipe, not a terminal) and asdf (read from sdtin)
-
-        test.py
-        #prints True is a user input terminal (no pipes) and waits for user input
-        #after ^D, prints what was input by keyboard.
-
-    s = unicode(sys.argv[1],'utf-8')
-    #reads stdin as if it were utf-8, which should be the case for any sany stdin input
-
-    s = unicode(sys.argv[1],sys.stdin.encoding)
-    #autodetects the encoding of the stdin
-    #does not work for pipes, since they don't have a default encoding like a terminal!
-    #do this *EVERYTIME* you take command line arguments which *MIGHT* in some case be unicode!!
-    #  meaning: whenever the command line args are not programming switches: filenames, natural language, etc.
-
-#stdout and err
-
-    if sys.stdout.isatty():
-        print "terminal"
-    else:
-        print "pipe"
-
-
-    from __future__ import print_function
-    print(*objects, sep=' ', end='\n', file=sys.stdout)
-    #this is normally hidden by the print "statement"
-        #in python 3.x will be a regular function and not reserved anymore
 
 #time
 
@@ -1997,6 +2088,56 @@ print($M.__path__)"
             """
             return 0
 
+#unittest
+    #http://docs.python.org/2/library/unittest.html
+    #http://www.diveintopython.net/unit_testing/index.html
+
+    import unittest 
+
+    import files
+
+    class test(unittest.TestCase):
+
+        def setUp(self):
+
+        def test(self):
+            self.assertEqual(,)
+            #assertEqual(a, b) 	a == b 	 
+            #assertNotEqual(a, b) 	a != b 	 
+            #assertTrue(x) 	bool(x) is True 	 
+            #assertFalse(x) 	bool(x) is False 	 
+            #assertIs(a, b) 	a is b 	2.7
+            #assertIsNot(a, b) 	a is not b 	2.7
+            #assertIsNone(x) 	x is None 	2.7
+            #assertIsNotNone(x) 	x is not None 	2.7
+            #assertIn(a, b) 	a in b 	2.7
+            #assertNotIn(a, b) 	a not in b 	2.7
+            #assertIsInstance(a, b) 	isinstance(a, b) 	2.7
+            #assertNotIsInstance(a, b) 	not isinstance(a, b) 	2.7
+            #assertAlmostEqual(a, b) 	round(a-b, 7) == 0 	 
+            #assertNotAlmostEqual(a, b) 	round(a-b, 7) != 0 	 
+            #assertGreater(a, b) 	a > b 	2.7
+            #assertGreaterEqual(a, b) 	a >= b 	2.7
+            #assertLess(a, b) 	a < b 	2.7
+            #assertLessEqual(a, b) 	a <= b 	2.7
+            #assertRegexpMatches(s, re) 	regex.search(s) 	2.7
+            #assertNotRegexpMatches(s, re) 	not regex.search(s) 	2.7
+            #assertItemsEqual(a, b) 	sorted(a) == sorted(b) and works with unhashable objs 	2.7
+            #assertDictContainsSubset(a, b)
+            #assertMultiLineEqual(a, b) 	strings 	2.7
+            #assertSequenceEqual(a, b) 	sequences 	2.7
+            #assertListEqual(a, b) 	lists 	2.7
+            #assertTupleEqual(a, b) 	tuples 	2.7
+            #assertSetEqual(a, b) 	sets or frozensets 	2.7
+            #assertDictEqual(a, b) 	dicts 	2.7
+            #assertRaises(exc, fun, *args, **kwds) 	fun(*args, **kwds) raises exc 	 
+            #assertRaisesRegexp(exc, re, fun, *args, **kwds) 	fun(*args, **kwds) raises exc and the message matches re 	2.7
+
+        def tearDown(self):
+
+    if __name__ == '__main__':
+        unittest.main()
+
 #doctest
     #use as quick and dirty testing for simpler functions
     #cannot replace really unit tests, specially for more complex functions
@@ -2192,59 +2333,31 @@ print($M.__path__)"
             file=sys.stderr,
         )
 
-#unittest
-    #http://docs.python.org/2/library/unittest.html
-    #http://www.diveintopython.net/unit_testing/index.html
-
-    import unittest 
-
-    import files
-
-    class test(unittest.TestCase):
-
-        def setUp(self):
-
-        def test(self):
-            self.assertEqual(,)
-            #assertEqual(a, b) 	a == b 	 
-            #assertNotEqual(a, b) 	a != b 	 
-            #assertTrue(x) 	bool(x) is True 	 
-            #assertFalse(x) 	bool(x) is False 	 
-            #assertIs(a, b) 	a is b 	2.7
-            #assertIsNot(a, b) 	a is not b 	2.7
-            #assertIsNone(x) 	x is None 	2.7
-            #assertIsNotNone(x) 	x is not None 	2.7
-            #assertIn(a, b) 	a in b 	2.7
-            #assertNotIn(a, b) 	a not in b 	2.7
-            #assertIsInstance(a, b) 	isinstance(a, b) 	2.7
-            #assertNotIsInstance(a, b) 	not isinstance(a, b) 	2.7
-            #assertAlmostEqual(a, b) 	round(a-b, 7) == 0 	 
-            #assertNotAlmostEqual(a, b) 	round(a-b, 7) != 0 	 
-            #assertGreater(a, b) 	a > b 	2.7
-            #assertGreaterEqual(a, b) 	a >= b 	2.7
-            #assertLess(a, b) 	a < b 	2.7
-            #assertLessEqual(a, b) 	a <= b 	2.7
-            #assertRegexpMatches(s, re) 	regex.search(s) 	2.7
-            #assertNotRegexpMatches(s, re) 	not regex.search(s) 	2.7
-            #assertItemsEqual(a, b) 	sorted(a) == sorted(b) and works with unhashable objs 	2.7
-            #assertDictContainsSubset(a, b)
-            #assertMultiLineEqual(a, b) 	strings 	2.7
-            #assertSequenceEqual(a, b) 	sequences 	2.7
-            #assertListEqual(a, b) 	lists 	2.7
-            #assertTupleEqual(a, b) 	tuples 	2.7
-            #assertSetEqual(a, b) 	sets or frozensets 	2.7
-            #assertDictEqual(a, b) 	dicts 	2.7
-            #assertRaises(exc, fun, *args, **kwds) 	fun(*args, **kwds) raises exc 	 
-            #assertRaisesRegexp(exc, re, fun, *args, **kwds) 	fun(*args, **kwds) raises exc and the message matches re 	2.7
-
-        def tearDown(self):
-
-    if __name__ == '__main__':
-        unittest.main()
-
 #environ
 
     #get environment variables
     import os
     print os.environ
     print os.environ['PATH']
+
+#fileinput
+    #read line by line from
+        #1) files with filenames in stdin[1:], one by one
+        #2) stdin
+    #if stdin is a tty, waits for input
+
+    ### test.py ###
+
+    import fileinput
+
+    for line in fileinput.input():
+        print line
+
+    ###
+
+    $test.py a.txt b.txt
+
+    $cat a.txt b.txt | test.py
+
+    $cat b.txt | test.py a.txt
+    #only a.txt is used

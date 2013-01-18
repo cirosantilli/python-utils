@@ -139,13 +139,8 @@ EXAMPLES
 
     #choices
         #select from a set
-        parser.add_argument('foo', choices='abc') #a, b or c only
-        parser.add_argument('foo', type=complex, choices=[1, 1j])
-        parser.add_argument(
-            '-a', 
-            nargs=1,
-            choices='abc'
-        )
+        parser.add_argument('a', choices='abc') #a, b or c only
+        parser.add_argument('a', type=complex, choices=[1, 1j]) #1 or 1j only
 
     args = parser.parse_args()
     a = args.a
