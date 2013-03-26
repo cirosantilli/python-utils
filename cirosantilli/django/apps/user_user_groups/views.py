@@ -503,7 +503,6 @@ def copy_selected(request, owner_username):
 
     groups = [ get_object_or_404(UserGroup, owner=owner, id2=id2)
             for id2 in request.POST.getlist('id2') ] 
-    print request.POST.getlist('id2')
 
     for old_group in groups:
         new_group = UserGroup.objects.create(

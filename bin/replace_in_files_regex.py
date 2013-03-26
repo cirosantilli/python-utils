@@ -9,8 +9,10 @@ import os.path
 from cirosantilli import files
 
 def _chomp(s):
-    if s:
+    if s and s[-1] == '\n':
         return s[:-1]
+    else:
+        return s
 
 if __name__ == '__main__':
 
@@ -20,24 +22,22 @@ if __name__ == '__main__':
         description="Replaces in multiple files linewise with python regexes.",
         epilog=r"""Shows only modified lines and files on stderr.
 
-SUMMARY
-
-   directories are ignored 
-
 EXAMPLES
 
-  find . -type f | %s -i 'find(\d)' 'replace\1'
-  #finds and replaces using python re.sub(), case insensitive
-  #see: http://docs.python.org/dev/library/re.html#re.sub
-  #prints modified lines to stderr
-  #this is a dry-run: files are not modified, only changes are shown
+  #finds and replaces using python re.sub():
 
-  find . -type f | %s -iD 'find(\d)' 'replace\1'
-  #D means *not* dry run. files are modified
+    find . -type f | %s 'find(\d)' 'replace\1'
+
+  #dry run only. No change is made to files
+  #prints only modified lines.
+  #for explanation of regexex see: <http://docs.python.org/dev/library/re.html#re.sub>
+
+  #-D means *not* dry run. files are modified:
+
+    find . -type f | %s -iD 'find(\d)' 'replace\1'
 """ % (f, f),
         formatter_class=RawTextHelpFormatter,
         )
-
 
     dotall_longname = '--dotall'
     multiline_longname = '--multiline'
@@ -116,7 +116,6 @@ EXAMPLES
             stdin_paths = paths_str.split(path_separator) #splits at null
             stdin_paths = filter(lambda p: p, stdin_paths) #removes empty paths (after last \n of \0)
             paths.extend(stdin_paths)
-    paths.sort()
 
     find = args.find
     replace = args.replace
@@ -134,7 +133,8 @@ EXAMPLES
 
                 #multiline
                 if multiline_mode:
-                    old = f.read(path)
+                    old = f.read()
+                    #print replace
                     old = _chomp(old)
                     new = p.sub(replace, old)
                     if old != new:

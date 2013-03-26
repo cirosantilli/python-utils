@@ -124,12 +124,13 @@ def index_all(request):
         filter_usernames.extend( user_in_group.user.username for user_in_group in users_in_group )
 
     user_list_table = user_user_groups.views.get_user_list_table(
-        UserGroup.objects.filter(owner=request.user).order_by(ORDER_BY),
+        UserGroup.objects.filter(owner=request.user.pk).order_by(ORDER_BY),
         has_owner=False,
         has_selection=True,
         form=FILTER_SERVER_FORM_ID,
         id='user-lists-table',
-        selection_args={
+        selection_args =
+        {
             'name':FILTER_USER_LIST_NAME,
             'accessor':'pk',
             'selected_values':filter_user_lists_pk,
@@ -145,7 +146,7 @@ def index_all(request):
         filter_uris.extend( uri_in_group.uri for uri_in_group in uris_in_group )
         
     uri_list_table = user_list_uri.views.get_list_table(
-        List.objects.filter(owner=request.user).order_by(ORDER_BY),
+        List.objects.filter(owner=request.user.pk).order_by(ORDER_BY),
         has_owner=False,
         has_selection=True,
         form=FILTER_SERVER_FORM_ID,

@@ -1,9 +1,11 @@
 from django.conf.urls import patterns, url
 from django.views.generic import DetailView, ListView
-from django.views.generic.simple import direct_to_template
+from django.views.generic import TemplateView
 
 import polls.views
 from polls.models import Poll
+
+#urlpatterns takes a list of tuples
 
 urlpatterns = patterns('polls.views',
 

@@ -53,11 +53,11 @@ APPEND_SLASH=True
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'elearn_django',                      # Or path to database file if using sqlite3.
-        'USER': 'root',                      # Not used with sqlite3.
-        'PASSWORD': 'thISaCHpa',                  # Not used with sqlite3.
-        'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
-        'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
+        'NAME': 'elearn_django',              # Or path to database file if using sqlite3.
+        'USER': 'test',                       # Not used with sqlite3.
+        'PASSWORD': 'asdf',                   # Not used with sqlite3.
+        'HOST': '',                           # Set to empty string for localhost. Not used with sqlite3.
+        'PORT': '',                           # Set to empty string for default. Not used with sqlite3.
     }
 }
 
@@ -146,6 +146,7 @@ MIDDLEWARE_CLASSES = (
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
+#which urls.py file to use for entire site
 ROOT_URLCONF = 'elearn.urls'
 
 # Make this unique, and don't share it with anybody.
@@ -157,14 +158,16 @@ SITE_ID = 1
 
 #static files are stuff like css and images
 #for deployement, set STATIC_ROOT and do : ./manage.py collectstatic
-# Absolute path to the directory static files should be collected to.
-# Don't put anything in this directory yourself; store your static files
-# in apps' "static/" subdirectories and in STATICFILES_DIRS.
-# Example: "/home/media/media.lawrence.com/static/"
-STATIC_ROOT = '/var/www/static'
+#this will put all the static files collected (including from apps)
+#into the that static root
+STATIC_ROOT = '/var/www/root/django/elearn/static'
 
-#STATIC_URL = "http://media.lawrence.com/static/"
-STATIC_URL = 'http://localhost/static/'
+#prefix to be used for static files.
+#will be exported to template files by some module included by default.
+#you must set your web server to serve files from STATIC_ROOT at that url location
+STATIC_URL = 'http://localhost/django/elearn/static/'
+
+#in this example, supposing apache has serve root at /var/www/root, it will work
 
 # Additional locations of static files
 STATICFILES_DIRS = (

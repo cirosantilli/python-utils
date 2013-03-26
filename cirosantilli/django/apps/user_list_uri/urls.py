@@ -3,8 +3,7 @@
 
 from django.conf.urls import patterns, url
 from django.views.generic import DetailView, ListView
-from django.views.generic.create_update import create_object 
-from django.views.generic.simple import direct_to_template
+from django.views.generic import TemplateView
 
 from settings import THISAPP
 

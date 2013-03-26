@@ -4,6 +4,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django import forms
 from django.utils.translation import ugettext_lazy as _
+from django.utils.timezone import now
 
 MAX_TITLE_LENGTH = 255
 MAX_DESCRIPTION_LENGTH = 2**16-1 #max mysql BLOB TEXT 8kb = 65k
@@ -48,7 +49,7 @@ class Issue(models.Model):
 
     creation_date = models.DateTimeField(
         'created',
-        default=lambda:datetime.now(),
+        default=lambda:now(),
     )
 
     def __unicode__(self):

@@ -27,7 +27,7 @@ def create_test_user_groups(
                 #group.group_set.add(user_in_group)
 
     sys.stderr.write(
-        "created %d groups per user with %d users per group"
+        "created %d groups per user with %d users per group\n"
         % (groups_per_user, users_per_group)
     )
 

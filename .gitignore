@@ -37,4 +37,5 @@ nosetests.xml
 migrations
 *.todo
 
-
+#dirs which contain tests or outside documentations
+_gitignore

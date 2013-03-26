@@ -11,6 +11,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django import forms
 from django.utils.translation import ugettext_lazy as _
+from django.utils.timezone import now
 
 MAX_ID2_LENGTH = 255
 MAX_DESCRIPTION_LENGTH = 2**16-1 #max mysql BLOB TEXT 8kb = 65k
@@ -41,7 +42,7 @@ class List(models.Model):
 
     creation_date = models.DateTimeField(
         'created',
-        default=lambda:datetime.now(),
+        default=lambda:now(),
     )
 
     description = models.TextField(
@@ -68,7 +69,7 @@ class Item(models.Model):
 
     date_added = models.DateTimeField(
         'added',
-        default=lambda:datetime.now(),
+        default=lambda:now(),
     )
 
     uri = models.CharField(

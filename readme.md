@@ -1,13 +1,10 @@
-My simple python scripts.
+My simple python scripts and cheats.
 
-I may have more python code in other repos, which are organized in a more project wise manner.
+Larger projects may be put into a repo of their own.
 
-There is lots of crap here since at least half of this repo is a sandbox.
-For scripts which I think may be worth your while, please check the [Featured][] section.
+A lot of stuff in this repo is a sandbox, so don't count on its quality blindly.
 
-Since I don't expect others to install all the scrips in this folder,
-I will try to give installation procedures on a file-by-file basis for scrips that have dependencies,
-instead of a setup.py file.
+I have listed stuff that may be worth your while in the [Featured][] section.
 
 # featured
 

@@ -71,7 +71,7 @@ def create_test_uri_lists(
             uris_per_uri_list = (uris_per_uri_list+1) % max_uris_per_uri_list
 
     sys.stderr.write(
-        "created %d uri lists per user with %d uris per list"
+        "created %d uri lists per user with %d uris per list\n"
         % (uri_lists_per_user, uris_per_uri_list)
     )
 

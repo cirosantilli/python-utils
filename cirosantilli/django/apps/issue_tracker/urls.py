@@ -1,7 +1,5 @@
 from django.conf.urls import patterns, url
 from django.views.generic import DetailView, ListView
-from django.views.generic.create_update import create_object 
-from django.views.generic.simple import direct_to_template
 
 from settings import THISAPP
 
@@ -21,5 +19,3 @@ URLS_THISAPP = { u[0]:THISAPP+'_'+u[0] for u in urls }
 urlpatterns = patterns(THISAPP+'.views',
    *[  url(u[1],u[0],name=URLS_THISAPP[u[0]]) for u in urls ]
 )
-
-print URLS_THISAPP

@@ -44,7 +44,7 @@ def create_test_issues(
             urin = (urin+1)%len(uris)
 
     sys.stderr.write(
-        "created %d issues per user" % (issues_per_user)
+        "created %d issues per user\n" % (issues_per_user)
     )
 
 def delete_all_issues():

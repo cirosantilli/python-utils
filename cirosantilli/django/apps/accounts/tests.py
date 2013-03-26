@@ -31,7 +31,7 @@ def create_test_users(nusers, *args, **options):
         for user in users:
             Profile.objects.create(user=user)
 
-        sys.stderr.write("created one superuser and %d regular users" % (nusers))
+        sys.stderr.write("created one superuser and %d regular users\n" % (nusers))
 
 def delete_all_users():
     for user in User.objects.all():
