@@ -134,6 +134,8 @@
 
                 sudo aptitude install -y libapache2-mod-wsgi
 
+            #exceptions are now logged to the server log file
+
 ##modules
 
     #env variable that tells where python searches for modules (python also looks under current dir)
