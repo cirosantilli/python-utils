@@ -1,6 +1,16 @@
 #! /usr/bin/env python
 
+## about
+
+#wsgi python interface for server communication
+
 #standard wsgi server reference implementation
+
+#much like cgi, but python specific
+
+#can have many implementations
+
+#on apache, is commonly implemented with mod_wsgi
 
 ##thanks to
 
@@ -40,7 +50,11 @@ def application(environ, start_response):
 
     return [response_body]
 
-##set server params
+## test
+
+### test server
+
+#### set server params
 
 httpd = make_server(
     'localhost', #hostname
@@ -48,7 +62,7 @@ httpd = make_server(
     application #the function with the given specifications
 )
 
-##run server
+#### run server
 
 #handle single request:
 
@@ -58,11 +72,37 @@ httpd = make_server(
 
 httpd.serve_forever()
 
-##try server out!
+### apache
 
-#firefox localhost:8051
+#use mod_wsgi
 
-#check the PATH_INFO env
-#``firefox localhost:8051/some/path/to/html.html``
+#first install and load mod_wsgi:
+
+#``` {.bash}
+#sudo aptitude install -y libapache2-mod-wsgi
+#```
+
+#exceptions are now logged to the server log file
+
+#put this in you apache.conf:
+
+    #WSGIScriptAlias /the/url /var/www/path/to/wsgi.py
+
+#works just like ``ScriptAlias``
+
+#### optional configurations
+
+#append dir to the *end* of the python search path:
+
+    #WSGIPythonPath /path/to/dir1:/path/to/dir2
+
+## try server out
+
+    #firefox localhost:8051
+
+# with a path:
+
+    #firefox localhost:8051/some/path/to/html.html
+
 #it contains /some/path/to/html.html
 #this allows you to serve what you want for that path.
