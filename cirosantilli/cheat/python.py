@@ -1483,7 +1483,7 @@ vars()
 
 #run string!
 
-exec('a=1')
+exec( 'a = 1' )
 assert a == 1
 
 ##streams
@@ -2084,59 +2084,6 @@ print datetime.datetime.fromtimestamp(0) #get a datetime from a seconds after 19
         #constants. many physical
             #http://docs.scipy.org/doc/scipy/reference/constants.html
 
-    ##matplotlib
-
-        #scientific plotting library
-
-        #sudo apt-get install python-matplotlib
-
-        import matplotlib.pyplot as plt
-
-        #data
-            plt.plot([1,2,3,4])
-            plt.show()
-
-            plt.plot([1,2,3,4], [1,4,9,16])
-            plt.show()
-
-            plt.plot(1,1)
-            plt.plot(2,2)
-            plt.show()
-
-        #format:
-            #-: lines linking points
-            #o: circles, no lines linking points
-            plt.plot([1,2,3,4], [1,4,9,16],format)
-
-        #subplots
-            plt.subplots('411')
-            plt.plot([1,1,1,1])
-            plt.subplots('411')
-            plt.plot([1,1,1,1])
-            plt.subplots('412')
-            plt.plot([2,2,2,2])
-            plt.subplots('421')
-            plt.plot([3,3,3,3])
-            plt.subplots('422')
-            plt.plot([4,4,4,4])
-            plt.show()
-
-            plt.subplots('411')
-            plt.plot([1,1,1,1])
-            plt.subplots('412')
-            plt.plot([2,2,2,2])
-            plt.subplots('413')
-            plt.plot([3,3,3,3])
-            plt.subplots('414')
-            plt.plot([4,4,4,4])
-            plt.show()
-
-        #labels and title
-            plt.xlabel('x')
-            plt.ylabel('y')
-            plt.title('title')
-            plt.plot([1,2,3])
-
     ##random
 
         import random
@@ -2146,118 +2093,6 @@ print datetime.datetime.fromtimestamp(0) #get a datetime from a seconds after 19
 
         for i in random.sample(xrange(2), 2):
             print i;
-
-    #sphinx
-        #generate srt doc for python source
-        #may take docstrings into account
-
-        sudo pip install sphinx
-
-        $sphinx-apidoc -fFo doc "$SRC"
-        #TODO: this is broken still
-        #f: force overwrite
-        #F: full recursive add
-        #o: otput dir
-        
-        #conf.py
-            #extensions are simply modules
-            extensions = [
-                'sphinx.ext.autodoc', #make docs from docstrings
-                'sphinx.ext.pngmath', #render math as png for html display
-                'sphinx.ext.jsmath',  #render math as via js
-                'sphinx.ext.coverage',
-            ]
-
-        #docstrings
-            def func(name, state=None):
-                """short summary
-
-                longer explanation
-                latex math: :math:`\\alpha`.
-                refers to a function: :func:`function1`
-                refers to a class: TODO
-
-                **kwargs vs named args**:
-                    note that in python, there is no difference for the end user
-                    between kwargs and args named on function def: so you document
-                    them in the same way
-
-                :param arg1: the first value
-                :param arg2: the first value
-                :param arg3: the first value
-                :type arg1: int
-                :type arg2: int
-                :type arg3: int
-                :returns: arg1/arg2 +arg3
-                :rtype: int
-                :raises: AttributeError, KeyError
-
-                :example:
-
-                >>> import template
-                >>> a = template.MainClass1()
-                >>> a.function1(1,1,1)
-                2
-
-                .. note:: can be useful to emphasize
-                    important feature
-                .. seealso:: :class:`MainClass2`
-                .. warning:: arg2 must be non-zero.
-                .. todo:: check that arg2 is non zero.This function does something.
-
-                """
-                return 0
-
-##unittest
-
-    #http://docs.python.org/2/library/unittest.html
-    #http://www.diveintopython.net/unit_testing/index.html
-
-    import unittest 
-
-    import files
-
-    class test(unittest.TestCase):
-
-        def setUp(self):
-
-        def test(self):
-            self.assertEqual(,)
-            #assertEqual(a, b) 	a == b 	 
-            #assertNotEqual(a, b) 	a != b 	 
-            #assertTrue(x) 	bool(x) is True 	 
-            #assertFalse(x) 	bool(x) is False 	 
-            #assertIs(a, b) 	a is b 	2.7
-            #assertIsNot(a, b) 	a is not b 	2.7
-            #assertIsNone(x) 	x is None 	2.7
-            #assertIsNotNone(x) 	x is not None 	2.7
-            #assertIn(a, b) 	a in b 	2.7
-            #assertNotIn(a, b) 	a not in b 	2.7
-            #assertIsInstance(a, b) 	isinstance(a, b) 	2.7
-            #assertNotIsInstance(a, b) 	not isinstance(a, b) 	2.7
-            #assertAlmostEqual(a, b) 	round(a-b, 7) == 0 	 
-            #assertNotAlmostEqual(a, b) 	round(a-b, 7) != 0 	 
-            #assertGreater(a, b) 	a > b 	2.7
-            #assertGreaterEqual(a, b) 	a >= b 	2.7
-            #assertLess(a, b) 	a < b 	2.7
-            #assertLessEqual(a, b) 	a <= b 	2.7
-            #assertRegexpMatches(s, re) 	regex.search(s) 	2.7
-            #assertNotRegexpMatches(s, re) 	not regex.search(s) 	2.7
-            #assertItemsEqual(a, b) 	sorted(a) == sorted(b) and works with unhashable objs 	2.7
-            #assertDictContainsSubset(a, b)
-            #assertMultiLineEqual(a, b) 	strings 	2.7
-            #assertSequenceEqual(a, b) 	sequences 	2.7
-            #assertListEqual(a, b) 	lists 	2.7
-            #assertTupleEqual(a, b) 	tuples 	2.7
-            #assertSetEqual(a, b) 	sets or frozensets 	2.7
-            #assertDictEqual(a, b) 	dicts 	2.7
-            #assertRaises(exc, fun, *args, **kwds) 	fun(*args, **kwds) raises exc 	 
-            #assertRaisesRegexp(exc, re, fun, *args, **kwds) 	fun(*args, **kwds) raises exc and the message matches re 	2.7
-
-        def tearDown(self):
-
-    if __name__ == '__main__':
-        unittest.main()
 
 ##os
 

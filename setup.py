@@ -18,10 +18,11 @@ setup(
     description='my simple python scripts and modules',
     long_description=open('readme.md').read(),
     install_requires=[
-        "termcolor >= 1.1.0",
-        "unidecode >= 0.04.9",
+        "Sphynx",
+        "matplotlib",
         "numpydoc",
-        "sphynx",
         "pygments",
+        "termcolor",
+        "unidecode",
     ],
 )

@@ -1,9 +1,11 @@
 *.py[cod]
 
-# C extensions
+#c
+*.o
+*.a
 *.so
 
-# Packages
+#packages
 *.egg
 *.egg-info
 dist
@@ -18,24 +20,28 @@ develop-eggs
 lib
 lib64
 
-# Installer logs
+#install
 pip-log.txt
 
-# Unit test / coverage reports
+#tests
 .coverage
 .tox
 nosetests.xml
 
-# Translations
+#translations
 *.mo
 
-# Mr Developer
+#mr developer
 .mr.developer.cfg
 .project
 .pydevproject
 
-migrations
-*.todo
-
-#dirs which contain tests or outside documentations
 _gitignore
+_out
+
+#sphinx
+_build
+_static
+_templates
+
+*.todo
