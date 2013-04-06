@@ -6,6 +6,8 @@ it is used on the python official documentation
 
 uses reST as base markup language.
 
+the automatic doc finding/generation is not yet very good IMHO.
+
 install:
 
     sudo pip install sphinx

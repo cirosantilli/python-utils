@@ -76,69 +76,101 @@
 
     ##boolean operator
 
-        a = True
-        b = False
-        assert not a   == False
-        assert a and b == False
-        assert a or  b == True
+        assert not True         == False
+        assert True and False   == False
+        assert True or  False   == True
 
     ##strings
 
         #2 classes: *str* and *unicode*
         #*basestring* is their common ancestor 
 
-        ##create
+        ##single vs double quotes
 
-            #no difference between sincle and double quotes:
+            #no difference:
 
-            "abc"
-            'abc'
+            assert "abc" == 'abc'
 
-            #backslash escapes like in c:
+            #except for excaping quotes themselves:
 
-            "asdf\tqwer\nzcxz"
+            assert "'" == '\''
+            assert '"' == "\""
 
-            "%s %d %f" % ("fdsa",1,1.1)
-            "%(v1)s %(#)03d %(v1)s %(#)03d" % \
-                    {'v1':"asdf", "#":2} # oh yes
-            #format strings: %s recieves strings, %d integegers (decimal), %f floats
+        #multiline
+
+            assert """a
+b""" == "a\nb"
+
+            assert '''a
+b''' == 'a\nb'
+
+            def f():
+                assert """a
+b""" == "a\nb"
+
+        ##backslash escapes
+            
+            #like c =)
+
+            print "a\tb\nc"
+
+        ##format strings
+
+            ##list
+            
+                #%s recieves strings, %d integegers (decimal), %f formatted floats:
+
+                assert "a%db"   % ( 1 )     == "a1b"
+                assert "%d %d"  % ( 1, 2 )  == "1 2"
+
+                #- lengh at least 2, left padded with spaces:
+
+                print "%f"      % ( 1.2 )   == " 1.10"
+                assert "%.2f"   % ( 1.2 )   == "1.10"
+                assert "%5.2f"  % ( 1.2 )   == " 1.10"
+
+                assert "%s"     % ( "abc" )     == "abc"
+
+            ##map
+
+                "%(v1)s %(#)03d %(v1)s %(#)03d" % {'v1':"asdf", "#":2}
 
             assert "ab" + "cd" == "abcd"
             assert "ab" * 3 == "ababab"
 
-            ##replace
+        ##replace
 
-                #1 replace max 
+            #1 replace max 
 
-                assert "aabbcc".replace("b","0")   == "aa00cc"
-                assert "aabbcc".replace("bb","0")  == "aa0cc"
-                assert "aabbcc".replace("b","0",1) == "aa0bcc"
+            assert "aabbcc".replace("b","0")   == "aa00cc"
+            assert "aabbcc".replace("bb","0")  == "aa0cc"
+            assert "aabbcc".replace("b","0",1) == "aa0bcc"
 
-            ##split
+        ##split
 
-                assert "0ab1ab2".split("ab") == ['0','1','2']
-                assert "0abab2".split("ab")  == ['0','', '2']
-                
-                #if string not given *splits at ``\s*`` regex*!!:
+            assert "0ab1ab2".split("ab") == ['0','1','2']
+            assert "0abab2".split("ab")  == ['0','', '2']
+            
+            #if string not given *splits at ``\s*`` regex*!!:
 
-                assert "0 1\t \n2".split()                  == ['0','1','2']
-                assert "0 1\t \n2".split(string.whitespace) == ['0','1','2']
+            assert "0 1\t \n2".split()                  == ['0','1','2']
+            assert "0 1\t \n2".split(string.whitespace) == ['0','1','2']
 
-                #very confusing.
+            #very confusing.
 
-                #split at ``[\n\r]+`` regex:
+            #split at ``[\n\r]+`` regex:
 
-                assert "0\n1\r2\r\n3".splitlines()  == ['0','1','2','3']
+            assert "0\n1\r2\r\n3".splitlines()  == ['0','1','2','3']
 
-            ##strip
+        ##strip
 
-                #strip chars:
+            #strip chars:
 
-                assert "0a1cba2".strip("abc") == "012"
+            assert "0a1cba2".strip("abc") == "012"
 
-                #whitespace by default:
+            #whitespace by default:
 
-                assert "0 1\t \n2".strip() == "012"
+            assert "0 1\t \n2".strip() == "012"
 
         ##query
 
@@ -1613,43 +1645,6 @@ assert a == 1
 #http://preshing.com/20110920/the-python-with-statement-by-example
 #http://effbot.org/zone/python-with-statement.htm
 
-##subprocess
-
-#http://www.doughellmann.com/PyMOTW/subprocess/
-#http://stackoverflow.com/questions/377017/test-if-executable-exists-in-python
-
-### test1.py ###
-import sys
-input = sys.stdin.read() 
-sys.stdout.write('message to stdout:%s\n'%input)
-sys.stderr.write('message to stderr:%s\n'%input)
-
-### subprocess_test.py ###
-import subprocess
-commands = [
-    'python',
-    'test1.py'
-]
-try:
-    process = subprocess.Popen(
-        commands,
-        shell=False,
-        stdin=subprocess.PIPE,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE
-    )
-except OSError: #gets here if command not found
-    sys.stderr.write(' '.join(commands) + '\nfailed. are all dependencies installed?'
-
-stdout, stderr = process.communicate("this is the stdin")
-#get stdout and stderr after giving stdin, must use stdin/err=process.PIPE
-# if you don't collect them by setting stdin/out=subprocess.PIPE,
-# they go to the usual stdout and stderr,
-# and therefore appear on the console or shell
-
-return_code = process.poll() #does not wait for process to end, None if process not yet terminated
-return_code = process.wait() #waits for process to end
-
 ##time
 
 #seconds after 1970
@@ -2116,7 +2111,7 @@ os.removedirs('/a/b/c')
 
 import os.path
 
-##getcwd
+###getcwd
 
 #get current working dir (each process has a cwd)
 
@@ -2124,7 +2119,7 @@ os.getcwd()
 
 #this is the same as the ``pwd`` of the bash that called the python interpreter.
 
-##os.path
+###os.path
 
 os.path.join('a//','/b')
 
@@ -2303,3 +2298,16 @@ print os.environ['PATH']
 #if not defined, set it and return new value
 print os.environ.setdefault['I_AM_PROBABLY_NOT_DEFINED','asdf']
 print os.environ['I_AM_PROBABLY_NOT_DEFINED']
+
+##command line arguments
+
+print sys.argv[0]
+print sys.argv[1:]
+
+##exit code
+
+#if no call is made to sys.exit, exit code is 0.
+
+sys.exit()
+sys.exit(0)
+sys.exit(1)
