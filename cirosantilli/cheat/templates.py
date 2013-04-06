@@ -1,20 +1,12 @@
 #!/usr/bin/env python
 
-#------------------------------------------------------------
-#
-# Ciro D. Santilli 
-#
-# Code snipets that I use often
-#
-#------------------------------------------------------------
+"""
+random templates that may be useful in the future
+"""
 
-if __name__ == '__main__':
-	print 'TEST'
 
 #1 UI user interface
-
 #2 prompt user Yes/No
-
 def prompt_yes_no(prompt=None, resp=False):
     """
     prompts for yes or no response from the user. Returns True for yes and

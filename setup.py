@@ -20,8 +20,10 @@ setup(
     install_requires=[
         "Sphynx",
         "matplotlib",
+        "numpy",
         "numpydoc",
         "pygments",
+        "scipy",
         "termcolor",
         "unidecode",
     ],

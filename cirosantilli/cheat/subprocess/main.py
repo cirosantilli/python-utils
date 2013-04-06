@@ -22,7 +22,9 @@
 
 #if true, is exactly the same as pasting the command on a shell
 
-#never use this, as it is highly system dependant and 
+#never use this beucause:
+#- it is highly system dependant
+#- makes escaping ``insane a la shell''
 
 #as this example illustrates, the PATH variable is still used to find the `python`
 #executable even if we are not in a shell.
@@ -34,14 +36,19 @@
 
 #if you ommit those, they go/come from the default place: the terminal or pipes
 
+###universal_newlines
+
+#if True, converts `os.linsep` to `\n` on stdout and stderr, and `\n` to `os.linesep` on stdin
+
+#default False.
+
+#it is up to the data creator do define if this should be on or off,
+#but almost always this should be on whenever the generator may generate
+#output fit for terminal consuption, and False otherswise.
+
 import subprocess
 
-commands = [
-    'python',
-    'a.py',
-    'arg 1',
-    'arg 2',
-]
+commands = [ 'python', 'a.py', 'arg 1', 'arg 2' ] 
 
 try:
 
@@ -50,19 +57,22 @@ try:
         shell  = False,
         stdin  = subprocess.PIPE,
         stdout = subprocess.PIPE,
-        stderr = subprocess.PIPE
+        stderr = subprocess.PIPE,
+        universal_newlines = True
     )
 
 except OSError:
     #typically gets here if the executable is not found
     sys.stderr.write( ' '.join(commands) + '\nfailed' )
 
-stdout, stderr = process.communicate( "stdin1\nstdin2" )
+stdin = "stdin1\nstdin2"
+stdout, stderr = process.communicate( stdin )
 assert stdout == 'stdout:\nstdin1\nstdin2\n'
 assert stderr == 'stderr:\narg 1\narg 2\n'
 
 #wait for process to end and get exit statut:
-assert process.wait() == 0
+exit_status = process.wait()
+assert exit_status == 0
 
 #does not wait for process to end, None if process not yet terminated:
     #return_code = process.poll()
