@@ -1,21 +1,14 @@
-My simple python scripts and cheats.
+my simple python scripts and cheats.
 
-Larger projects may be put into a repo of their own.
-
-A lot of stuff in this repo is a sandbox, so don't count on its quality blindly.
-
-I have listed stuff that may be worth your while in the [Featured][] section.
-
-# featured
-
-This section showcases scripts which I think might be worth your while.
-
-Is a script is not here, it may be total trash (due lack of tests, or pure noobiness =) )
-
-## bin/python_cheatsheet.py
-
-## bin/find_basename_res.py
-
-simplified ack -g -all with multiple regexes
+larger projects may be put into a repo of their own.
 
 
+# finding good stuff
+
+a lot of stuff in this repo is a sandbox.
+
+to find the better stuff do:
+    
+    grep -r '#!note=9'
+    grep -r '#!note=8'
+    grep -r '#!note=7'
