@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 
-#------------------------------------------------------------
-#
-# Ciro D. Santilli 
-#
-#------------------------------------------------------------
+"""
+parse command line arguments
+
+stdlib
+"""
 
 import argparse
 import os.path
@@ -26,51 +26,69 @@ EXAMPLES
         formatter_class=RawTextHelpFormatter, #keep newlines
     )
 
-    parser.add_argument('a',
+    parser.add_argument(
+        'a',
         help="positional (obligatory) argument because no hyphen before a.",
-        default="")
-    parser.parse_args('1')
+        default=""
+    )
+    args = parser.parse_args('1')
     a = args.a
     #1
 
-    parser.add_argument('0',
+    parser.add_argument(
+        '0',
         help="positional (obligatory) argument because no hyphen before a.",
-        default="")
+        default=""
+    )
     #a = args. #TODO what name?
 
-    parser.add_argument('-a',
+    parser.add_argument(
+        '-a',
         help="optional argument because there is hyphen before a. Takes a single value.",
-        default="")
+        default=""
+    )
     parser.parse_args('--foo 1'.split())
     args.a
     #1
 
-    parser.add_argument('-a', '--a-long',
+    parser.add_argument(
+        '-a',
+        '--a-long',
         help="provides long name. Must destination is 'along', not 'a'.",
-        default="")
+        default=""
+    )
     a = parser.parse_args().a_long
     #hyphens are converted to underscores
 
-    parser.add_argument('-a', '--a-long',
+    parser.add_argument(
+        '-a',
+        '--a-long',
         dest="d",
         help="provides long name. Must destination is 'along', not 'a'.",
-        default="")
+        default=""
+    )
     a = args.d
 
-    parser.add_argument('-a', 
+    parser.add_argument(
+        '-a', 
         action="store_true", 
         default=False, 
-        help='a is False if not present')
+        help='a is False if not present'
+    )
 
-    parser.add_argument('-a', 
+    parser.add_argument(
+        '-a', 
         action="store_false", 
         default=True, 
-        help="a is True if not present")
+        help="a is True if not present"
+    )
 
-    parser.add_argument('-a',
+    parser.add_argument(
+        '-a',
         type=int,
         default=1
-        help="stores an integer value")
+        help="stores an integer value"
+    )
 
     parser.add_argument('-a'
         nargs='*',

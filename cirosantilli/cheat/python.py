@@ -943,7 +943,7 @@ print b.__class__.static
     #a.non_existent = 6
     #must use setattr()
 
-##inheritance
+###inheritance
 
 class B(A):
     def __init__(
@@ -972,7 +972,7 @@ class B(A):
 
         print "Constructor B was called"
 
-##special methods
+###special methods
 
 class A():
     """
@@ -1049,10 +1049,12 @@ class A():
         return 'a'
 
     def __repr__(self):
-        """formal, very precise and verbose
+        """formal and very precise
 
-        used in interactive section:
+        what you get if you put an object on a interctive session directly:
+
         >>> A()
+        class A()
         """
         return 'class A()'
 
@@ -1092,16 +1094,62 @@ class A():
 a = A()
 assert a.__class__.__name__ == 'A'
 
-###__eq__
+####__str__
 
-####default
+#automaticaly print all members of objects:
 
 class C:
-    def __init__(i):
+
+    def __init__(self,i,j):
+        self.i = i
+        self.j = j
+
+    def __str__(self):
+        out = '\n' + 30 * '-' + '\n'
+        for k in self.__dict__.keys():
+            out += k + ':\n'
+            out += str(self.__dict__[k]) + '\n\n'
+        return out
+
+#designed to look good even if values have multiline representations
+
+####__eq__
+
+#defalut does not compare element by element!
+
+#compares adress of object.
+
+class C:
+    def __init__(self,i):
         self.a = i
+
 c = C(1)
 c2 = C(1)
-assert c != c1
+assert c != c2
+c = c2
+assert c == c2
+
+#to compare by element do this:
+
+class C:
+
+    def __init__(self,i,j):
+        self.i = i
+        self.j = j
+
+    def __eq__(self, other):
+        """
+        all attributes of objects are equal
+        """
+        if type(other) is type(self):
+            return self.__dict__ == other.__dict__
+        return False
+
+c = C(1)
+c2 = C(1)
+assert c == c2
+c2 = C(2)
+assert c != c2
 
 ###None
 
@@ -1160,21 +1208,6 @@ b = func(2)
 print b.a
 print a.a #unaltered
 
-###type
-
-#check type of object
-
-#make classes dynamically
-
-class C(B):
-    a = 1
-print C.a
-
-#same as
-
-C = type( 'C', (B, ), dict(a = 1) )
-print C.a
-
 ###@classmethod and @staticmethod
 
 class A():
@@ -1224,6 +1257,51 @@ class C:
 
 c = C('the my object')
 c.print_all()
+
+##__dict__
+
+#readonly
+
+###function
+
+def f():
+    """doc"""
+    a = 1
+
+assert f.__dict__ == {}
+
+f.a = 1
+assert f.__dict__ == { 'a' : 1 }
+
+###object
+
+class C:
+    def __init__(self):
+        self.a = 1
+        self.b = "abc"
+
+assert C().__dict__ == { 'a':1, 'b':"abc" }
+
+###class
+
+class C:
+    """doc"""
+    a = 1
+    def f():
+        b = 2
+
+###type
+
+#make classes dynamically
+
+class C(B):
+    a = 1
+print C.a
+
+assert set( C.__dict__.keys() ) == set( ['a', 'f', '__module__', '__doc__'] )
+assert C.__dict__['a'] == 1
+assert C.__dict__['__module__'] == '__main__'
+assert C.__dict__['__doc__'] == 'doc'
 
 ##exceptions
 
@@ -1595,7 +1673,7 @@ __builtins__.dir()
 
 ###functions
 
-##dir
+####dir
 
 #list all available names in current scope:
 
@@ -1620,18 +1698,76 @@ f.__call__()
 f.a = 'b'
 dir(f)
 
-##vars
+####vars
 
 #list all available names in current scope and their string values:
 
 vars()
 
-##exec
+####exec
 
 #run string!
 
 exec( 'a = 1' )
 assert a == 1
+
+####type()
+
+#determine type of value
+
+print type(1)
+#<type 'int'>
+
+print type(1.0)
+#<type 'float'>
+
+print type("s")
+#<type 'str'>
+
+print type(u"s")
+#<type 'unicode'>
+
+print type([])
+#<type 'list'>
+
+print type({})
+#<type 'dict'>
+
+print type(set())
+#<type 'set'>
+
+print type(())
+#<type 'tuple'>
+
+print type(lambda:1)
+#<type 'function'>
+
+class C: pass
+
+print type(C)
+#<type 'cobject'>
+
+#does not return string:
+
+assert type(1) != "<type 'int'>"
+print type(type(a))
+#<type 'type'>
+
+#can be used to compare
+
+assert type(1) == type(2)
+assert type(1) != type(1.0)
+
+#####make classes dynamically
+
+class C(B):
+    a = 1
+print C.a
+
+#same as
+
+D = type( 'D', (B, ), dict(a = 1) )
+print C.a
 
 ##streams
 
@@ -1643,7 +1779,7 @@ assert a == 1
 
 #there are however some operations may be only
 #available to certain types of streams.
-
+I get
 #for example, search operations can be done on files, but not on stdin/out
 
 ###read methods
@@ -2075,6 +2211,18 @@ print os.environ
 
 #get one from the dict:
 print os.environ['PATH']
+
+##bad
+
+#this does *not* work!:
+os.environ = {'a':'b'}
+#child process will not inherit it!
+
+#and now this won't reset environ either
+os.environ
+#the docs say it only sets os.environ the first time it is imported!
+
+#you have onlly change what the name environ means here.
 
 ###setdefault
 

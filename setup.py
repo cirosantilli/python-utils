@@ -11,7 +11,7 @@ setup(
     author_email='ciro.santilli@gmail.com',
     packages=['cirosantilli'],
     scripts=[
-        'bin/stowe-towels.py',
+        'bin/move_regex.py',
     ],
     url='https://github.com/cirosantilli/',
     license='license.md', #GPL, BSD, or MIT. firefox http://www.codinghorror.com/blog/2007/04/pick-a-license-any-license.html 
