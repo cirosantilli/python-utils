@@ -1,12 +1,19 @@
 from distutils.core import setup
 
-#which tool to use?
+#which tool to use to distribute?
 
 #<http://stackoverflow.com/questions/6344076/differences-between-distribute-distutils-setuptools-and-distutils2>
 
+#you *need* the files:
+
+#MANIFEST.txt
+#CHANGES.txt
+
+#or it won't work!
+
 setup(
     name='cirosantilli',
-    version='0.1.0',
+    version='0.0.1',
     author='Ciro Duran Santilli',
     author_email='ciro.santilli@gmail.com',
     packages=['cirosantilli'],
