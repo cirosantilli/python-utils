@@ -25,6 +25,7 @@ setup(
     description='my simple python scripts and modules',
     long_description=open('readme.md').read(),
     install_requires=[
+        "ipython",
         "Sphynx",
         "matplotlib",
         "numpy",
