@@ -1,29 +1,15 @@
 #!/usr/bin/env python
 
-from cirosantilli import test_executable
-from cirosantilli.test_executable import ProgramInput, ProgramOutput
+"""
+this calls test_executable_caller as it should be called for the test to work.
+"""
 
-inouts = [
-
-    #stdout = 0
-    (
-        ProgramInput(  ['arg 1','arg 2'], 'stdin\n', {'a':'b', 'c':'d'} ),
-        ProgramOutput( 'stdin\n', 'arg 1, arg 2\n', 0 )
-    ),
-
-    #stdout = 1
-    (
-        ProgramInput( ['arg 1','arg 2'], "stdin\n", {'a':'b'} ),
-        ProgramOutput( "stdin\n", "arg 1, arg 2\n", 1 ),
-    ),
-
-
-    #a fail: stdout = 0
-    #(
-        #ProgramInput( ['arg 1','arg 2'], "stdin\n", {'a':'b'} ),
-        #ProgramOutput( "stdin\n", "arg 1, arg 2\n", 0 ),
-    #),
-]
+import subprocess
 
 if __name__ == '__main__':
-    test_executable.main( inouts )
+    process = subprocess.Popen(
+        ['python', 'test_executable_caller.py','test_executable_callee.py'],
+        shell  = False,
+        universal_newlines = True
+    )
+    exit_status = process.wait()

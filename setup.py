@@ -32,6 +32,7 @@ setup(
         "numpydoc",
         "pygments",
         "scipy",
+        "sympy",
         "termcolor",
         "unidecode",
     ],

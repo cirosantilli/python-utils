@@ -189,7 +189,10 @@ def main( inouts, executable_path = None, universal_newlines = True ):
                 exit_status = process.wait()
                 out = ProgramOutput( stdout, stderr, exit_status )
 
-                self.assertEqual( out.__dict__, out_expect.__dict__ )
+                try:
+                    self.assertEqual( out.__dict__, out_expect.__dict__ )
+                except AssertionError, e:
+                    raise AssertionError( '\nINPUT:' + repr(inp) + 'OUTPUTS:\n------------------------------\n' + str(e) )
 
                 #restore environ
                 os.environ = old_env
