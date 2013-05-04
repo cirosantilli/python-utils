@@ -68,19 +68,18 @@ output_format = 'svg'
 
 #- list of all files inside relative_output_path that will be plotted -#
 file_names = [
-#"x-minus-y-in-0-2-0-2"
-#"2-minus-x-in-0-2-helper-x-equals-1"
-#"x-pow-2-plus-y-pow-2-equals-1"
-#"t-pow-2-in-minus-2-2"
-#"test_plot"
-#"e-pow-x-in-minus-2-2",
-#"e-pow-x-in-minus-1-3",
-#"e-pow-x-in-minus-1-1-2-4",
-#"e-pow-x-in-r",
-"e-pow-x-in-minus-2-2-view-x-minus-2-3",
-#"e-pow-x-in-minus-1-3-view-x-minus-2-3",
-#"e-pow-x-in-minus-2-3-view-x-minus-2-3",
-
+    #"x-minus-y-in-0-2-0-2"
+    #"2-minus-x-in-0-2-helper-x-equals-1"
+    #"x-pow-2-plus-y-pow-2-equals-1"
+    #"t-pow-2-in-minus-2-2"
+    #"test_plot"
+    #"e-pow-x-in-minus-2-2",
+    #"e-pow-x-in-minus-1-3",
+    #"e-pow-x-in-minus-1-1-2-4",
+    #"e-pow-x-in-r",
+    "e-pow-x-in-minus-2-2-view-x-minus-2-3",
+    #"e-pow-x-in-minus-1-3-view-x-minus-2-3",
+    #"e-pow-x-in-minus-2-3-view-x-minus-2-3",
 ];
 
     
@@ -88,12 +87,10 @@ for file_name in file_names:
     #- generate a plot from file -#
     plt.close()
     input_path = os.path.join( root, relative_input_path, os.path.normpath(file_name) + extension)
-    execfile(input_path)
+    execfile( input_path )
     plt.show()
     
     #- save last generated plot -#
     output_path = os.path.join( root, relative_output_path, os.path.splitext(file_name)[0] + "." + output_format)
     print output_path
-    plt.savefig(output_path, format=output_format, bbox_inches='tight')
-    
-    
+    plt.savefig( output_path, format=output_format, bbox_inches='tight')

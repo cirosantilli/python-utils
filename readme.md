@@ -8,9 +8,7 @@ a lot of stuff in this repo is a sandbox.
 
 to find the better stuff do:
     
-    grep -r '?note=9'
-    grep -r '?note=8'
-    grep -r '?note=7'
+    grep -Er '^#\?note=[7-9]'
 
 for directories that are modules, metadata is stored in the `__init__.py`
 and for other dirs, in `readme.md` file.
