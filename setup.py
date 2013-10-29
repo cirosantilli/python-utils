@@ -4,7 +4,7 @@
 """
 this is the central cheat for the various setup tools like ``distutils`` or ``setuptools``
 
-#you need the files
+# you need the files
 
 - MANIFEST.txt
  CHANGES.txt
@@ -30,13 +30,38 @@ current best course of action for python only projects:
 the best you can do with the stdlib is `distutils`,
 but this is worse than `distribute`.
 
-#distribute
+# distutils
 
 is seems to be backwards compatible with ``distutils`` TODO check
 
-##install and uninstall
+the setup function will parse command line arguments which allow you
+to do tons of things from the command line.
 
-the setup function will parse command line arguments and can install everything if you tell it to.
+## setup.cfg
+
+you can set default options for the commands via the `setup.cfg` script
+
+example: `bdist_rpm` is a subcommand, that is you call it as:
+
+    python setup.py bdist_rpm
+
+`release`, `packager` and `doc_files` are options:
+
+    python setup.py bdist_rpm --release r --packager p --doc_files a b c
+    python setup.py bdist_rpm --help
+
+to set all the values add the following to `setup.cfg`:
+
+    [bdist_rpm]
+    release = 1
+    packager = Greg Ward <gward@python.net>
+    doc_files = CHANGES.txt
+                README.txt
+                USAGE.txt
+                doc/
+                examples/
+
+## install and uninstall
 
 basic install:
 
@@ -47,6 +72,11 @@ this
 - moves files to the correct install location
 - overwrites any existing files updating them.
 - creates a build dir in current dir which you should ignore in your gitignore
+
+    it puts everythin in the right place inside this build dir:
+
+    - python files are copyied
+    - c/c++ extension `.o` and `.so` are put in there
 
 **however** there is no automatic way to uninstall!!....
 <http://stackoverflow.com/questions/402359/how-do-you-uninstall-a-python-package-that-was-installed-using-distutils>
@@ -63,18 +93,56 @@ so that record.txt will contain the installed files, so to uninstall you can:
 
 clearly a hack =)
 
-##develop
+## sdist
+
+create a source distribution: pack all the source code into a compressed file
+to give to someone else for them to build
+
+    python setup.py sdist
+
+not very useful since people should just use `git` or `hg`...
+
+MANIFST.in files will also be included
+
+## build_ext
+
+only build c/c++ [extensions](http://docs.python.org/2/extending/):
+
+### -inplace
+
+This will place the compiled c/c++ outputs side by side with the python code in the repo,
+exactly where they need to be, without touching anything outside the repo:
+
+    python setup.py build_ext --inplace
+
+great for testing projects that contain c/c++ extensions without having to install every time
+before a test so that you can modify the python files directly.
+
+# distribute specific
+
+## bdist
+
+built distribution:
+
+- c/c++ extensions will be compiled
+- could create distro specific distributions like `rpm`
+
+## upload
+
+uploads to pypi!
+
+## develop
 
    sudo python setup.py develop
 
 only installs executables in path, but keeps python modules in place
 so that you can edit them where they are for tests
 
-##test
+## test
 
 TODO
 
-#egg
+# egg
 
 TODO what is
 """
@@ -107,6 +175,8 @@ setup(
     #if you want to add data files your package, use [package data]
 
     ##package data
+
+    #data needed for a single package
 
     package_data = {
         #'setup_test_dir': ['*.txt']
@@ -142,6 +212,25 @@ setup(
         #'bin/move_regex.py',
     ],
 
+    ##data_files
+
+    #system independent data files.
+
+    #this data can be used across packages
+
+    #relative paths go under `sys.prefix`, which equals `/usr/` in current Ubuntu for example.
+
+    #basenames cannot be changed
+
+    data_files = [
+        #('bitmaps', ['bm/b1.gif', 'bm/b2.gif']),   #files will go under `sys.prefix + bitmaps`
+        #('/etc/init.d', ['init-script'])           #files will go under `/etc/init.d/`
+    ],
+
+    ##install_requires
+
+    #not in `distutils`, must use `distribute`
+
     #whatever is listed here will be installed if not already:
     install_requires = [
 
@@ -152,9 +241,10 @@ setup(
         "Sphinx",
         #"matplotlib",  #*
         #"numpy",       #*
-        #"numpydoc",    #*
+        "numpydoc",     #used for numpy and matplotlib docs
         "pygments",
         #"scipy",       #*
+        "srtmerge",     #computer algebra system
         "sympy",        #computer algebra system
         "termcolor",    #output ansi color escape codes
         "unidecode",    #convert unicode to ascii. Ex: à -> a, 中-> zhong
@@ -170,16 +260,4 @@ setup(
     ],
     #* failed for this packagebe, better with distro's package manager
 
-    ##data_files
-
-    #system independent data files.
-
-    #relative paths go under `sys.prefix`, which equals `/usr/` in current Ubuntu for example.
-
-    #basenames cannot be changed
-
-    data_files = [
-        #('bitmaps', ['bm/b1.gif', 'bm/b2.gif']),   #files will go under `sys.prefix + bitmaps`
-        #('/etc/init.d', ['init-script'])           #files will go under `/etc/init.d/`
-    ]
 )
