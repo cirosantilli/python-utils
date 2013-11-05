@@ -1,154 +1,167 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
+#-*- coding: utf-8 -*-
 
 """
-this is the central cheat for the various setup tools like ``distutils`` or ``setuptools``
+This is the central cheat for the various setup tools like `distutils`, `setuptools` and `distribute`.
 
-# you need the files
+You *need* the files
 
-- MANIFEST.txt
- CHANGES.txt
+- `MANIFEST.txt`
+- `CHANGES.txt
 
-or it won't work!
+Or it won't work!
 
 #which tool to use to distribute?
 
-python distribution is currently messy
+    Python distribution is currently messy.
 
-see:
+    See:
 
-- http://stackoverflow.com/questions/6344076/differences-between-distribute-distutils-setuptools-and-distutils2
-- http://python-notes.boredomandlaziness.org/en/latest/pep_ideas/core_packaging_api.html
+    - <http://stackoverflow.com/questions/6344076/differences-between-distribute-distutils-setuptools-and-distutils2>
+    - <http://python-notes.boredomandlaziness.org/en/latest/pep_ideas/core_packaging_api.html>
 
-current best course of action for python only projects:
+    Current best course of action for python only projects:
 
-- non stdlib `distribute` to create packages.
-   Note that the `distribute` base module is called `setuptools` because `distribute` is a fork of `setuptools`...
-- pypi to host the packages: https://pypi.python.org/pypi
-- `pip` to install packages from pypi automatically
+    - use the non-stdlib `distribute` module to create packages.
 
-the best you can do with the stdlib is `distutils`,
-but this is worse than `distribute`.
+        Note that the `distribute` base module is called `setuptools`
+        because `distribute` is a fork of `setuptools`.
 
-# distutils
+    - host the packages on pypi: <https://pypi.python.org/pypi>
 
-is seems to be backwards compatible with ``distutils`` TODO check
+    - end users can now use `pip` to install packages from pypi very easily.
 
-the setup function will parse command line arguments which allow you
-to do tons of things from the command line.
+    The best you can do with the stdlib is `distutils`,
+    but this is worse than `distribute`.
 
-## setup.cfg
+#distutils
 
-you can set default options for the commands via the `setup.cfg` script
+        The setup function will parse command line arguments which allow you
+        to do tons of things from the command line.
 
-example: `bdist_rpm` is a subcommand, that is you call it as:
+    ##setup.cfg
 
-    python setup.py bdist_rpm
+        You can set default options for the commands via the `setup.cfg` script
 
-`release`, `packager` and `doc_files` are options:
+        Example: `bdist_rpm` is a subcommand, that is you call it as:
 
-    python setup.py bdist_rpm --release r --packager p --doc_files a b c
-    python setup.py bdist_rpm --help
+            python setup.py bdist_rpm
 
-to set all the values add the following to `setup.cfg`:
+        `release`, `packager` and `doc_files` are options:
 
-    [bdist_rpm]
-    release = 1
-    packager = Greg Ward <gward@python.net>
-    doc_files = CHANGES.txt
-                README.txt
-                USAGE.txt
-                doc/
-                examples/
+            python setup.py bdist_rpm --release r --packager p --doc_files a b c
+            python setup.py bdist_rpm --help
 
-## install and uninstall
+        To set all the values add the following to `setup.cfg`:
 
-basic install:
+            [bdist_rpm]
+            release = 1
+            packager = Greg Ward <gward@python.net>
+            doc_files = CHANGES.txt
+                        README.txt
+                        USAGE.txt
+                        doc/
+                        examples/
 
-    sudo python setup.py install
+    ##install and uninstall
 
-this
+        Basic install:
 
-- moves files to the correct install location
-- overwrites any existing files updating them.
-- creates a build dir in current dir which you should ignore in your gitignore
+            sudo python setup.py install
 
-    it puts everythin in the right place inside this build dir:
+        This:
 
-    - python files are copyied
-    - c/c++ extension `.o` and `.so` are put in there
+        - moves files to the correct install location
+        - overwrites any existing files updating them.
+        - creates a build dir in current dir which you should ignore in your gitignore
 
-**however** there is no automatic way to uninstall!!....
-<http://stackoverflow.com/questions/402359/how-do-you-uninstall-a-python-package-that-was-installed-using-distutils>
+            it puts everythin in the right place inside this build dir:
 
-you should use a packag manger like `pip` for that TODO how
+            - python files are copyied
+            - c/c++ extension `.o` and `.so` are put in there
 
-the best you can currently do without a package manger is:
+        **however** there is no automatic way to uninstall!!....
+        <http://stackoverflow.com/questions/402359/how-do-you-uninstall-a-python-package-that-was-installed-using-distutils>
 
-   sudo python setup.py install --record record.txt
+        You should use a packag manger like `pip` for that TODO how:
 
-so that record.txt will contain the installed files, so to uninstall you can:
+        The best you can currently do without a package manger is:
 
-   cat record.txt | xargs sudo rm -rf
+            sudo python setup.py install --record record.txt
 
-clearly a hack =)
+        So that `record.txt` will contain the installed files, so to uninstall you can:
 
-## sdist
+            cat record.txt | xargs sudo rm -rf
 
-create a source distribution: pack all the source code into a compressed file
-to give to someone else for them to build
+        Clearly a hack =)
 
-    python setup.py sdist
+    ##sdist
 
-not very useful since people should just use `git` or `hg`...
+        Create a source distribution: pack all the source code into a compressed file
+        to give to someone else for them to build
 
-MANIFST.in files will also be included
+            python setup.py sdist
 
-## build_ext
+        Not very useful since people should just use `git` or `hg`...
 
-only build c/c++ [extensions](http://docs.python.org/2/extending/):
+        `MANIFST.in` files will also be included
 
-### -inplace
+    ##build_ext
 
-This will place the compiled c/c++ outputs side by side with the python code in the repo,
-exactly where they need to be, without touching anything outside the repo:
+        Only build c/c++ [extensions](http://docs.python.org/2/extending/):
 
-    python setup.py build_ext --inplace
+        ###-inplace
 
-great for testing projects that contain c/c++ extensions without having to install every time
-before a test so that you can modify the python files directly.
+            This will place the compiled c/c++ outputs side by side with the python code in the repo,
+            exactly where they need to be, without touching anything outside the repo:
 
-# distribute specific
+                python setup.py build_ext --inplace
 
-## bdist
+            Great for testing projects that contain c/c++ extensions without having to install every time
+            before a test so that you can modify the python files directly.
 
-built distribution:
+#distribute specific
 
-- c/c++ extensions will be compiled
-- could create distro specific distributions like `rpm`
+    ##bdist
 
-## upload
+        Built distribution:
 
-uploads to pypi!
+        - c/c++ extensions will be compiled
+        - could create distro specific distributions like `rpm`
 
-## develop
+    ##upload
 
-   sudo python setup.py develop
+        Uploads to pypi!
 
-only installs executables in path, but keeps python modules in place
-so that you can edit them where they are for tests
+    ##develop
 
-## test
+            sudo python setup.py develop
 
-TODO
+        Only installs executables in path, but keeps python modules in place
+        so that you can edit them where they are for tests.
 
-# egg
+    ##test
 
-TODO what is
+        TODO
+
+    ##pkc_resource
+
+        Allows to get information about packages installed with distribute,
+        and therefore if it was installed with pip this will work too.
+
+        Get package version:
+
+            import pkg_resources
+            pkg_resources.get_distribution("srtmerge").version
+
+#egg
+
+    TODO what is
 """
 
 from distutils.core import setup   #only for basic projects
-#from setuptools import setup        #this is distutils, which is a currently remerging fork of setuptools....
+#from setuptools import setup      #this is distutils, which is a currently
+                                   #remerging fork of setuptools....
 
 setup(
     name                = 'cirosantilli',
@@ -243,15 +256,12 @@ setup(
         #"numpy",       #*
         "numpydoc",     #used for numpy and matplotlib docs
         "pygments",
-        #"scipy",       #*
-        "srtmerge",     #computer algebra system
+        #"scipy",
+        "srtmerge",
         "sympy",        #computer algebra system
         "termcolor",    #output ansi color escape codes
         "unidecode",    #convert unicode to ascii. Ex: à -> a, 中-> zhong
 
-        #test with several different versions of python packages
-        #one per "virtual" envirnoment
-        #tutorial: http://simononsoftware.com/virtualenv-tutorial/
         "virtualenv",
 
         #view what packages are installed
