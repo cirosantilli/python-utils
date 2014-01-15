@@ -4,7 +4,7 @@
 At the moment this is a hackish implementation for the question asked at
 <http://stackoverflow.com/questions/20842687/rapidly-develop-gui-for-command-line/20998839#20998839>
 
-If this ever gets decente, lets split it into a new repo and make it pip installable.
+If this ever gets decent, lets split it into a new repo and make it pip installable.
 """
 
 import Tkinter
