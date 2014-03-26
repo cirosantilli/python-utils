@@ -1,8 +1,9 @@
-Simple Python scripts, cheat sheets and mini projects.
+Simple Python utilities and modules.
 
-Larger projects may be put into a repo of their own.
+Install with:
 
-Most useful directories:
+    sudo pip install git+git://github.com/cirosantilli/python-utils.git@master 
 
-- `cheat`: cheatsheets on Python and libraries
-- `bin`: useful scripts
+Uninstall with:
+
+    sudo pip uninstall cirosantilli

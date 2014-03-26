@@ -1,3 +1,0 @@
-"""
-mod2 docstring
-"""
