@@ -11,7 +11,18 @@ You *need* the files
 
 Or it won't work!
 
-#which tool to use to distribute?
+#Gemfile equivalent
+
+To allow users who have downloaded the source to develop it, use a
+`requirements.txt` by selecting required output lines from:
+
+    pip freeze
+
+And tell users to install with:
+
+    sudo pip install -r requirements.txt
+
+#Which tool to use to distribute?
 
     Python distribution is currently messy.
 
@@ -269,5 +280,4 @@ setup(
         "yolk",
     ],
     #* failed for this packagebe, better with distro's package manager
-
 )
